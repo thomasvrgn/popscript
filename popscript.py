@@ -5,7 +5,12 @@
 import re
 
 tokens = {
-  'COMMENT_INLINE': '--'
+  'PRGM_START': r'POPSCRIPT',
+  'CNDT_ELIF': r'elif',
+  'CNDT_ELSE': r'else',
+  'CNDT_IF': r'if',
+  'CMT_INLINE': r'--(.*)',
+  'VAR_DEFINE': r'def'
 }
 class PS:
   
@@ -13,48 +18,20 @@ class PS:
     self.file     = 'tests/index.ps'
     self.posX     = -1
     self.posY     = 1
-    self.cur_char = ''
-    self.status   = 'S_FREE'
-    self.future_free = False
+    self.status   = ''
 
   def parse (self):
 
     file = open(self.file).read().split('\n')
-    
-    if file[0] == 'POPSCRIPT':
-      for line in file:
-        line_split = re.split('', line)[1:len(re.split('', line)) - 1]
-        comment = []
-        if len(line_split) == 0:
-          self.posX = -1
-          self.posY += 1
-          self.cur_char = ''
-        else:
-          for char in line_split:
-            self.posX += 1
-            self.cur_char = line_split[self.posX]
-            if self.future_free:
-              self.status = 'S_FREE'
-              self.future_free = False
-            if self.posX + 1 == len(line_split):
-              self.posX = -1
-              self.posY += 1
-              self.cur_char = ''
-              if self.status == 'S_COMMENT_INLINE':
-                self.future_free = True
-            
-            # Comments parsing
-            if self.status == 'S_COMMENT_INLINE':
-              comment.append(char)
-            if line_split[self.posX] == tokens['COMMENT_INLINE'][0]:
-              if line_split[self.posX + 1] == tokens['COMMENT_INLINE'][1]:
-                self.status = 'S_COMMENT_INLINE'
-                comment.append(char)
+    for line in file:
+      for token in tokens:
+        matches = re.finditer(tokens.get(token), line, re.MULTILINE)
+        for matchNum, match in enumerate(matches, start = 1):
+          print(match)
+          print(match.groups())
+                  
 
-            # print(verify)
-            print(char, self.status)
-        print('================================================') 
-
+     
 popscript = PS()
 
 popscript.parse()
