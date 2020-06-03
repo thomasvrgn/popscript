@@ -14,4 +14,13 @@ module.exports = {
   DOT         : /\./,
   COMMA       : /,/,
 
+  // TYPES
+
+  STRING      : /('|")(.*?)('|")/,
+  INT         : /\d+/,
+  ARRAY_START : /:-/,
+  ARRAY_END   : /-:/,
+  TYPE        : /int|str|list/,
+  OPTIONAL    : /optional/,
+
 }
