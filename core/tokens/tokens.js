@@ -12,7 +12,10 @@ module.exports = {
   TABS        : /^\s+/,
   COLON       : /:/,
   DOT         : /\./,
-  COMMA       : /,/,
+  COMMA       : /,/,    
+  L_PAREN     : /\(/,
+  R_PAREN     : /\)/,
+  ARGUMENTS   : /=>/,
 
   // TYPES
 
