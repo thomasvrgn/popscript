@@ -29,7 +29,7 @@ module.exports = {
 
   // KEYWORDS
 
-  FUNCTION    : /fn|fnc|func|def|function/,
+  FUNCTION    : /fn/,
   IF          : /if/,
   ELIF        : /elif/,
   ELSE        : /else/,
