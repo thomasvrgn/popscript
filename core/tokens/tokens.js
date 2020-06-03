@@ -22,5 +22,6 @@ module.exports = {
   ARRAY_END   : /-:/,
   TYPE        : /int|str|list/,
   OPTIONAL    : /optional/,
+  BOOLEAN     : /true|false/,
 
 }
