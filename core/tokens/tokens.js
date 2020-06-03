@@ -20,7 +20,7 @@ module.exports = {
   // TYPES
 
   STRING      : /('|")(.*?)('|")/     , // Match any strings
-  INT         : /\d+/                 , // Match any digits
+  INT         : /-?\d+/               , // Match any digits
   ARRAY_START : /:-/                  , // Match array start
   ARRAY_END   : /-:/                  , // Match array end
   TYPE        : /int|str|list/        , // Match any type
