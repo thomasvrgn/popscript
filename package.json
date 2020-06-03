@@ -1,23 +1,26 @@
 {
-  "name"         : "popscript",
-  "version"      : "1.0.0",
-  "description"  : "⌨ Popscript programming language.",
-  "main"         : "main.js",
-  "directories"  : {
-    "test"       : "tests"
+  "name": "popscript",
+  "version": "1.0.0",
+  "description": "⌨ Popscript programming language.",
+  "main": "main.js",
+  "directories": {
+    "test": "tests"
   },
-  "scripts"      : {
-    "dev"        : "nodemon main.js"
+  "scripts": {
+    "dev": "nodemon main.js"
   },
-  "repository"   : {
-    "type"       : "git",
-    "url"        : "git+https://github.com/NessMC/popscript.git"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NessMC/popscript.git"
   },
-  "keywords"     : [],
-  "author"       : "NessMC",
-  "license"      : "ISC",
-  "bugs"         : {
-    "url"        : "https://github.com/NessMC/popscript/issues"
+  "keywords": [],
+  "author": "NessMC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NessMC/popscript/issues"
   },
-  "homepage"     : "https://github.com/NessMC/popscript#readme"
+  "homepage": "https://github.com/NessMC/popscript#readme",
+  "dependencies": {
+    "lexr": "^1.0.4"
+  }
 }
