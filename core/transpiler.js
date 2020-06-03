@@ -3,13 +3,14 @@
              Transpiler
 //////////////////////////////////*/
 
-const lexer = require('./lexr') // Importing Lexer class
+const lexer = require('./lexr')                            // Importing Lexer class
 
 module.exports = class {
 
     constructor (content = '') {
         
-        this.content = content.split(/\r?\n/g).filter(x => x !== '') // Splitting content by new line
+        this.content = content.split(/\r?\n/g)
+                              .filter(x => x !== '')       // Splitting content by new line
 
     }
 
