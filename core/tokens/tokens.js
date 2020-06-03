@@ -24,4 +24,13 @@ module.exports = {
   OPTIONAL    : /optional/,
   BOOLEAN     : /true|false/,
 
+  // KEYWORDS
+
+  FUNCTION    : /fn|fnc|func|def|function/,
+  IF          : /if/,
+  ELIF        : /elif/,
+  ELSE        : /else/,
+  PRINT       : /print/,
+  RETURN      : /return/,
+
 }
