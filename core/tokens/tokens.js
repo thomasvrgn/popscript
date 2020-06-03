@@ -36,4 +36,12 @@ module.exports = {
   PRINT       : /print/,
   RETURN      : /return/,
 
+  // OTHER
+
+  WORD        : /\w+/,
+  SIGNS       : />|<|=+|\+|\-|\*|\/|%/,
+  NOT         : /not|!/,
+  AND         : /and|&/,
+  COMMENT     : /;.*/
+
 }
