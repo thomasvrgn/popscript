@@ -35,7 +35,7 @@ module.exports = class {
                 switch (token) {
 
                     case 'FUNCTION': {
-                        context = token
+                        context = token                    // Setting context to function
                         built.push('function')
                         break
                     }
@@ -47,7 +47,7 @@ module.exports = class {
 
                     case 'WORD': {
                         if (context === 'FUNCTION') {
-                            functions.push(value)
+                            functions.push(value)          // Pushing function name to function list
                             built.push(value)
                         }
                         break
