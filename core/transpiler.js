@@ -41,7 +41,8 @@ module.exports = class {
                     }
 
                     case 'ARGUMENTS': {
-                        console.log(built)
+                        context = token                    // Setting context to arguments
+                        built.push('(')
                         break
                     }
 
@@ -49,6 +50,17 @@ module.exports = class {
                         if (context === 'FUNCTION') {
                             functions.push(value)          // Pushing function name to function list
                             built.push(value)
+                        } else if (context === 'ARGUMENTS') {
+                            built.push(value)              // Pushing function argument to built line
+                        }
+                        break
+                    }
+
+                    case 'SPACE': {
+                        if (context === 'ARGUMENTS') {
+                            if (lexered[parseInt(lexer_item) - 1].token === 'WORD') {
+                                built.push(', ')
+                            }
                         }
                         break
                     }
