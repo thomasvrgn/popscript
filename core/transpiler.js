@@ -34,19 +34,19 @@ module.exports = class {
 
                 switch (token) {
 
-                    case 'FUNCTION': {
+                    case 'FUNCTION': {                     // Refer to function keyword (fn)
                         context = token                    // Setting context to function
                         built.push('function')
                         break
                     }
 
-                    case 'ARGUMENTS': {
+                    case 'ARGUMENTS': {                    // Refer to function arguments (=>)
                         context = token                    // Setting context to arguments
                         built.push('(')
                         break
                     }
 
-                    case 'WORD': {
+                    case 'WORD': {                         // Refer to words
                         if (context === 'FUNCTION') {
                             functions.push(value)          // Pushing function name to function list
                             built.push(value)
@@ -56,7 +56,7 @@ module.exports = class {
                         break
                     }
 
-                    case 'SPACE': {
+                    case 'SPACE': {                        // Refer to spaces
                         if (context === 'ARGUMENTS') {
                             if (lexered[parseInt(lexer_item) - 1].token === 'WORD') {
                                 built.push(', ')
