@@ -16,8 +16,9 @@ module.exports = class {
 
     transpile () {
 
-        for (const index in this.content) {
+        const functions     = []
 
+        for (const index in this.content) {
             const line      = this.content[index]        , // Defining line content with index variable
                   lexered   = new lexer(line).tokenize() , // Lexering class call with line content
                   built     = []                           // Variable will contain line content
@@ -31,9 +32,31 @@ module.exports = class {
                       token = item.token                 , // Token item
                       value = item.value                   // Value item
 
-                console.log(token, value)
+                switch (token) {
+
+                    case 'FUNCTION': {
+                        context = token
+                        built.push('function')
+                        break
+                    }
+
+                    case 'ARGUMENTS': {
+                        console.log(built)
+                        break
+                    }
+
+                    case 'WORD': {
+                        if (context === 'FUNCTION') {
+                            functions.push(value)
+                            built.push(value)
+                        }
+                        break
+                    }
+
+                }
 
             }
+            console.log(built)
 
         }
 
