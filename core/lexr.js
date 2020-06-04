@@ -3,8 +3,8 @@
                 Lexr
 //////////////////////////////////*/
 
-const tokens = require('./tokens/tokens'),
-      lexr   = require('lexr')
+const tokens = require('./tokens/tokens'),   // Importing token object
+      lexr   = require('lexr')               // Importing Lexer package
 
 module.exports = class {
 
@@ -16,11 +16,11 @@ module.exports = class {
 
     tokenize () {
 
-        const lexer = new lexr.Tokenizer('')
+        const lexer = new lexr.Tokenizer('') // Lexer initialization
 
-        lexer.addTokenSet(tokens)
+        lexer.addTokenSet(tokens)            // Imported tokens adding to lexer
 
-        return lexer.tokenize(this.content)
+        return lexer.tokenize(this.content)  // Returning lexered contnet
 
     }
 
