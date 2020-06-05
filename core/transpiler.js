@@ -17,7 +17,8 @@ module.exports = class {
     transpile () {
 
         const functions     = []
-
+        const func_args     = {}
+        let   func          = undefined
         for (const index in this.content) {
             const line      = this.content[index]        , // Defining line content with index variable
                   lexered   = new lexer(line).tokenize() , // Lexering class call with line content
@@ -50,11 +51,18 @@ module.exports = class {
                         if (context === 'FUNCTION') {
                             functions.push(value)          // Pushing function name to function list
                             built.push(value)
+                            func_args[value] = []
+                            func = value
                         } else if (context === 'ARGUMENTS') {
                             built.push(value)              // Pushing function argument to built line
+                            if (func_args[func]) func_args[func].push(value)
                         } else {
                             if (functions.includes(value)) {
                                 built.push(value)
+                            } else if (func_args[func]) {
+                                if (func_args[func].includes(value)) {
+                                    built.push(value)
+                                }
                             }
                         }
                         break
