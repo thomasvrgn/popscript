@@ -52,16 +52,31 @@ module.exports = class {
                             built.push(value)
                         } else if (context === 'ARGUMENTS') {
                             built.push(value)              // Pushing function argument to built line
+                        } else {
+                            if (functions.includes(value)) {
+                                built.push(value)
+                            }
                         }
                         break
                     }
 
                     case 'SPACE': {                        // Refer to spaces
                         if (context === 'ARGUMENTS') {
-                            if (lexered[parseInt(lexer_item) - 1].token === 'WORD') {
+                            if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && lexered[parseInt(lexer_item) - 1].token === 'WORD') {
                                 built.push(', ')
+                            } else if (lexered[parseInt(lexer_item) + 1].token === 'SIGNS') {
+                                built.push(')')
+                                context = undefined
                             }
                         }
+                        break
+                    }
+                    case 'SIGNS': case 'AND': case 'NOT': {
+                        if (context === 'ARGUMENTS') {
+                            built.push(')')
+                            context = undefined
+                        }
+                        built.push(value)
                         break
                     }
 
