@@ -176,7 +176,33 @@ module.exports = class {
                             func_args[func] = []
                             context = undefined
                         }
-                        built.push(value)
+                        switch (value) {
+
+                            case '&': {
+                                built.push('&&')
+                                break
+                            }
+
+                            case '|': {
+                                built.push('||')
+                                break
+                            }
+
+                            case '=': {
+                                if (condition) {
+                                    built.push('==')
+                                } else {
+                                    built.push(value)
+                                }
+                                break
+                            }
+
+                            default: {
+                                built.push(value)
+                                break
+                            }
+
+                        }
                         break
                     }
 
