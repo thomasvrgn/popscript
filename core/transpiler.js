@@ -91,9 +91,37 @@ module.exports = class {
                                 built.push(')')
                                 context = undefined
                             }
+                        } else if (context === 'FUNCTION') {
+                            built.push(' ')
+                        } else {
+                            built.push(' ')
                         }
                         break
                     }
+
+                    case 'TABS': {
+
+                        if (parseInt(lexer_item) === 0) {
+                            built.push(value)
+                        } else {
+                            if (context === 'ARGUMENTS') {
+                                if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && lexered[parseInt(lexer_item) - 1].token === 'WORD') {
+                                    built.push(', ')
+                                } else if (lexered[parseInt(lexer_item) + 1].token === 'SIGNS') {
+                                    func_args[func] = []
+                                    built.push(')')
+                                    context = undefined
+                                }
+                            } else if (context === 'FUNCTION') {
+                                built.push(' ')
+                            } else {
+                                built.push(' ')
+                            }
+                        }
+                        break
+
+                    }
+
                     case 'SIGNS': case 'AND': case 'NOT': {  // Refer to signs, not and and keywords
                         if (context === 'ARGUMENTS') {
                             func_args[func] = []
@@ -107,7 +135,7 @@ module.exports = class {
                 }
 
             }
-            console.log(built)
+            console.log(built.join(''))
 
         }
 
