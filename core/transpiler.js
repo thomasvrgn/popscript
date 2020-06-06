@@ -28,7 +28,6 @@ module.exports = class {
                   variable  = false                      ,  // Variable line status    
                   type_ctx  = undefined                     // Variable type context
             for (const lexer_item in lexered) {
-                
                 const item  = lexered[lexer_item]        ,  // Defining lexered item by index
                       token = item.token                 ,  // Token item
                       value = item.value                    // Value item
@@ -73,18 +72,35 @@ module.exports = class {
                                 } else {
                                     console.log(value)
                                 }
+                            } else if (condition) {
+                                built.push(value)
+                                if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                                    built.push('):')
+                                }
                             } else {
                                 console.log(`[ERROR] At line ${index}: Variable "${value}" has not been declared!`)
                                 console.log(lexered.map(x => Object.values(x)[1]).join(''))
-                                console.log(lexered.map(x => Object.values(x)[1]).map((x, index) => index == lexer_item ? x = new Array(x.length).fill('^').join('') : new Array(x.length).fill(' ').join('')).join(''))
+                                console.log(lexered.map(x => Object.values(x)[1]).map((x, index) => index == lexer_item ? x = new Array(x.length).fill('^')
+                                                         .join('') : new Array(x.length).fill(' ')
+                                                                                        .join(''))
+                                                                                        .join(''))
                             }
+                        }
+                        break
+                    }
+
+                    case 'INT': {
+                        built.push(value)
+                        if (condition && lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                            built.push('):')
                         }
                         break
                     }
 
                     case 'SPACE': {                         // Refer to spaces
                         if (context === 'ARGUMENTS') {
-                            if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && lexered[parseInt(lexer_item) - 1].token === 'WORD') {
+                            if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && 
+                                lexered[parseInt(lexer_item) - 1].token === 'WORD') {
                                 built.push(', ')
                             } else if (lexered[parseInt(lexer_item) + 1].token === 'SIGNS') {
                                 func_args[func] = []
@@ -98,13 +114,15 @@ module.exports = class {
                         }
                         break
                     }
+
                     case 'TABS': {
 
                         if (parseInt(lexer_item) === 0) {   // Check if line starting with tabs
                             built.push(value)
                         } else {                            // If line not starting with, tabs are simply duplicated 
                             if (context === 'ARGUMENTS') {
-                                if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && lexered[parseInt(lexer_item) - 1].token === 'WORD') {
+                                if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && 
+                                    lexered[parseInt(lexer_item) - 1].token === 'WORD') {
                                     built.push(', ')
                                 } else if (lexered[parseInt(lexer_item) + 1].token === 'SIGNS') {
                                     func_args[func] = []
@@ -121,6 +139,16 @@ module.exports = class {
 
                     }
 
+                    case 'STRING': {
+                        built.push(value)
+                        if (condition) {
+                            if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                                built.push('):')
+                            }
+                        } 
+                        break
+                    }
+
                     case 'SIGNS': case 'AND': case 'NOT': {  // Refer to signs, not and and keywords
                         if (context === 'ARGUMENTS') {
                             func_args[func] = []
@@ -128,6 +156,23 @@ module.exports = class {
                             context = undefined
                         }
                         built.push(value)
+                        break
+                    }
+
+                    case 'IF': {
+                        built.push('if (')
+                        condition = true
+                        break
+                    }
+
+                    case 'ELSE': {
+                        built.push('else:')
+                        break
+                    }
+
+                    case 'ELIF': {
+                        built.push('else if (')
+                        condition = true
                         break
                     }
 
