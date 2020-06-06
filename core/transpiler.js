@@ -57,6 +57,12 @@ module.exports = class {
                             built.push(value)               // Pushing function argument to built line
                             if (func_args[func]) {
                                 func_args[func].push(value) // Pushing function argument to function array
+                                if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                                    built.push(')')         // Close arguments if end
+                                    if (built.includes('function')) {
+                                        built.push(':')     // Add colon if it's function context
+                                    }
+                                }
                             }
                         } else {
                             if (functions.includes(value)) {
@@ -75,6 +81,7 @@ module.exports = class {
                             if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && lexered[parseInt(lexer_item) - 1].token === 'WORD') {
                                 built.push(', ')
                             } else if (lexered[parseInt(lexer_item) + 1].token === 'SIGNS') {
+                                func_args[func] = []
                                 built.push(')')
                                 context = undefined
                             }
@@ -83,6 +90,7 @@ module.exports = class {
                     }
                     case 'SIGNS': case 'AND': case 'NOT': {  // Refer to signs, not and and keywords
                         if (context === 'ARGUMENTS') {
+                            func_args[func] = []
                             built.push(')')
                             context = undefined
                         }
