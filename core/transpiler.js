@@ -98,12 +98,11 @@ module.exports = class {
                         }
                         break
                     }
-
                     case 'TABS': {
 
-                        if (parseInt(lexer_item) === 0) {
+                        if (parseInt(lexer_item) === 0) {   // Check if line starting with tabs
                             built.push(value)
-                        } else {
+                        } else {                            // If line not starting with, tabs are simply duplicated 
                             if (context === 'ARGUMENTS') {
                                 if (lexered[parseInt(lexer_item) + 1].token === 'WORD' && lexered[parseInt(lexer_item) - 1].token === 'WORD') {
                                     built.push(', ')
