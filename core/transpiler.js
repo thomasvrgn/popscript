@@ -67,10 +67,16 @@ module.exports = class {
                         } else {
                             if (functions.includes(value)) {
                                 built.push(value)           // Pushing function call to built line
-                            } else if (func_args[func]) {
+                            } else if (func_args[func].length > 0) {
                                 if (func_args[func].includes(value)) {
                                     built.push(value)       // Pushing function argument to built line
+                                } else {
+                                    console.log(value)
                                 }
+                            } else {
+                                console.log(`[ERROR] At line ${index}: Variable "${value}" has not been declared!`)
+                                console.log(lexered.map(x => Object.values(x)[1]).join(''))
+                                console.log(lexered.map(x => Object.values(x)[1]).map((x, index) => index == lexer_item ? x = new Array(x.length).fill('^').join('') : new Array(x.length).fill(' ').join('')).join(''))
                             }
                         }
                         break
