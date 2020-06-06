@@ -105,8 +105,11 @@ module.exports = class {
 
                     case 'SPACE': {                         // Refer to spaces
                         if (context === 'ARGUMENTS') {
-                            if (['STRING', 'WORD', 'INT'].includes(lexered.slice(lexer_item)[1].token) && 
-                                !lexered.slice(parseInt(lexer_item) - 2).map(x => Object.values(x)[0]).includes('ARGUMENTS')) {
+                            if (['STRING', 'WORD', 'INT'].includes(lexered
+                                                         .slice(lexer_item)[1].token) && 
+                                                 !lexered.slice(parseInt(lexer_item) - 2)
+                                                         .map(x => Object.values(x)[0])
+                                                         .includes('ARGUMENTS')) {
                                 built.push(', ')
                             }
                         } else if (context === 'FUNCTION') {
