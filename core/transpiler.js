@@ -74,7 +74,7 @@ module.exports = class {
                                 }
                             } else if (condition) {
                                 built.push(value)
-                                if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                                if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE' && x.token !== 'COMMENT').length === 0) {
                                     built.push('):')
                                 }
                             } else {
@@ -85,14 +85,6 @@ module.exports = class {
                                                                                         .join(''))
                                                                                         .join(''))
                             }
-                        }
-                        break
-                    }
-
-                    case 'INT': {
-                        built.push(value)
-                        if (condition && lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
-                            built.push('):')
                         }
                         break
                     }
@@ -139,13 +131,19 @@ module.exports = class {
 
                     }
 
-                    case 'STRING': {
+                    case 'STRING': case 'INT': case 'BOOLEAN': {
                         built.push(value)
                         if (condition) {
-                            if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                            if (lexered.slice(parseInt(lexer_item) + 1).filter(x => x.token !== 'SPACE' && 
+                                                                                    x.token !== 'COMMENT').length === 0) {
                                 built.push('):')
                             }
                         } 
+                        break
+                    }
+
+                    case 'COMMENT': {
+                        built.push(value.replace('--', '//'))
                         break
                     }
 

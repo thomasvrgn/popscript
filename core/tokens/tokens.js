@@ -42,6 +42,6 @@ module.exports = {
   SIGNS       : />|<|=|\+|\-|\*|\/|%/ , // Match any sign
   NOT         : /not|!/               , // Match not keyword
   AND         : /and|&/               , // Match and keyword
-  COMMENT     : /;.*/                 , // Match comments
+  COMMENT     : /--.*/                 , // Match comments
 
 }
