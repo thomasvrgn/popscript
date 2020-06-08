@@ -2,7 +2,10 @@
     "compilerOptions": {
         "rootDir": "./src",
         "outDir": "./dist",
-        "watch": true 
+        "watch": true,
+        "lib": [
+            "ES2015"
+        ]
     },
     "exclude": [
         "node_modules"
