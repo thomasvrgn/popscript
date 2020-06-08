@@ -4,7 +4,8 @@
         "outDir": "./dist",
         "watch": true,
         "lib": [
-            "ES2015"
+            "ES2015",
+            "dom"
         ]
     },
     "exclude": [

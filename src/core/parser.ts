@@ -2,20 +2,22 @@ import { scanner } from './scanner'
 
 export class Tokenizer {
 
-    tokens    : any
-    customOut : Object
-    ignore    : Object
-    functions : Object
+    public static tokens    : Object = {}
+    public static customOut : Object = {}
+    public static ignore    : Object = {}
+    public static functions : Object = {}
 
     constructor() {}
 
-    public addTokenSet (tokenSet: Object) {
-
-        for (const key in tokenSet) this.tokens[key] = tokenSet[key]
+    public static addTokenSet (tokenSet: any) {
+        
+        for (const key in tokenSet) {
+            this.tokens[key] = tokenSet[key]
+        }
 
     }
 
-    public tokenize (string: string) {
+    public static tokenize (string: string) {
 
         return scanner(string, this)
 

@@ -1,8 +1,13 @@
+
+interface Token {
+    token      : string,
+    value      : string,
+    customOut? : any
+}
 function formatOutput (currentTok: string, tokenValue: string, tokenizer: any) {
-    const output = {
+    const output: Token = {
         token     : currentTok , 
-        value     : tokenValue ,
-        customOut : String
+        value     : tokenValue 
     }
     if (currentTok in tokenizer.customOut) output.customOut = tokenizer.customOut[currentTok]
     return output

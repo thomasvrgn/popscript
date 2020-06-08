@@ -4,8 +4,7 @@ exports.scanner = void 0;
 function formatOutput(currentTok, tokenValue, tokenizer) {
     var output = {
         token: currentTok,
-        value: tokenValue,
-        customOut: String
+        value: tokenValue
     };
     if (currentTok in tokenizer.customOut)
         output.customOut = tokenizer.customOut[currentTok];
