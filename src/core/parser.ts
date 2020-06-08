@@ -1,4 +1,4 @@
-import Scanner from './scanner'
+import { scanner } from './scanner'
 
 export class Tokenizer {
 
@@ -15,9 +15,9 @@ export class Tokenizer {
 
     }
 
-    public tokenize (string: String) {
+    public tokenize (string: string) {
 
-        return Scanner.tokenize(string, this)
+        return scanner(string, this)
 
     }
 

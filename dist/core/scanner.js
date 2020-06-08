@@ -1,56 +1,55 @@
 "use strict";
 exports.__esModule = true;
-function formatOutput(currTok, tokValue, tokenizer) {
+exports.scanner = void 0;
+function formatOutput(currentTok, tokenValue, tokenizer) {
     var output = {
-        token: currTok,
-        value: tokValue,
-        customOut: ''
+        token: currentTok,
+        value: tokenValue,
+        customOut: String
     };
-    if (currTok in tokenizer.customOut)
-        output.customOut = tokenizer.customOut[currTok];
+    if (currentTok in tokenizer.customOut)
+        output.customOut = tokenizer.customOut[currentTok];
     return output;
 }
-function updateValues(tempArr, values, key) {
-    if (tempArr !== null && (tempArr.index < values.startTok ||
-        tempArr.index === values.startTok &&
-            tempArr[0].length > values.endTok)) {
-        values.startTok = tempArr.index;
-        values.tokValue = tempArr[0];
-        values.endTok = tempArr[0].length;
-        values.currTok = key;
+function updateValues(tempArray, values, key) {
+    if (tempArray !== null && (tempArray.index < values.startToken ||
+        tempArray.index === values.startToken &&
+            tempArray[0].length > values.endToken)) {
+        values.startToken = tempArray.index;
+        values.tokenValue = tempArray[0];
+        values.endToken = tempArray[0].length;
+        values.currToken = key;
     }
     return values;
 }
-function getNearestTok(tokens, aString) {
+function getNearestTok(tokens, string) {
     var values = {
-        endTok: 0,
-        startTok: Number.MAX_SAFE_INTEGER,
-        tokValue: '',
-        currTok: ''
+        endToken: 0,
+        startToken: Number.MAX_SAFE_INTEGER,
+        tokenValue: '',
+        currToken: ''
     };
     for (var key in tokens) {
-        var tempArr = aString.match(tokens[key]);
-        values = updateValues(tempArr, values, key);
+        var tempArray = string.match(tokens[key]);
+        values = updateValues(tempArray, values, key);
     }
     return values;
 }
-exports["default"] = {
-    tokenize: function (aString, tokenizer) {
-        var tokens = tokenizer.tokens;
-        var tok = [];
-        while (aString) {
-            var _a = getNearestTok(tokens, aString), endTok = _a.endTok, startTok = _a.startTok, tokValue = _a.tokValue, currTok = _a.currTok;
-            if (startTok !== 0) {
-                tokValue = aString.substring(0, startTok);
-                currTok = tokenizer.errTok;
-                endTok = startTok;
-            }
-            if (!tokenizer.ignore[currTok])
-                tok.push(formatOutput(currTok, tokValue, tokenizer));
-            if (currTok in tokenizer.functions)
-                tokenizer.functions[currTok]();
-            aString = aString.substring(endTok);
+function scanner(string, tokenizer) {
+    var tokens = tokenizer.tokens, token = [];
+    while (string) {
+        var _a = getNearestTok(tokens, string), endToken = _a.endToken, startToken = _a.startToken, tokenValue = _a.tokenValue, currToken = _a.currToken;
+        if (startToken !== 0) {
+            tokenValue = string.substring(0, startToken);
+            currToken = tokenizer.errTok;
+            endToken = startToken;
         }
-        return tok;
+        if (!tokenizer.ignore[currToken])
+            token.push(formatOutput(currToken, tokenValue, tokenizer));
+        if (currToken in tokenizer.functions)
+            tokenizer.functions[currToken]();
+        string = string.substring(endToken);
     }
-};
+    return token;
+}
+exports.scanner = scanner;

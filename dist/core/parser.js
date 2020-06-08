@@ -10,7 +10,7 @@ var Tokenizer = /** @class */ (function () {
             this.tokens[key] = tokenSet[key];
     };
     Tokenizer.prototype.tokenize = function (string) {
-        return scanner_1["default"].tokenize(string, this);
+        return scanner_1.scanner(string, this);
     };
     return Tokenizer;
 }());
