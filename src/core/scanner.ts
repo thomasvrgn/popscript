@@ -8,12 +8,12 @@ interface Token {
     value      : string,
     customOut? : any
 }
-function formatOutput (currentTok: string, tokenValue: string, tokenizer: any) {
+function formatOutput (currentToken: string, tokenValue: string, tokenizer: any) {
     const output: Token = {
-        token     : currentTok , 
+        token     : currentToken , 
         value     : tokenValue 
     }
-    if (currentTok in tokenizer.customOut) output.customOut = tokenizer.customOut[currentTok]
+    if (currentToken in tokenizer.customOut) output.customOut = tokenizer.customOut[currentToken]
     return output
 }
 

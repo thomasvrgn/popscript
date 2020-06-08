@@ -5,13 +5,13 @@
 //////////////////////////////////*/
 exports.__esModule = true;
 exports.scanner = void 0;
-function formatOutput(currentTok, tokenValue, tokenizer) {
+function formatOutput(currentToken, tokenValue, tokenizer) {
     var output = {
-        token: currentTok,
+        token: currentToken,
         value: tokenValue
     };
-    if (currentTok in tokenizer.customOut)
-        output.customOut = tokenizer.customOut[currentTok];
+    if (currentToken in tokenizer.customOut)
+        output.customOut = tokenizer.customOut[currentToken];
     return output;
 }
 function updateValues(tempArray, values, key) {
