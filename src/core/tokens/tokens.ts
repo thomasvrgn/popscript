@@ -1,3 +1,8 @@
+/*//////////////////////////////////
+         POPSCRIPT LANGUAGE
+               Tokens
+//////////////////////////////////*/
+
 export default {
 
     // BASIC

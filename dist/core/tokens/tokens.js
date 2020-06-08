@@ -1,4 +1,8 @@
 "use strict";
+/*//////////////////////////////////
+         POPSCRIPT LANGUAGE
+               Tokens
+//////////////////////////////////*/
 exports.__esModule = true;
 exports["default"] = {
     // BASIC

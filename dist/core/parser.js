@@ -1,4 +1,8 @@
 "use strict";
+/*//////////////////////////////////
+         POPSCRIPT LANGUAGE
+               Parser
+//////////////////////////////////*/
 exports.__esModule = true;
 exports.Tokenizer = void 0;
 var scanner_1 = require("./scanner");

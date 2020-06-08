@@ -1,3 +1,8 @@
+/*//////////////////////////////////
+         POPSCRIPT LANGUAGE
+               Parser
+//////////////////////////////////*/
+
 import { scanner } from './scanner'
 
 export class Tokenizer {

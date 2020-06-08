@@ -1,3 +1,7 @@
+/*//////////////////////////////////
+         POPSCRIPT LANGUAGE
+               Scanner
+//////////////////////////////////*/
 
 interface Token {
     token      : string,

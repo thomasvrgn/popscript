@@ -1,4 +1,8 @@
 "use strict";
+/*//////////////////////////////////
+         POPSCRIPT LANGUAGE
+               Scanner
+//////////////////////////////////*/
 exports.__esModule = true;
 exports.scanner = void 0;
 function formatOutput(currentTok, tokenValue, tokenizer) {
