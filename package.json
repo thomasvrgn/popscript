@@ -1,0 +1,32 @@
+{
+  "name": "popscript",
+  "version": "1.0.0",
+  "description": "🍿 Popscript programming language.",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "node_modules/.bin/tsc",
+    "build": "node_modules/.bin/webpack --config webpack.config.js",
+    "start": "node_modules/.bin/nodemon ./build/popscript.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NessMC/popscript.git"
+  },
+  "keywords": [
+    "popscript",
+    "javascript",
+    "language"
+  ],
+  "author": "NessMC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NessMC/popscript/issues"
+  },
+  "homepage": "https://github.com/NessMC/popscript#readme",
+  "devDependencies": {
+    "typescript": "^3.9.5",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "nodemon": "^2.0.4"
+  }
+}
