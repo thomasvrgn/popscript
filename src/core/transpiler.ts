@@ -52,10 +52,10 @@ export default class Transpiler {
                     case 'STRING': {
                         const match = value.match(/::\w+::?/g)
                         if (match) {
-                            for (const occurence of match) {
-                                const variable_name = occurence.slice(2, occurence.length - 2)
+                            for (const occurrence of match) {
+                                const variable_name = occurrence.slice(2, occurrence.length - 2)
                                 if (Array.from(Object.keys(this.variables)).includes(variable_name)) {
-                                    value = value.replace(occurence, '${' + variable_name + '}')
+                                    value = value.replace(occurrence, '${' + variable_name + '}')
                                 } else {
                                     throw 'VARIABLE CALLED "' + variable_name + '" DOES NOT EXISTS!'
                                 }
