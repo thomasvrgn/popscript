@@ -3,8 +3,6 @@
                 Main
 //////////////////////////////////*/
 
-import { Tokenizer } from './core/parser'
-import Tokens        from './core/tokens/tokens'
+import Transpiler from './core/transpiler';
 
-Tokenizer.addTokenSet(Tokens)
-console.log(Tokenizer.tokenize("fn coucou => hello"))
+new Transpiler('print "hello world"').transpile()

@@ -3,7 +3,7 @@
                Scanner
 //////////////////////////////////*/
 
-interface Token {
+export interface Token {
     token      : string,
     value      : string,
     customOut? : any
