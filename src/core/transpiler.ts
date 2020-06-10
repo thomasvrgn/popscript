@@ -9,7 +9,8 @@ import {Token}       from './scanner';
 
 export default class Transpiler {
 
-    private readonly content: any
+    private readonly content   : any
+    private readonly variables : Object = {}
 
     constructor (content) {
 
@@ -33,7 +34,6 @@ export default class Transpiler {
                 const item  : Token = tokens[item_token],
                       value : string = item.value,
                       token : string = item.token
-
                 switch (token) {
 
                     case 'PRINT': {
@@ -48,6 +48,21 @@ export default class Transpiler {
                     }
 
                     case 'STRING': {
+                        built.push(value)
+                        break
+                    }
+
+                    case 'WORD': {
+                        if (Array.from(Object.keys(this.variables)).includes(value)) {
+                            built.push(value)
+                        } else {
+                            if (parseInt(item_token) === 0) {
+                                built.push(`var ${value}`)
+                            }
+                        }
+                        break
+                    }
+                    case 'SIGNS': {
                         built.push(value)
                         break
                     }

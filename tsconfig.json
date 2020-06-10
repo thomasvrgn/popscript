@@ -5,7 +5,8 @@
         "watch": true,
         "lib": [
             "ES2015",
-            "dom"
+            "dom",
+            "es7"
         ]
     },
     "exclude": [

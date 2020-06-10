@@ -8,6 +8,7 @@ var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var Transpiler = /** @class */ (function () {
     function Transpiler(content) {
+        this.variables = {};
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         this.content = content.split(/\n/g);
     }
@@ -28,6 +29,21 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'STRING': {
+                        built.push(value);
+                        break;
+                    }
+                    case 'WORD': {
+                        if (Array.from(Object.keys(this.variables)).includes(value)) {
+                            built.push(value);
+                        }
+                        else {
+                            if (parseInt(item_token) === 0) {
+                                built.push("var " + value);
+                            }
+                        }
+                        break;
+                    }
+                    case 'SIGNS': {
                         built.push(value);
                         break;
                     }
