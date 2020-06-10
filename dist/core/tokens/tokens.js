@@ -16,7 +16,7 @@ exports["default"] = {
     R_PAREN: /\)/,
     ARGUMENTS: /=>/,
     // TYPES
-    STRING: /('|")(.*?)('|")/,
+    STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,
     ARRAY_START: /:-/,
     ARRAY_END: /-:/,
@@ -32,7 +32,7 @@ exports["default"] = {
     RETURN: /return/,
     // OTHER
     WORD: /\w+/,
-    SIGNS: />|<|=|\+|\-|\*|\/|%|\|/,
+    SIGNS: /[><=+\-*\/%|]/,
     NOT: /not|!/,
     AND: /and|&/,
     COMMENT: /--.*/
