@@ -23,6 +23,8 @@ export default class Transpiler {
 
     transpile () {
 
+        const code = []
+
         for (const index in this.content) {
 
             const line    : string        = this.content[index]
@@ -31,9 +33,9 @@ export default class Transpiler {
                   built   : Array<string> = []
             for (const item_token in tokens) {
 
-                const item  : Token = tokens[item_token],
-                      value : string = item.value,
-                      token : string = item.token
+                let item  : Token  = tokens[item_token],
+                    value : string = item.value,
+                    token : string = item.token
                 switch (token) {
 
                     case 'PRINT': {
@@ -48,7 +50,20 @@ export default class Transpiler {
                     }
 
                     case 'STRING': {
-                        built.push(value)
+                        const match = value.match(/::\w+::?/g)
+                        if (match) {
+                            for (const occurence of match) {
+                                const variable_name = occurence.slice(2, occurence.length - 2)
+                                if (Array.from(Object.keys(this.variables)).includes(variable_name)) {
+                                    value = value.replace(occurence, '${' + variable_name + '}')
+                                } else {
+                                    throw 'VARIABLE CALLED "' + variable_name + '" DOES NOT EXISTS!'
+                                }
+                            }
+                            built.push(value.replace(/\"/g, '`'))
+                        } else {
+                            built.push(value)
+                        }
                         break
                     }
 
@@ -58,6 +73,7 @@ export default class Transpiler {
                         } else {
                             if (parseInt(item_token) === 0) {
                                 built.push(`var ${value}`)
+                                this.variables[value] = ''
                             }
                         }
                         break
@@ -69,16 +85,18 @@ export default class Transpiler {
 
                 }
 
-
-
             }
+
             for (const context_item in context) {
                 context.splice(Number(context_item), 1)
                 built.push(')')
             }
-            eval(built.join(''))
+
+            console.log(built.join(''))
+            code.push(built.join(''))
             built = []
         }
+        eval(code.join('\n'))
 
     }
 

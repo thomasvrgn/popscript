@@ -5,4 +5,4 @@
 
 import Transpiler from './core/transpiler';
 
-new Transpiler('print "hello world"\ntest = "coucou"').transpile()
+new Transpiler('test = "world"\nprint "hello ::test::!"').transpile()

@@ -13,6 +13,7 @@ var Transpiler = /** @class */ (function () {
         this.content = content.split(/\n/g);
     }
     Transpiler.prototype.transpile = function () {
+        var code = [];
         for (var index in this.content) {
             var line = this.content[index];
             var tokens = parser_1.Tokenizer.tokenize(line);
@@ -29,7 +30,23 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'STRING': {
-                        built.push(value);
+                        var match = value.match(/::\w+::?/g);
+                        if (match) {
+                            for (var _i = 0, match_1 = match; _i < match_1.length; _i++) {
+                                var occurence = match_1[_i];
+                                var variable_name = occurence.slice(2, occurence.length - 2);
+                                if (Array.from(Object.keys(this.variables)).includes(variable_name)) {
+                                    value = value.replace(occurence, '${' + variable_name + '}');
+                                }
+                                else {
+                                    throw 'VARIABLE CALLED "' + variable_name + '" DOES NOT EXISTS!';
+                                }
+                            }
+                            built.push(value.replace(/\"/g, '`'));
+                        }
+                        else {
+                            built.push(value);
+                        }
                         break;
                     }
                     case 'WORD': {
@@ -39,6 +56,7 @@ var Transpiler = /** @class */ (function () {
                         else {
                             if (parseInt(item_token) === 0) {
                                 built.push("var " + value);
+                                this.variables[value] = '';
                             }
                         }
                         break;
@@ -53,9 +71,11 @@ var Transpiler = /** @class */ (function () {
                 context.splice(Number(context_item), 1);
                 built.push(')');
             }
-            eval(built.join(''));
+            console.log(built.join(''));
+            code.push(built.join(''));
             built = [];
         }
+        eval(code.join('\n'));
     };
     return Transpiler;
 }());
