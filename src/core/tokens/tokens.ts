@@ -19,7 +19,7 @@ export default {
 
     // TYPES
 
-    STRING      : /('|")(.*?)('|")/        , // Match any strings
+    STRING      : /(['"])(.*?)(['"])/      , // Match any strings
     INT         : /-?\d+/                  , // Match any digits
     ARRAY_START : /:-/                     , // Match array start
     ARRAY_END   : /-:/                     , // Match array end
@@ -39,7 +39,7 @@ export default {
     // OTHER
 
     WORD        : /\w+/                    , // Match any words
-    SIGNS       : />|<|=|\+|\-|\*|\/|%|\|/ , // Match any sign
+    SIGNS       : />|<|=|\+|-|\*|\/|%|\|/  , // Match any sign
     NOT         : /not|!/                  , // Match not keyword
     AND         : /and|&/                  , // Match and keyword
     COMMENT     : /--.*/                   , // Match comments
