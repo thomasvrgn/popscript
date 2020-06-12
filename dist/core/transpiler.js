@@ -31,8 +31,9 @@ var Transpiler = /** @class */ (function () {
                     case 'SPACE': {
                         if (context.includes('PRINT') ||
                             context.includes('VARIABLE')) {
-                            if (!['PRINT', 'SIGNS'].includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token) &&
-                                !Array.from(Object.keys(this_1.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].value)) {
+                            if (tokens.slice(parseInt(item_token) - 1)
+                                .filter(function (x) { return x.token !== 'SPACE'; })
+                                .filter(function (x) { return ['PRINT', 'SIGNS'].includes(x.token); }).length === 0) {
                                 built.push(', ');
                             }
                             else if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'SIGNS' &&
@@ -98,12 +99,10 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else if (context.includes('ARGUMENTS')) {
                                     built.push(value);
+                                    this_1.variables[value] = '';
                                     if (tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; }).length === 0) {
                                         built.push('):');
                                     }
-                                }
-                                else {
-                                    console.log(line);
                                 }
                             }
                         }
@@ -175,7 +174,6 @@ var Transpiler = /** @class */ (function () {
                 }
                 context.splice(Number(context_item), 1);
             }
-            console.log(built.join(''));
             code.push(built.join(''));
             built = [];
         };
@@ -183,7 +181,7 @@ var Transpiler = /** @class */ (function () {
         for (var index in this.content) {
             _loop_1(index);
         }
-        console.log(new tabdown_1["default"](code).tab().join('\n'));
+        eval(new tabdown_1["default"](code).tab().join('\n'));
     };
     return Transpiler;
 }());

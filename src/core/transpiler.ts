@@ -50,8 +50,9 @@ export default class Transpiler {
                     case 'SPACE': {
                         if (context.includes('PRINT')    ||
                             context.includes('VARIABLE')) {
-                            if (!['PRINT', 'SIGNS'].includes(tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token) &&
-                                !Array.from(Object.keys(this.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].value)) {
+                            if (tokens.slice(parseInt(item_token) - 1)
+                                      .filter(x => x.token !== 'SPACE')
+                                      .filter(x => ['PRINT', 'SIGNS'].includes(x.token)).length === 0) {
                                 built.push(', ')
                             } else if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token === 'SIGNS' &&
                                        tokens.slice(parseInt(item_token) + 1).filter(x => x.token === 'SPACE').length > 0) {
