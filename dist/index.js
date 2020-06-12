@@ -5,4 +5,4 @@
 //////////////////////////////////*/
 exports.__esModule = true;
 var transpiler_1 = require("./core/transpiler");
-new transpiler_1["default"]('test = "world"\nprint "hello ::test::!"').transpile();
+new transpiler_1["default"]('test = "world"\nprint "hello ::test::!"\nprint "hello" test').transpile();

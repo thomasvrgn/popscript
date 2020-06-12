@@ -27,6 +27,11 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'SPACE': {
+                        if (context.includes('PRINT')) {
+                            if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'PRINT') {
+                                built.push(', ');
+                            }
+                        }
                         break;
                     }
                     case 'STRING': {
@@ -42,7 +47,7 @@ var Transpiler = /** @class */ (function () {
                                     throw 'VARIABLE CALLED "' + variable_name + '" DOES NOT EXISTS!';
                                 }
                             }
-                            built.push(value.replace(/\"/g, '`'));
+                            built.push(value.replace(/"/g, '`'));
                         }
                         else {
                             built.push(value);

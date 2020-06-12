@@ -45,7 +45,11 @@ export default class Transpiler {
                     }
 
                     case 'SPACE': {
-
+                        if (context.includes('PRINT')) {
+                            if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token !== 'PRINT') {
+                                built.push(', ')
+                            }
+                        }
                         break
                     }
 
@@ -60,7 +64,7 @@ export default class Transpiler {
                                     throw 'VARIABLE CALLED "' + variable_name + '" DOES NOT EXISTS!'
                                 }
                             }
-                            built.push(value.replace(/\"/g, '`'))
+                            built.push(value.replace(/"/g, '`'))
                         } else {
                             built.push(value)
                         }
