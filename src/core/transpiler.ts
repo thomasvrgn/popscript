@@ -109,11 +109,10 @@ export default class Transpiler {
                                     this.functions.push(value)
                                 } else if (context.includes('ARGUMENTS')) {
                                     built.push(value)
+                                    this.variables[value] = ''
                                     if (tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE').length === 0) {
                                         built.push('):')
                                     }
-                                } else {
-                                    console.log(line)
                                 }
                             }
                         }
@@ -195,13 +194,12 @@ export default class Transpiler {
                 context.splice(Number(context_item), 1)
             }
 
-            console.log(built.join(''))
             code.push(built.join(''))
             built = []
 
         }
 
-        console.log(new Tabdown(code).tab().join('\n'))
+        eval(new Tabdown(code).tab().join('\n'))
 
     }
 

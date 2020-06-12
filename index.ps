@@ -1,4 +1,10 @@
-fn send => message test
-    print message
+username = "Ness"
 
-send("coucou")
+print "Hello" username
+
+fn setUsername => value
+    username = value
+
+setUsername("coucou")
+
+print "Hello" username
