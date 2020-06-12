@@ -12,13 +12,13 @@ export default class Transpiler {
 
     private readonly content   : any
     private readonly variables : Object = {}
+    private readonly functions : Array<string> = []
 
     constructor (content) {
 
         Tokenizer.addTokenSet(Tokens)
 
         this.content = content.split(/\n/g)
-
 
     }
 
@@ -95,17 +95,25 @@ export default class Transpiler {
                             built.push(value)
                         } else {
                             if (parseInt(item_token) === 0) {
-                                built.push(`var ${value}`)
-                                this.variables[value] = ''
-                                context.push('VARIABLE')
+                                if (this.functions.includes(value)) {
+                                    built.push(value)
+                                    context.push('FUNCTION_CALL')
+                                } else {
+                                    built.push(`var ${value}`)
+                                    this.variables[value] = ''
+                                    context.push('VARIABLE')
+                                }
                             } else {
                                 if (context[context.length - 1] === 'FUNCTION') {
                                     built.push(value)
+                                    this.functions.push(value)
                                 } else if (context.includes('ARGUMENTS')) {
                                     built.push(value)
                                     if (tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE').length === 0) {
                                         built.push('):')
                                     }
+                                } else {
+                                    console.log(line)
                                 }
                             }
                         }
@@ -137,6 +145,8 @@ export default class Transpiler {
                         if (context.includes('VARIABLE')) {
                             built.push('[')
                             context.push('ARRAY')
+                        } else if (context[context.length - 1] === 'FUNCTION_CALL') {
+                            built.push('(')
                         }
                         break
                     }
@@ -144,6 +154,8 @@ export default class Transpiler {
                     case 'R_PAREN': {
                         if (context.includes('VARIABLE')) {
                             built.push(']')
+                        } else if (context[context.length - 1] === 'FUNCTION_CALL') {
+                            built.push(')')
                         }
                         break
                     }
@@ -155,11 +167,15 @@ export default class Transpiler {
                     }
 
                     case 'ARGUMENTS': {
-                        console.log(context)
                         if (context[context.length - 1] === 'FUNCTION') {
                             built.push('(')
                             context.push(token)
                         }
+                        break
+                    }
+
+                    case 'TABS': {
+                        built.push(value)
                         break
                     }
 
@@ -172,7 +188,8 @@ export default class Transpiler {
                     built.push(']')
                 }
                 if (!context.includes('VARIABLE') &&
-                    !context.includes('FUNCTION')) {
+                    !context.includes('FUNCTION') &&
+                    !context.includes('FUNCTION_CALL')) {
                     built.push(')')
                 }
                 context.splice(Number(context_item), 1)
@@ -184,7 +201,7 @@ export default class Transpiler {
 
         }
 
-        console.log(new Tabdown(code).tab())
+        console.log(new Tabdown(code).tab().join('\n'))
 
     }
 

@@ -7,7 +7,7 @@ export default class Tabdown {
     private code    : Array<string>;
 
     constructor (content) {
-        this.content = content
+        this.content = content.filter(x => x !== '')
         this.AST     = {
             root: {
 
@@ -35,8 +35,6 @@ export default class Tabdown {
         const line    = this.content[index],
               ft_line = this.content[index + 1]
 
-        if (!line) return
-
         const depth    = line.match(/^\s+/) ? line.match(/^\s+/)[0].length / 2 : 0,
               ft_depth = ft_line ? this.content[index + 1].match(/^\s+/) ? this.content[index + 1].match(/^\s+/)[0].length / 2 : 0 : undefined
         if (line.trimRight().endsWith(':')) {
@@ -45,9 +43,12 @@ export default class Tabdown {
         } else {
             this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, '')
         }
-        if (ft_depth < depth) this.parents = this.parents.slice(0, ft_depth)
-
-        this.buildAST(index + 1)
+        if (ft_depth < depth) {
+            this.parents = this.parents.slice(0, ft_depth)
+        }
+        if (ft_line) {
+            this.buildAST(index + 1)
+        }
 
     }
 

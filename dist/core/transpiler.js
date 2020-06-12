@@ -10,6 +10,7 @@ var tabdown_1 = require("./tabdown");
 var Transpiler = /** @class */ (function () {
     function Transpiler(content) {
         this.variables = {};
+        this.functions = [];
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         this.content = content.split(/\n/g);
     }
@@ -80,19 +81,29 @@ var Transpiler = /** @class */ (function () {
                         }
                         else {
                             if (parseInt(item_token) === 0) {
-                                built.push("var " + value);
-                                this_1.variables[value] = '';
-                                context.push('VARIABLE');
+                                if (this_1.functions.includes(value)) {
+                                    built.push(value);
+                                    context.push('FUNCTION_CALL');
+                                }
+                                else {
+                                    built.push("var " + value);
+                                    this_1.variables[value] = '';
+                                    context.push('VARIABLE');
+                                }
                             }
                             else {
                                 if (context[context.length - 1] === 'FUNCTION') {
                                     built.push(value);
+                                    this_1.functions.push(value);
                                 }
                                 else if (context.includes('ARGUMENTS')) {
                                     built.push(value);
                                     if (tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; }).length === 0) {
                                         built.push('):');
                                     }
+                                }
+                                else {
+                                    console.log(line);
                                 }
                             }
                         }
@@ -121,11 +132,17 @@ var Transpiler = /** @class */ (function () {
                             built.push('[');
                             context.push('ARRAY');
                         }
+                        else if (context[context.length - 1] === 'FUNCTION_CALL') {
+                            built.push('(');
+                        }
                         break;
                     }
                     case 'R_PAREN': {
                         if (context.includes('VARIABLE')) {
                             built.push(']');
+                        }
+                        else if (context[context.length - 1] === 'FUNCTION_CALL') {
+                            built.push(')');
                         }
                         break;
                     }
@@ -135,11 +152,14 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'ARGUMENTS': {
-                        console.log(context);
                         if (context[context.length - 1] === 'FUNCTION') {
                             built.push('(');
                             context.push(token);
                         }
+                        break;
+                    }
+                    case 'TABS': {
+                        built.push(value);
                         break;
                     }
                 }
@@ -149,7 +169,8 @@ var Transpiler = /** @class */ (function () {
                     built.push(']');
                 }
                 if (!context.includes('VARIABLE') &&
-                    !context.includes('FUNCTION')) {
+                    !context.includes('FUNCTION') &&
+                    !context.includes('FUNCTION_CALL')) {
                     built.push(')');
                 }
                 context.splice(Number(context_item), 1);
@@ -162,7 +183,7 @@ var Transpiler = /** @class */ (function () {
         for (var index in this.content) {
             _loop_1(index);
         }
-        console.log(new tabdown_1["default"](code).tab());
+        console.log(new tabdown_1["default"](code).tab().join('\n'));
     };
     return Transpiler;
 }());

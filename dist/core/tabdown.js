@@ -3,7 +3,7 @@ exports.__esModule = true;
 var fs = require('fs');
 var Tabdown = /** @class */ (function () {
     function Tabdown(content) {
-        this.content = content;
+        this.content = content.filter(function (x) { return x !== ''; });
         this.AST = {
             root: {}
         };
@@ -26,8 +26,6 @@ var Tabdown = /** @class */ (function () {
     Tabdown.prototype.buildAST = function (index) {
         if (index === void 0) { index = 0; }
         var line = this.content[index], ft_line = this.content[index + 1];
-        if (!line)
-            return;
         var depth = line.match(/^\s+/) ? line.match(/^\s+/)[0].length / 2 : 0, ft_depth = ft_line ? this.content[index + 1].match(/^\s+/) ? this.content[index + 1].match(/^\s+/)[0].length / 2 : 0 : undefined;
         if (line.trimRight().endsWith(':')) {
             this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, {});
@@ -36,9 +34,12 @@ var Tabdown = /** @class */ (function () {
         else {
             this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, '');
         }
-        if (ft_depth < depth)
+        if (ft_depth < depth) {
             this.parents = this.parents.slice(0, ft_depth);
-        this.buildAST(index + 1);
+        }
+        if (ft_line) {
+            this.buildAST(index + 1);
+        }
     };
     Tabdown.prototype.addBrackets = function (item) {
         for (var child in item) {
