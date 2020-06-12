@@ -45,14 +45,15 @@ export default class Transpiler {
                     }
 
                     case 'SPACE': {
-                        if (context.includes('PRINT')) {
-                            if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token !== 'PRINT') {
+                        if (context.includes('PRINT') ||
+                            context.includes('VARIABLE')) {
+                            if (!['PRINT', 'SIGNS'].includes(tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token) &&
+                                !Array.from(Object.keys(this.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].value)) {
                                 built.push(', ')
-                            }
-                        } else if (context.includes('ARRAY')) {
-                            if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token !== 'L_PAREN' &&
-                                tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'R_PAREN') {
-                                built.push(', ')
+                            } else if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token === 'SIGNS' &&
+                                       tokens.slice(parseInt(item_token) + 1).filter(x => x.token === 'SPACE').length > 0) {
+                                built.push('[')
+                                context.push('ARRAY')
                             }
                         }
                         break
@@ -113,7 +114,10 @@ export default class Transpiler {
             }
 
             for (const context_item in context) {
-                if (!['VARIABLE'].includes(context[context_item])) {
+                if (context.includes('ARRAY')) {
+                    built.push(']')
+                }
+                if (!context.includes('VARIABLE')) {
                     built.push(')')
                 }
                 context.splice(Number(context_item), 1)

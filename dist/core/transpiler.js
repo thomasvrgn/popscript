@@ -27,9 +27,16 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'SPACE': {
-                        if (context.includes('PRINT')) {
-                            if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'PRINT') {
+                        if (context.includes('PRINT') ||
+                            context.includes('VARIABLE')) {
+                            if (!['PRINT', 'SIGNS'].includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token) &&
+                                !Array.from(Object.keys(this.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].value)) {
                                 built.push(', ');
+                            }
+                            else if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'SIGNS' &&
+                                tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token === 'SPACE'; }).length > 0) {
+                                built.push('[');
+                                context.push('ARRAY');
                             }
                         }
                         break;
@@ -62,6 +69,7 @@ var Transpiler = /** @class */ (function () {
                             if (parseInt(item_token) === 0) {
                                 built.push("var " + value);
                                 this.variables[value] = '';
+                                context.push('VARIABLE');
                             }
                         }
                         break;
@@ -70,17 +78,35 @@ var Transpiler = /** @class */ (function () {
                         built.push(value);
                         break;
                     }
+                    case 'L_PAREN': {
+                        if (context.includes('VARIABLE')) {
+                            built.push('[');
+                            context.push('ARRAY');
+                        }
+                        break;
+                    }
+                    case 'R_PAREN': {
+                        if (context.includes('VARIABLE')) {
+                            built.push(']');
+                        }
+                        break;
+                    }
                 }
             }
             for (var context_item in context) {
+                if (context.includes('ARRAY')) {
+                    built.push(']');
+                }
+                if (!context.includes('VARIABLE')) {
+                    built.push(')');
+                }
                 context.splice(Number(context_item), 1);
-                built.push(')');
             }
             console.log(built.join(''));
             code.push(built.join(''));
             built = [];
         }
-        eval(code.join('\n'));
+        //eval(code.join('\n'))
     };
     return Transpiler;
 }());

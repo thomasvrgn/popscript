@@ -18,8 +18,6 @@ exports["default"] = {
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,
-    ARRAY_START: /:-/,
-    ARRAY_END: /-:/,
     TYPE: /int|str|list/,
     OPTIONAL: /optional/,
     BOOLEAN: /true|false/,
