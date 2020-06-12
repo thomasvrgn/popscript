@@ -40,6 +40,17 @@ var Transpiler = /** @class */ (function () {
                                 this_1.variables[built[0].replace('var ', '')] = 'array';
                             }
                         }
+                        else {
+                            if (context.includes('ARGUMENTS')) {
+                                if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'ARGUMENTS' &&
+                                    tokens.slice(parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).length > 0) {
+                                    built.push(', ');
+                                }
+                            }
+                            else {
+                                built.push(' ');
+                            }
+                        }
                         break;
                     }
                     case 'STRING': {
@@ -71,6 +82,17 @@ var Transpiler = /** @class */ (function () {
                                 built.push("var " + value);
                                 this_1.variables[value] = '';
                                 context.push('VARIABLE');
+                            }
+                            else {
+                                if (context[context.length - 1] === 'FUNCTION') {
+                                    built.push(value);
+                                }
+                                else if (context.includes('ARGUMENTS')) {
+                                    built.push(value);
+                                    if (tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; }).length === 0) {
+                                        built.push('):');
+                                    }
+                                }
                             }
                         }
                         break;
@@ -106,13 +128,27 @@ var Transpiler = /** @class */ (function () {
                         }
                         break;
                     }
+                    case 'FUNCTION': {
+                        built.push('function');
+                        context.push('FUNCTION');
+                        break;
+                    }
+                    case 'ARGUMENTS': {
+                        console.log(context);
+                        if (context[context.length - 1] === 'FUNCTION') {
+                            built.push('(');
+                            context.push(token);
+                        }
+                        break;
+                    }
                 }
             }
             for (var context_item in context) {
                 if (context.includes('ARRAY')) {
                     built.push(']');
                 }
-                if (!context.includes('VARIABLE')) {
+                if (!context.includes('VARIABLE') &&
+                    !context.includes('FUNCTION')) {
                     built.push(')');
                 }
                 context.splice(Number(context_item), 1);

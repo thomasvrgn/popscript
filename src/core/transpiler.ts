@@ -47,7 +47,7 @@ export default class Transpiler {
                     }
 
                     case 'SPACE': {
-                        if (context.includes('PRINT') ||
+                        if (context.includes('PRINT')    ||
                             context.includes('VARIABLE')) {
                             if (!['PRINT', 'SIGNS'].includes(tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token) &&
                                 !Array.from(Object.keys(this.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].value)) {
@@ -57,6 +57,15 @@ export default class Transpiler {
                                 built.push('[')
                                 context.push('ARRAY')
                                 this.variables[built[0].replace('var ', '')] = 'array'
+                            }
+                        } else {
+                            if (context.includes('ARGUMENTS')) {
+                                if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token !== 'ARGUMENTS' &&
+                                    tokens.slice(parseInt(item_token)).filter(x => x.token !== 'SPACE').length > 0) {
+                                    built.push(', ')
+                                }
+                            } else {
+                                built.push(' ')
                             }
                         }
                         break
@@ -88,6 +97,15 @@ export default class Transpiler {
                                 built.push(`var ${value}`)
                                 this.variables[value] = ''
                                 context.push('VARIABLE')
+                            } else {
+                                if (context[context.length - 1] === 'FUNCTION') {
+                                    built.push(value)
+                                } else if (context.includes('ARGUMENTS')) {
+                                    built.push(value)
+                                    if (tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE').length === 0) {
+                                        built.push('):')
+                                    }
+                                }
                             }
                         }
                         break
@@ -129,6 +147,21 @@ export default class Transpiler {
                         break
                     }
 
+                    case 'FUNCTION': {
+                        built.push('function')
+                        context.push('FUNCTION')
+                        break
+                    }
+
+                    case 'ARGUMENTS': {
+                        console.log(context)
+                        if (context[context.length - 1] === 'FUNCTION') {
+                            built.push('(')
+                            context.push(token)
+                        }
+                        break
+                    }
+
                 }
 
             }
@@ -137,7 +170,8 @@ export default class Transpiler {
                 if (context.includes('ARRAY')) {
                     built.push(']')
                 }
-                if (!context.includes('VARIABLE')) {
+                if (!context.includes('VARIABLE') &&
+                    !context.includes('FUNCTION')) {
                     built.push(')')
                 }
                 context.splice(Number(context_item), 1)
