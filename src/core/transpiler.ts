@@ -5,7 +5,8 @@
 
 import { Tokenizer } from './parser'
 import Tokens        from './tokens/tokens'
-import {Token}       from './scanner';
+import {Token}       from './scanner'
+import Tabdown       from './tabdown'
 
 export default class Transpiler {
 
@@ -183,7 +184,7 @@ export default class Transpiler {
 
         }
 
-        eval(code.join('\n'))
+        console.log(new Tabdown(code).tab())
 
     }
 

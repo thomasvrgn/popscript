@@ -6,6 +6,7 @@
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var Transpiler = /** @class */ (function () {
     function Transpiler(content) {
         this.variables = {};
@@ -161,7 +162,7 @@ var Transpiler = /** @class */ (function () {
         for (var index in this.content) {
             _loop_1(index);
         }
-        eval(code.join('\n'));
+        console.log(new tabdown_1["default"](code).tab());
     };
     return Transpiler;
 }());
