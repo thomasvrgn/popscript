@@ -49,6 +49,11 @@ export default class Transpiler {
                             if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token !== 'PRINT') {
                                 built.push(', ')
                             }
+                        } else if (context.includes('ARRAY')) {
+                            if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token !== 'L_PAREN' &&
+                                tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'R_PAREN') {
+                                built.push(', ')
+                            }
                         }
                         break
                     }
@@ -78,6 +83,7 @@ export default class Transpiler {
                             if (parseInt(item_token) === 0) {
                                 built.push(`var ${value}`)
                                 this.variables[value] = ''
+                                context.push('VARIABLE')
                             }
                         }
                         break
@@ -87,20 +93,37 @@ export default class Transpiler {
                         break
                     }
 
+                    case 'L_PAREN': {
+                        if (context.includes('VARIABLE')) {
+                            built.push('[')
+                            context.push('ARRAY')
+                        }
+                        break
+                    }
+
+                    case 'R_PAREN': {
+                        if (context.includes('VARIABLE')) {
+                            built.push(']')
+                        }
+                        break
+                    }
+
                 }
 
             }
 
             for (const context_item in context) {
+                if (!['VARIABLE'].includes(context[context_item])) {
+                    built.push(')')
+                }
                 context.splice(Number(context_item), 1)
-                built.push(')')
             }
 
             console.log(built.join(''))
             code.push(built.join(''))
             built = []
         }
-        eval(code.join('\n'))
+        //eval(code.join('\n'))
 
     }
 
