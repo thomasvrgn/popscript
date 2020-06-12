@@ -74,6 +74,15 @@ var Transpiler = /** @class */ (function () {
                         else {
                             built.push(value);
                         }
+                        if (['JOIN', 'SPLIT'].includes(context[context.length - 1])) {
+                            built.push(')');
+                        }
+                        break;
+                    }
+                    case 'JOIN':
+                    case 'SPLIT': {
+                        built.push("." + value.toLowerCase() + "(");
+                        context.push(token);
                         break;
                     }
                     case 'WORD': {
@@ -104,6 +113,9 @@ var Transpiler = /** @class */ (function () {
                                         built.push('):');
                                     }
                                 }
+                                else {
+                                    built.push(value);
+                                }
                             }
                         }
                         break;
@@ -113,11 +125,20 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'INDEX': {
-                        if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().token === 'WORD') {
+                        if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().token === 'WORD' &&
+                            tokens.slice(parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'INT') {
                             if (this_1.variables[tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().value] === 'array') {
                                 built.push('[');
                                 context.push('INDEX');
                             }
+                        }
+                        else if (['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token) - 1)
+                            .filter(function (x) { return x.token !== 'SPACE'; })[tokens.slice(0, parseInt(item_token) - 1)
+                            .filter(function (x) { return x.token !== 'SPACE'; }).length - 1].token) ||
+                            ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token))
+                                .filter(function (x) { return x.token !== 'SPACE'; })[tokens.slice(0, parseInt(item_token))
+                                .filter(function (x) { return x.token !== 'SPACE'; }).length - 1].token)) {
+                            built.push('.');
                         }
                         break;
                     }
@@ -169,7 +190,9 @@ var Transpiler = /** @class */ (function () {
                 }
                 if (!context.includes('VARIABLE') &&
                     !context.includes('FUNCTION') &&
-                    !context.includes('FUNCTION_CALL')) {
+                    !context.includes('FUNCTION_CALL') &&
+                    !context.includes('JOIN') &&
+                    !context.includes('SPLIT')) {
                     built.push(')');
                 }
                 context.splice(Number(context_item), 1);

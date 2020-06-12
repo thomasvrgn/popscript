@@ -31,6 +31,8 @@ export default {
     ELSE        : /else/              , // Match else condition
     PRINT       : /print/             , // Match print keyword
     RETURN      : /return/            , // Match return keyword
+    JOIN        : /join/              ,
+    SPLIT       : /split/             ,
 
     // OTHER
 
