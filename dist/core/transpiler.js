@@ -78,6 +78,10 @@ var Transpiler = /** @class */ (function () {
                         built.push(value);
                         break;
                     }
+                    case 'INDEX': {
+                        built.push('[' + value.slice(1, value.length - 1) + ']');
+                        break;
+                    }
                     case 'L_PAREN': {
                         if (context.includes('VARIABLE')) {
                             built.push('[');
@@ -106,7 +110,7 @@ var Transpiler = /** @class */ (function () {
             code.push(built.join(''));
             built = [];
         }
-        //eval(code.join('\n'))
+        eval(code.join('\n'));
     };
     return Transpiler;
 }());

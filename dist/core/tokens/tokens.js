@@ -7,14 +7,14 @@ exports.__esModule = true;
 exports["default"] = {
     // BASIC
     SPACE: /\s/,
-    PROPERTY: /:\w+/,
     TABS: /^\s+/,
-    COLON: /:/,
     DOT: /\./,
     COMMA: /,/,
     L_PAREN: /\(/,
     R_PAREN: /\)/,
     ARGUMENTS: /=>/,
+    INDEX: /<\d+>/,
+    PROPERTY: /:\w+/,
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,

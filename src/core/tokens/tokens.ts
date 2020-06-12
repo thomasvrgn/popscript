@@ -8,15 +8,14 @@ export default {
     // BASIC
 
     SPACE       : /\s/                , // Match any spaces
-    PROPERTY    : /:\w+/              , // Match properties like :length
     TABS        : /^\s+/              , // Match start tabs
-    COLON       : /:/                 , // Matchs colons like test : str
     DOT         : /\./                , // Match any dots
     COMMA       : /,/                 , // Match any comma
     L_PAREN     : /\(/                , // Match any left parenthesis
     R_PAREN     : /\)/                , // Match any right parenthesis
     ARGUMENTS   : /=>/                , // Match arguments start like fn test => coucou
-
+    INDEX       : /<\d+>/                 , // Match index
+    PROPERTY    : /:\w+/              , // Match properties like :length
     // TYPES
 
     STRING      : /(['"])(.*?)(['"])/ , // Match any strings

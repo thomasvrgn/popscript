@@ -31,11 +31,13 @@ export default class Transpiler {
             const tokens  : Array<Token>  = Tokenizer.tokenize(line)
             let   context : Array<string> = [],
                   built   : Array<string> = []
+
             for (const item_token in tokens) {
 
                 let item  : Token  = tokens[item_token],
                     value : string = item.value,
                     token : string = item.token
+
                 switch (token) {
 
                     case 'PRINT': {
@@ -89,8 +91,14 @@ export default class Transpiler {
                         }
                         break
                     }
+
                     case 'SIGNS': {
                         built.push(value)
+                        break
+                    }
+
+                    case 'INDEX': {
+                        built.push('[' + value.slice(1, value.length - 1) + ']')
                         break
                     }
 
@@ -126,8 +134,10 @@ export default class Transpiler {
             console.log(built.join(''))
             code.push(built.join(''))
             built = []
+
         }
-        //eval(code.join('\n'))
+
+        eval(code.join('\n'))
 
     }
 
