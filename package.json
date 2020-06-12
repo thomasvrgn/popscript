@@ -28,5 +28,9 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "@types/node": "^14.0.13",
+    "fs": "0.0.1-security"
   }
 }

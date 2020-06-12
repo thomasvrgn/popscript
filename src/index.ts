@@ -4,5 +4,9 @@
 //////////////////////////////////*/
 
 import Transpiler from './core/transpiler';
+import * as FS    from 'fs'
 
-new Transpiler('test = "world"\nprint "hello ::test::!"\nprint "hello" test').transpile()
+FS.readFile('./index.ps', 'UTF-8', (error, content) => {
+    if (error) throw error
+    new Transpiler(content.split(/\r?\n/g).join('\n')).transpile()
+})
