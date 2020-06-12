@@ -13,8 +13,7 @@ exports["default"] = {
     L_PAREN: /\(/,
     R_PAREN: /\)/,
     ARGUMENTS: /=>/,
-    INDEX: /<\d+>/,
-    PROPERTY: /:\w+/,
+    INDEX: /:/,
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,

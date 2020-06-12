@@ -14,8 +14,8 @@ var Transpiler = /** @class */ (function () {
     }
     Transpiler.prototype.transpile = function () {
         var code = [];
-        for (var index in this.content) {
-            var line = this.content[index];
+        var _loop_1 = function (index) {
+            var line = this_1.content[index];
             var tokens = parser_1.Tokenizer.tokenize(line);
             var context = [], built = [];
             for (var item_token in tokens) {
@@ -30,13 +30,14 @@ var Transpiler = /** @class */ (function () {
                         if (context.includes('PRINT') ||
                             context.includes('VARIABLE')) {
                             if (!['PRINT', 'SIGNS'].includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token) &&
-                                !Array.from(Object.keys(this.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].value)) {
+                                !Array.from(Object.keys(this_1.variables)).includes(tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].value)) {
                                 built.push(', ');
                             }
                             else if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'SIGNS' &&
                                 tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token === 'SPACE'; }).length > 0) {
                                 built.push('[');
                                 context.push('ARRAY');
+                                this_1.variables[built[0].replace('var ', '')] = 'array';
                             }
                         }
                         break;
@@ -47,7 +48,7 @@ var Transpiler = /** @class */ (function () {
                             for (var _i = 0, match_1 = match; _i < match_1.length; _i++) {
                                 var occurrence = match_1[_i];
                                 var variable_name = occurrence.slice(2, occurrence.length - 2);
-                                if (Array.from(Object.keys(this.variables)).includes(variable_name)) {
+                                if (Array.from(Object.keys(this_1.variables)).includes(variable_name)) {
                                     value = value.replace(occurrence, '${' + variable_name + '}');
                                 }
                                 else {
@@ -62,13 +63,13 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'WORD': {
-                        if (Array.from(Object.keys(this.variables)).includes(value)) {
+                        if (Array.from(Object.keys(this_1.variables)).includes(value)) {
                             built.push(value);
                         }
                         else {
                             if (parseInt(item_token) === 0) {
                                 built.push("var " + value);
-                                this.variables[value] = '';
+                                this_1.variables[value] = '';
                                 context.push('VARIABLE');
                             }
                         }
@@ -79,7 +80,17 @@ var Transpiler = /** @class */ (function () {
                         break;
                     }
                     case 'INDEX': {
-                        built.push('[' + value.slice(1, value.length - 1) + ']');
+                        if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().token === 'WORD') {
+                            if (this_1.variables[tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().value] === 'array') {
+                                built.push('[');
+                                context.push('INDEX');
+                            }
+                        }
+                        break;
+                    }
+                    case 'INT': {
+                        built.push(value);
+                        context.filter(function (x) { return x === 'INDEX'; }).map(function (x) { return built.push(']'); });
                         break;
                     }
                     case 'L_PAREN': {
@@ -109,6 +120,10 @@ var Transpiler = /** @class */ (function () {
             console.log(built.join(''));
             code.push(built.join(''));
             built = [];
+        };
+        var this_1 = this;
+        for (var index in this.content) {
+            _loop_1(index);
         }
         eval(code.join('\n'));
     };

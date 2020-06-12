@@ -56,6 +56,7 @@ export default class Transpiler {
                                        tokens.slice(parseInt(item_token) + 1).filter(x => x.token === 'SPACE').length > 0) {
                                 built.push('[')
                                 context.push('ARRAY')
+                                this.variables[built[0].replace('var ', '')] = 'array'
                             }
                         }
                         break
@@ -98,7 +99,18 @@ export default class Transpiler {
                     }
 
                     case 'INDEX': {
-                        built.push('[' + value.slice(1, value.length - 1) + ']')
+                        if (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').pop().token === 'WORD') {
+                            if (this.variables[tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').pop().value] === 'array') {
+                                built.push('[')
+                                context.push('INDEX')
+                            }
+                        }
+                        break
+                    }
+
+                    case 'INT': {
+                        built.push(value)
+                        context.filter(x => x === 'INDEX').map(x => built.push(']'))
                         break
                     }
 
