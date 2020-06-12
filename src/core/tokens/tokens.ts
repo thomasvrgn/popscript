@@ -21,8 +21,6 @@ export default {
 
     STRING      : /(['"])(.*?)(['"])/ , // Match any strings
     INT         : /-?\d+/             , // Match any digits
-    ARRAY_START : /:-/                , // Match array start
-    ARRAY_END   : /-:/                , // Match array end
     TYPE        : /int|str|list/      , // Match any type
     OPTIONAL    : /optional/          , // Match optional type
     BOOLEAN     : /true|false/        , // Match boolean
