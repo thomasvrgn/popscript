@@ -40,8 +40,10 @@ function getNearestTok (tokens, string: string) {
     }
 
     for (const key in tokens) {
-        const tempArray = string.match(tokens[key])
-              values  = updateValues(tempArray, values, key)
+        if (tokens.hasOwnProperty(key)) {
+            const tempArray = string.match(tokens[key])
+            values  = updateValues(tempArray, values, key)
+        }
     }
 
     return values
