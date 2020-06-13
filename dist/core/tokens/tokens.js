@@ -27,6 +27,8 @@ exports["default"] = {
     ELSE: /else/,
     PRINT: /print/,
     RETURN: /return/,
+    JOIN: /join/,
+    SPLIT: /split/,
     // OTHER
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]/,
