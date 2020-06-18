@@ -33,8 +33,10 @@ function getNearestTok(tokens, string) {
         currToken: ''
     };
     for (var key in tokens) {
-        var tempArray = string.match(tokens[key]);
-        values = updateValues(tempArray, values, key);
+        if (tokens.hasOwnProperty(key)) {
+            var tempArray = string.match(tokens[key]);
+            values = updateValues(tempArray, values, key);
+        }
     }
     return values;
 }

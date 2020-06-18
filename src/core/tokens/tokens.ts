@@ -33,6 +33,8 @@ export default {
     RETURN      : /return/            , // Match return keyword
     JOIN        : /join/              ,
     SPLIT       : /split/             ,
+    ADD         : /\+=/               ,
+    REMOVE      : /-=/                ,
 
     // OTHER
 

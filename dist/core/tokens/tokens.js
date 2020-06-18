@@ -29,6 +29,8 @@ exports["default"] = {
     RETURN: /return/,
     JOIN: /join/,
     SPLIT: /split/,
+    ADD: /\+=/,
+    REMOVE: /-=/,
     // OTHER
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]/,

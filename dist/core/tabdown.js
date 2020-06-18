@@ -14,9 +14,11 @@ var Tabdown = /** @class */ (function () {
         var item = this.AST['root'];
         if (array.length > 0) {
             for (var itemt in array) {
-                if (parseInt(itemt) + 1 === array.length)
-                    item[array[itemt]][property] = value;
-                item = item[array[itemt]];
+                if (array.hasOwnProperty(itemt)) {
+                    if (parseInt(itemt) + 1 === array.length)
+                        item[array[itemt]][property] = value;
+                    item = item[array[itemt]];
+                }
             }
         }
         else {
@@ -43,14 +45,16 @@ var Tabdown = /** @class */ (function () {
     };
     Tabdown.prototype.addBrackets = function (item) {
         for (var child in item) {
-            if (typeof item[child] === 'object') {
-                this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + child.split('||')[0].slice(0, child.split('||')[0].length - 1) + '{');
-                this.addBrackets(item[child]);
-                this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + '}');
-            }
-            else {
-                this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + child.split('||')[0]);
-                this.addBrackets(item[child]);
+            if (item.hasOwnProperty(child)) {
+                if (typeof item[child] === 'object') {
+                    this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + child.split('||')[0].slice(0, child.split('||')[0].length - 1) + '{');
+                    this.addBrackets(item[child]);
+                    this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + '}');
+                }
+                else {
+                    this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + child.split('||')[0]);
+                    this.addBrackets(item[child]);
+                }
             }
         }
     };

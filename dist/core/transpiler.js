@@ -20,7 +20,7 @@ var Transpiler = /** @class */ (function () {
             if (this_1.content.hasOwnProperty(index)) {
                 var line = this_1.content[index];
                 var tokens = parser_1.Tokenizer.tokenize(line);
-                var context = [], built_1 = [];
+                var context = [], built_1 = [], var_name = void 0;
                 for (var item_token in tokens) {
                     if (tokens.hasOwnProperty(item_token)) {
                         var item = tokens[item_token], value = item.value, token = item.token;
@@ -76,6 +76,9 @@ var Transpiler = /** @class */ (function () {
                                 else {
                                     built_1.push(value);
                                 }
+                                if (context.includes('VARIABLE')) {
+                                    this_1.variables[var_name] = 'string';
+                                }
                                 if (['JOIN', 'SPLIT'].includes(context[context.length - 1])) {
                                     built_1.push(')');
                                 }
@@ -101,6 +104,7 @@ var Transpiler = /** @class */ (function () {
                                             built_1.push("var " + value);
                                             this_1.variables[value] = '';
                                             context.push('VARIABLE');
+                                            var_name = value;
                                         }
                                     }
                                     else {
@@ -124,6 +128,38 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'SIGNS': {
                                 built_1.push(value);
+                                break;
+                            }
+                            case 'ADD': {
+                                var variable = tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).reverse()[0];
+                                if (!variable)
+                                    break;
+                                var_name = variable.value;
+                                if (this_1.variables[var_name] === 'string')
+                                    built_1.push('+=');
+                                else if (this_1.variables[var_name] === 'array') {
+                                    built_1.push('.push(');
+                                    context.push('ADD');
+                                }
+                                else if (this_1.variables[var_name] === 'number')
+                                    built_1.push('+=');
+                                break;
+                            }
+                            case 'REMOVE': {
+                                var variable = tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).reverse()[0];
+                                if (!variable)
+                                    break;
+                                var_name = variable.value;
+                                if (this_1.variables[var_name] === 'string') {
+                                    built_1.push("= " + var_name + ".replace(");
+                                    context.push('REMOVE');
+                                }
+                                else if (this_1.variables[var_name] === 'array') {
+                                    built_1.push("= " + var_name + ".filter(x => x !== ");
+                                    context.push('REMOVE');
+                                }
+                                else if (this_1.variables[var_name] === 'number')
+                                    built_1.push('-=');
                                 break;
                             }
                             case 'INDEX': {
@@ -186,20 +222,28 @@ var Transpiler = /** @class */ (function () {
                             }
                         }
                     }
-                    for (var context_item in context) {
-                        if (context.hasOwnProperty(context_item)) {
-                            if (context.includes('ARRAY')) {
-                                built_1.push(']');
+                }
+                for (var context_item in context) {
+                    if (context.hasOwnProperty(context_item)) {
+                        if (context.includes('ARRAY')) {
+                            built_1.push(']');
+                        }
+                        if (!context.includes('VARIABLE') &&
+                            !context.includes('FUNCTION') &&
+                            !context.includes('FUNCTION_CALL') &&
+                            !context.includes('JOIN') &&
+                            !context.includes('SPLIT')) {
+                            if (context.includes('ADD') || context.includes('REMOVE')) {
+                                if (this_1.variables[var_name] === 'string')
+                                    built_1.push(', "")');
+                                else if (this_1.variables[var_name] === 'array')
+                                    built_1.push(')');
                             }
-                            if (!context.includes('VARIABLE') &&
-                                !context.includes('FUNCTION') &&
-                                !context.includes('FUNCTION_CALL') &&
-                                !context.includes('JOIN') &&
-                                !context.includes('SPLIT')) {
+                            else {
                                 built_1.push(')');
                             }
-                            context.splice(Number(context_item), 1);
                         }
+                        context.splice(Number(context_item), 1);
                     }
                 }
                 code.push(built_1.join(''));

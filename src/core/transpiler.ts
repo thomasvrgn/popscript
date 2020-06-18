@@ -31,7 +31,8 @@ export default class Transpiler {
                 const line    : string        = this.content[index]
                 const tokens  : Array<Token>  = Tokenizer.tokenize(line)
                 let   context : Array<string> = [],
-                      built   : Array<string> = []
+                      built   : Array<string> = [],
+                      var_name : string
 
                 for (const item_token in tokens) {
                     if (tokens.hasOwnProperty(item_token)) {
@@ -87,6 +88,9 @@ export default class Transpiler {
                                 } else {
                                     built.push(value)
                                 }
+                                if (context.includes('VARIABLE')) {
+                                    this.variables[var_name] = 'string'
+                                }
                                 if (['JOIN', 'SPLIT'].includes(context[context.length - 1])) {
                                     built.push(')')
                                 }
@@ -111,6 +115,7 @@ export default class Transpiler {
                                             built.push(`var ${value}`)
                                             this.variables[value] = ''
                                             context.push('VARIABLE')
+                                            var_name = value
                                         }
                                     } else {
                                         if (context[context.length - 1] === 'FUNCTION') {
@@ -132,6 +137,32 @@ export default class Transpiler {
 
                             case 'SIGNS': {
                                 built.push(value)
+                                break
+                            }
+
+                            case 'ADD': {
+                                const variable = tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').reverse()[0]
+                                if (!variable) break
+                                var_name = variable.value
+                                if (this.variables[var_name] === 'string') built.push('+=')
+                                else if (this.variables[var_name] === 'array') {
+                                    built.push('.push(')
+                                    context.push('ADD')
+                                } else if (this.variables[var_name] === 'number') built.push('+=')
+                                break
+                            }
+
+                            case 'REMOVE': {
+                                const variable = tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').reverse()[0]
+                                if (!variable) break
+                                var_name = variable.value
+                                if (this.variables[var_name] === 'string') {
+                                    built.push(`= ${var_name}.replace(`)
+                                    context.push('REMOVE')
+                                } else if (this.variables[var_name] === 'array') {
+                                    built.push(`= ${var_name}.filter(x => x !== `)
+                                    context.push('REMOVE')
+                                } else if (this.variables[var_name] === 'number') built.push('-=')
                                 break
                             }
 
@@ -199,29 +230,33 @@ export default class Transpiler {
                             }
 
                         }
+
                     }
 
-                    for (const context_item in context) {
-                        if (context.hasOwnProperty(context_item)) {
-                            if (context.includes('ARRAY')) {
-                                built.push(']')
-                            }
-                            if (!context.includes('VARIABLE')      &&
-                                !context.includes('FUNCTION')      &&
-                                !context.includes('FUNCTION_CALL') &&
-                                !context.includes('JOIN')          &&
-                                !context.includes('SPLIT')) {
+                }
+                for (const context_item in context) {
+                    if (context.hasOwnProperty(context_item)) {
+                        if (context.includes('ARRAY')) {
+                            built.push(']')
+                        }
+                        if (!context.includes('VARIABLE')      &&
+                            !context.includes('FUNCTION')      &&
+                            !context.includes('FUNCTION_CALL') &&
+                            !context.includes('JOIN')          &&
+                            !context.includes('SPLIT')) {
+                            if (context.includes('ADD') || context.includes('REMOVE')) {
+                                if (this.variables[var_name] === 'string') built.push(', "")')
+                                else if (this.variables[var_name] === 'array') built.push(')')
+                            } else {
                                 built.push(')')
                             }
-                            context.splice(Number(context_item), 1)
                         }
+                        context.splice(Number(context_item), 1)
                     }
-
                 }
                 code.push(built.join(''))
                 built = []
             }
-
 
         }
 
