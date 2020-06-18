@@ -40,8 +40,6 @@ var Transpiler = /** @class */ (function () {
                                     }
                                     else if (tokens.slice(parseInt(item_token) - 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'SIGNS' &&
                                         tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token === 'SPACE'; }).length > 0) {
-                                        built_1.push('[');
-                                        context.push('ARRAY');
                                         this_1.variables[built_1[0].replace('var ', '')] = 'array';
                                     }
                                 }
@@ -77,7 +75,9 @@ var Transpiler = /** @class */ (function () {
                                     built_1.push(value);
                                 }
                                 if (context.includes('VARIABLE')) {
-                                    this_1.variables[var_name] = 'string';
+                                    if (this_1.variables[var_name] !== 'array') {
+                                        this_1.variables[var_name] = 'string';
+                                    }
                                 }
                                 if (['JOIN', 'SPLIT'].includes(context[context.length - 1])) {
                                     built_1.push(')');
@@ -135,6 +135,7 @@ var Transpiler = /** @class */ (function () {
                                 if (!variable)
                                     break;
                                 var_name = variable.value;
+                                console.log(this_1.variables);
                                 if (this_1.variables[var_name] === 'string')
                                     built_1.push('+=');
                                 else if (this_1.variables[var_name] === 'array') {
@@ -183,12 +184,16 @@ var Transpiler = /** @class */ (function () {
                             case 'INT': {
                                 built_1.push(value);
                                 context.filter(function (x) { return x === 'INDEX'; }).map(function (x) { return built_1.push(']'); });
+                                if (context.includes('VARIABLE')) {
+                                    this_1.variables[var_name] = 'number';
+                                }
                                 break;
                             }
                             case 'L_PAREN': {
                                 if (context.includes('VARIABLE')) {
                                     built_1.push('[');
                                     context.push('ARRAY');
+                                    this_1.variables[var_name] = 'array';
                                 }
                                 else if (context[context.length - 1] === 'FUNCTION_CALL') {
                                     built_1.push('(');
@@ -225,9 +230,6 @@ var Transpiler = /** @class */ (function () {
                 }
                 for (var context_item in context) {
                     if (context.hasOwnProperty(context_item)) {
-                        if (context.includes('ARRAY')) {
-                            built_1.push(']');
-                        }
                         if (!context.includes('VARIABLE') &&
                             !context.includes('FUNCTION') &&
                             !context.includes('FUNCTION_CALL') &&
@@ -248,6 +250,7 @@ var Transpiler = /** @class */ (function () {
                 }
                 code.push(built_1.join(''));
                 built_1 = [];
+                context = [];
             }
         };
         var this_1 = this;
