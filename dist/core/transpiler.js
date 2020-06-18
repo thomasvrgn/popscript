@@ -164,17 +164,22 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'INDEX': {
-                                if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().token === 'WORD' &&
-                                    tokens.slice(parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'INT') {
-                                    if (this_1.variables[tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop().value] === 'array') {
+                                console.log(tokens);
+                                if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).pop() && tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).reverse()[0].token === 'WORD' &&
+                                    tokens.slice(parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; })[0] && tokens.slice(parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; })[0].token === 'INT') {
+                                    if (this_1.variables[tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).reverse()[0].value] && this_1.variables[tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).reverse()[0].value] === 'array') {
                                         built_1.push('[');
                                         context.push('INDEX');
                                     }
                                 }
-                                else if (['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token) - 1)
+                                else if (tokens.slice(0, parseInt(item_token) - 1)
+                                    .filter(function (x) { return x.token !== 'SPACE'; })[tokens.slice(0, parseInt(item_token) - 1)
+                                    .filter(function (x) { return x.token !== 'SPACE'; }).length - 1] && ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token) - 1)
                                     .filter(function (x) { return x.token !== 'SPACE'; })[tokens.slice(0, parseInt(item_token) - 1)
                                     .filter(function (x) { return x.token !== 'SPACE'; }).length - 1].token) ||
-                                    ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token))
+                                    tokens.slice(0, parseInt(item_token))
+                                        .filter(function (x) { return x.token !== 'SPACE'; })[tokens.slice(0, parseInt(item_token))
+                                        .filter(function (x) { return x.token !== 'SPACE'; }).length - 1] && ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token))
                                         .filter(function (x) { return x.token !== 'SPACE'; })[tokens.slice(0, parseInt(item_token))
                                         .filter(function (x) { return x.token !== 'SPACE'; }).length - 1].token)) {
                                     built_1.push('.');
@@ -257,7 +262,7 @@ var Transpiler = /** @class */ (function () {
         for (var index in this.content) {
             _loop_1(index);
         }
-        eval(new tabdown_1["default"](code).tab().join('\n'));
+        console.log(new tabdown_1["default"](code).tab().join('\n'));
     };
     return Transpiler;
 }());

@@ -168,16 +168,21 @@ export default class Transpiler {
                             }
 
                             case 'INDEX': {
-                                if (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').pop().token === 'WORD' &&
-                                    tokens.slice(parseInt(item_token)).filter(x => x.token !== 'SPACE')[0].token === 'INT') {
-                                    if (this.variables[tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').pop().value] === 'array') {
+                                console.log(tokens)
+                                if (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').pop() && tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').reverse()[0].token === 'WORD' &&
+                                    tokens.slice(parseInt(item_token)).filter(x => x.token !== 'SPACE')[0] && tokens.slice(parseInt(item_token)).filter(x => x.token !== 'SPACE')[0].token === 'INT') {
+                                    if (this.variables[tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').reverse()[0].value] && this.variables[tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').reverse()[0].value] === 'array') {
                                         built.push('[')
                                         context.push('INDEX')
                                     }
-                                } else if (['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token) - 1)
+                                } else if (tokens.slice(0, parseInt(item_token) - 1)
+                                        .filter(x => x.token !== 'SPACE')[tokens.slice(0, parseInt(item_token) - 1)
+                                        .filter(x => x.token !== 'SPACE').length - 1] && ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token) - 1)
                                         .filter(x => x.token !== 'SPACE')[tokens.slice(0, parseInt(item_token) - 1)
                                         .filter(x => x.token !== 'SPACE').length - 1].token) ||
-                                    ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token))
+                                    tokens.slice(0, parseInt(item_token))
+                                        .filter(x => x.token !== 'SPACE')[tokens.slice(0, parseInt(item_token))
+                                        .filter(x => x.token !== 'SPACE').length - 1] && ['WORD', 'STRING'].includes(tokens.slice(0, parseInt(item_token))
                                         .filter(x => x.token !== 'SPACE')[tokens.slice(0, parseInt(item_token))
                                         .filter(x => x.token !== 'SPACE').length - 1].token)) {
                                     built.push('.')
@@ -239,6 +244,8 @@ export default class Transpiler {
                     }
 
                 }
+
+
                 for (const context_item in context) {
                     if (context.hasOwnProperty(context_item)) {
                         if (!context.includes('VARIABLE')      &&
@@ -265,7 +272,7 @@ export default class Transpiler {
 
         }
 
-        eval(new Tabdown(code).tab().join('\n'))
+        console.log(new Tabdown(code).tab().join('\n'))
 
     }
 

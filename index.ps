@@ -1,20 +1,63 @@
-username = "Ness"
-print username
-username += "Test"
-print username
-username -= "Ness"
-print "Bonjour" username
+; STRINGS
 
-nombre = 0
-print "Le nombre est" nombre
-nombre += 10
-print "Le nombre après est" nombre
-nombre -= 5
-print "Le nombre encore après est" nombre
+string = "coucou" + "test"
+string -= "test"
+string += "Ness"
 
-liste = ("coucou" "test")
-print liste
-liste += "hello"
-print liste
-liste -= "coucou"
-print liste
+print string
+print string:length
+print string<0>
+print string - "coucou"
+print string + "bruh"
+
+; ARRAYS
+
+array = ("coucou", "bruh", "hello")
+array -= "coucou"
+array += "ness"
+
+print array
+print array:length
+print array<1>
+print array - "bruh"
+print array + "yo"
+
+; NUMBERS
+
+number = 0
+number += 6
+number -= 10
+
+print number
+print number - 4
+print number + 100
+
+; CONDITIONS
+
+if number > 0
+    print "number higher than zero"
+else if number = -1
+    print "number equal to minus one"
+else
+    print "number lower than zero"
+
+; LOOPS
+
+loop i for 5 times
+    print i
+
+loop array as item
+    print item
+
+while number > 0
+    number -= 1
+    print "number is higher than zero"
+
+; FUNCTIONS
+
+fn welcome => name
+    print "Welcome" name "!"
+
+welcome("Ness")
+
+
