@@ -56,8 +56,6 @@ export default class Transpiler {
                                         built.push(', ')
                                     } else if (tokens.slice(parseInt(item_token) - 1).filter(x => x.token !== 'SPACE')[0].token === 'SIGNS' &&
                                         tokens.slice(parseInt(item_token) + 1).filter(x => x.token === 'SPACE').length > 0) {
-                                        built.push('[')
-                                        context.push('ARRAY')
                                         this.variables[built[0].replace('var ', '')] = 'array'
                                     }
                                 } else {
@@ -89,7 +87,9 @@ export default class Transpiler {
                                     built.push(value)
                                 }
                                 if (context.includes('VARIABLE')) {
-                                    this.variables[var_name] = 'string'
+                                    if (this.variables[var_name] !== 'array') {
+                                        this.variables[var_name] = 'string'
+                                    }
                                 }
                                 if (['JOIN', 'SPLIT'].includes(context[context.length - 1])) {
                                     built.push(')')
@@ -144,6 +144,7 @@ export default class Transpiler {
                                 const variable = tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').reverse()[0]
                                 if (!variable) break
                                 var_name = variable.value
+                                console.log(this.variables)
                                 if (this.variables[var_name] === 'string') built.push('+=')
                                 else if (this.variables[var_name] === 'array') {
                                     built.push('.push(')
@@ -188,6 +189,9 @@ export default class Transpiler {
                             case 'INT': {
                                 built.push(value)
                                 context.filter(x => x === 'INDEX').map(x => built.push(']'))
+                                if (context.includes('VARIABLE')) {
+                                    this.variables[var_name] = 'number'
+                                }
                                 break
                             }
 
@@ -195,6 +199,7 @@ export default class Transpiler {
                                 if (context.includes('VARIABLE')) {
                                     built.push('[')
                                     context.push('ARRAY')
+                                    this.variables[var_name] = 'array'
                                 } else if (context[context.length - 1] === 'FUNCTION_CALL') {
                                     built.push('(')
                                 }
@@ -236,9 +241,6 @@ export default class Transpiler {
                 }
                 for (const context_item in context) {
                     if (context.hasOwnProperty(context_item)) {
-                        if (context.includes('ARRAY')) {
-                            built.push(']')
-                        }
                         if (!context.includes('VARIABLE')      &&
                             !context.includes('FUNCTION')      &&
                             !context.includes('FUNCTION_CALL') &&
@@ -254,8 +256,11 @@ export default class Transpiler {
                         context.splice(Number(context_item), 1)
                     }
                 }
+
                 code.push(built.join(''))
                 built = []
+                context = []
+
             }
 
         }
