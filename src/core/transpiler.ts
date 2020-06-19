@@ -76,6 +76,14 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'L_PAREN': case 'R_PAREN': {
+                                if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
+                                    if (token === 'L_PAREN') built.push('[')
+                                    else if (token === 'R_PAREN') built.push(']')
+                                }
+                                break
+                            }
+
                         }
 
                     }
