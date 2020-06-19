@@ -86,6 +86,11 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'PROPERTY': {
+                                built.push('.' + value.slice(1))
+                                break
+                            }
+
                             case 'L_PAREN': case 'R_PAREN': {
                                 if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
                                     if (token === 'L_PAREN') built.push('[')
@@ -148,6 +153,9 @@ export default class Transpiler {
                                 } else if (context.includes('ARRAY::REMOVE')) {
                                     built.push('), ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
+                                } else if (context.includes('ARRAY::PUSH')) {
+                                    built.push(')')
+                                    context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
                                 }
                                 break
                             }
@@ -156,6 +164,17 @@ export default class Transpiler {
 
                     }
 
+                }
+
+                if (context.includes('STRING::REMOVE')) {
+                    built.push(', "")')
+                    context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
+                } else if (context.includes('ARRAY::REMOVE')) {
+                    built.push(')')
+                    context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
+                } else if (context.includes('ARRAY::PUSH')) {
+                    built.push(')')
+                    context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
                 }
 
                 code.push(built.join(''))
@@ -168,7 +187,7 @@ export default class Transpiler {
 
         }
 
-        //console.log(code)
+        console.log(code)
 
     }
 

@@ -67,6 +67,10 @@ var Transpiler = /** @class */ (function () {
                                 built.push('[' + value.slice(1, value.length - 1) + ']');
                                 break;
                             }
+                            case 'PROPERTY': {
+                                built.push('.' + value.slice(1));
+                                break;
+                            }
                             case 'L_PAREN':
                             case 'R_PAREN': {
                                 if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
@@ -125,17 +129,33 @@ var Transpiler = /** @class */ (function () {
                                     built.push('), ');
                                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::REMOVE'; }), 1);
                                 }
+                                else if (context.includes('ARRAY::PUSH')) {
+                                    built.push(')');
+                                    context.splice(context.findIndex(function (x) { return x === 'ARRAY::PUSH'; }), 1);
+                                }
                                 break;
                             }
                         }
                     }
+                }
+                if (context.includes('STRING::REMOVE')) {
+                    built.push(', "")');
+                    context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
+                }
+                else if (context.includes('ARRAY::REMOVE')) {
+                    built.push(')');
+                    context.splice(context.findIndex(function (x) { return x === 'ARRAY::REMOVE'; }), 1);
+                }
+                else if (context.includes('ARRAY::PUSH')) {
+                    built.push(')');
+                    context.splice(context.findIndex(function (x) { return x === 'ARRAY::PUSH'; }), 1);
                 }
                 code.push(built.join(''));
                 built = [];
                 context = [];
             }
         }
-        //console.log(code)
+        console.log(code);
     };
     return Transpiler;
 }());
