@@ -41,11 +41,14 @@ export default class Transpiler {
                             token : string = item.token
 
                         if (!token) return console.log('Can\'t understand this keyword "' + value + '" at line', index)
-
                         switch (token) {
 
                             case 'STRING': case 'INT': {
                                 built.push(value)
+                                if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0 &&
+                                    this.variables[var_name] !== 'array') {
+                                    this.variables[var_name] = token.toLowerCase()
+                                }
                                 break
                             }
 
@@ -80,6 +83,64 @@ export default class Transpiler {
                                 if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
                                     if (token === 'L_PAREN') built.push('[')
                                     else if (token === 'R_PAREN') built.push(']')
+                                    this.variables[var_name] = 'array'
+                                }
+                                break
+                            }
+
+                            case 'COMMA': {
+                                built.push(value)
+                                break
+                            }
+
+                            case 'ADD': {
+                                switch (this.variables[var_name]) {
+
+                                    case 'string': case 'int': {
+                                        built.push('+=')
+                                        break
+                                    }
+
+                                    case 'array': {
+                                        built.push('.push(')
+                                        context.push('ARRAY::PUSH')
+                                        break
+                                    }
+                                }
+                                break
+                            }
+
+                            case 'REMOVE': {
+                                switch (this.variables[var_name]) {
+
+                                    case 'int': {
+                                        built.push('-=')
+                                        break
+                                    }
+
+                                    case 'string': {
+                                        built.push(' = ' + var_name + '.replace(')
+                                        context.push('STRING::REMOVE')
+                                        break
+                                    }
+
+                                    case 'array': {
+                                        built.push('.filter(x => x !== ')
+                                        context.push('ARRAY::REMOVE')
+                                        break
+                                    }
+
+                                }
+                                break
+                            }
+
+                            case 'AND': {
+                                if (context.includes('STRING::REMOVE')) {
+                                    built.push(', ""), ')
+                                    context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
+                                } else if (context.includes('ARRAY::REMOVE')) {
+                                    built.push('), ')
+                                    context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
                                 }
                                 break
                             }
@@ -100,7 +161,7 @@ export default class Transpiler {
 
         }
 
-        //console.log(code)
+        console.log(code)
 
     }
 

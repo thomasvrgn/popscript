@@ -29,6 +29,10 @@ var Transpiler = /** @class */ (function () {
                             case 'STRING':
                             case 'INT': {
                                 built.push(value);
+                                if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0 &&
+                                    this.variables[var_name] !== 'array') {
+                                    this.variables[var_name] = token.toLowerCase();
+                                }
                                 break;
                             }
                             case 'COMMENT': {
@@ -56,6 +60,66 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 break;
                             }
+                            case 'L_PAREN':
+                            case 'R_PAREN': {
+                                if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
+                                    if (token === 'L_PAREN')
+                                        built.push('[');
+                                    else if (token === 'R_PAREN')
+                                        built.push(']');
+                                    this.variables[var_name] = 'array';
+                                }
+                                break;
+                            }
+                            case 'COMMA': {
+                                built.push(value);
+                                break;
+                            }
+                            case 'ADD': {
+                                switch (this.variables[var_name]) {
+                                    case 'string':
+                                    case 'int': {
+                                        built.push('+=');
+                                        break;
+                                    }
+                                    case 'array': {
+                                        built.push('.push(');
+                                        context.push('ARRAY::PUSH');
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'REMOVE': {
+                                switch (this.variables[var_name]) {
+                                    case 'int': {
+                                        built.push('-=');
+                                        break;
+                                    }
+                                    case 'string': {
+                                        built.push(' = ' + var_name + '.replace(');
+                                        context.push('STRING::REMOVE');
+                                        break;
+                                    }
+                                    case 'array': {
+                                        built.push('.filter(x => x !== ');
+                                        context.push('ARRAY::REMOVE');
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'AND': {
+                                if (context.includes('STRING::REMOVE')) {
+                                    built.push(', ""), ');
+                                    context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
+                                }
+                                else if (context.includes('ARRAY::REMOVE')) {
+                                    built.push('), ');
+                                    context.splice(context.findIndex(function (x) { return x === 'ARRAY::REMOVE'; }), 1);
+                                }
+                                break;
+                            }
                         }
                     }
                 }
@@ -64,7 +128,7 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        //console.log(code)
+        console.log(code);
     };
     return Transpiler;
 }());

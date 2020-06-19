@@ -40,10 +40,10 @@ export default {
 
     // OTHER
 
+    AND         : /and|&/             , // Match and keyword
     WORD        : /\w+/               , // Match any words
     SIGNS       : /[><=+\-*\/%|]/     , // Match any sign
     NOT         : /not|!/             , // Match not keyword
-    AND         : /and|&/             , // Match and keyword
     COMMENT     : /--.*/              , // Match comments
 
 }

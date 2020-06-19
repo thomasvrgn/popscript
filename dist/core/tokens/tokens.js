@@ -33,9 +33,9 @@ exports["default"] = {
     ADD: /(\+=|=\+)/,
     REMOVE: /(-=|=-)/,
     // OTHER
+    AND: /and|&/,
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]/,
     NOT: /not|!/,
-    AND: /and|&/,
     COMMENT: /--.*/
 };
