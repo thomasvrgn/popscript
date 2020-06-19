@@ -26,12 +26,26 @@ var Transpiler = /** @class */ (function () {
                         if (!token)
                             return console.log('Can\'t understand this keyword "' + value + '" at line', index);
                         switch (token) {
-                            case 'STRING': {
+                            case 'STRING':
+                            case 'INT': {
                                 built.push(value);
                                 break;
                             }
                             case 'COMMENT': {
                                 built.push('//' + value.trim().slice(2));
+                                break;
+                            }
+                            case 'WORD': {
+                                if (this.variables[value] !== undefined) {
+                                    built.push(value);
+                                    context.push('VARIABLE::USE');
+                                }
+                                else {
+                                    built.push("var " + value);
+                                    this.variables[value] = '';
+                                    context.push('VARIABLE::DECLARATION');
+                                }
+                                var_name = value;
                                 break;
                             }
                         }

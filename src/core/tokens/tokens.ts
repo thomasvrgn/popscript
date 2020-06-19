@@ -31,6 +31,7 @@ export default {
     ELSE        : /else/              , // Match else condition
     WHILE       : /while/             , // Match while keyword
     LOOP        : /loop/              , // Match loop keyword
+    AS          : /as/                , // Match as in loop keyword
     PRINT       : /print/             , // Match print keyword
     RETURN      : /return/            , // Match return keyword
     ADD         : /(\+=|=\+)/         , // Match value adding

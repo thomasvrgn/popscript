@@ -54,6 +54,19 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'WORD': {
+                                if (this.variables[value] !== undefined) {
+                                    built.push(value)
+                                    context.push('VARIABLE::USE')
+                                } else {
+                                    built.push(`var ${value}`)
+                                    this.variables[value] = ''
+                                    context.push('VARIABLE::DECLARATION')
+                                }
+                                var_name = value
+                                break
+                            }
+
                         }
 
                     }
@@ -66,6 +79,7 @@ export default class Transpiler {
                 context = []
 
             }
+
 
         }
 
