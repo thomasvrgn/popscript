@@ -160,7 +160,7 @@ export default class Transpiler {
                                     }
 
                                     case 'array': {
-                                        built.push('.filter(x => x !== ')
+                                        built.push(' = ' + var_name + '.filter(x => x !== ')
                                         context.push('ARRAY::REMOVE')
                                         break
                                     }
@@ -197,13 +197,16 @@ export default class Transpiler {
                                 if (context.includes('STRING::REMOVE')) {
                                     built.push(', ""); ')
                                     context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
-                                } else if (context.includes('ARRAY::REMOVE')) {
+                                }
+                                if (context.includes('ARRAY::REMOVE')) {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
-                                } else if (context.includes('ARRAY::PUSH')) {
+                                }
+                                if (context.includes('ARRAY::PUSH')) {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
-                                } else if (context.includes('PRINT::START')) {
+                                }
+                                if (context.includes('PRINT::START')) {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                                 }
