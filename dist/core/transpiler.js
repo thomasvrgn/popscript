@@ -58,6 +58,9 @@ var Transpiler = /** @class */ (function () {
                                         built.push('=');
                                     }
                                 }
+                                else {
+                                    built.push(value);
+                                }
                                 break;
                             }
                             case 'L_PAREN':

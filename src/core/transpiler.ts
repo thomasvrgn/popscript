@@ -75,6 +75,8 @@ export default class Transpiler {
                                     if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
                                         built.push('=')
                                     }
+                                } else {
+                                    built.push(value)
                                 }
                                 break
                             }
