@@ -15,12 +15,12 @@ export default {
     R_PAREN     : /\)/                , // Match any right parenthesis
     ARGUMENTS   : /=>/                , // Match arguments start like fn test => coucou
     INDEX       : /:/                 , // Match index
+
     // TYPES
 
     STRING      : /(['"])(.*?)(['"])/ , // Match any strings
     INT         : /-?\d+/             , // Match any digits
-    TYPE        : /int|str|list/      , // Match any type
-    OPTIONAL    : /optional/          , // Match optional type
+    OPTIONAL    : /opt/               , // Match optional type
     BOOLEAN     : /true|false/        , // Match boolean
 
     // KEYWORDS
@@ -29,10 +29,10 @@ export default {
     IF          : /if/                , // Match if condition
     ELIF        : /elif/              , // Match else if condition
     ELSE        : /else/              , // Match else condition
+    WHILE       : /while/             , // Match while keyword
+    LOOP        : /loop/              , // Match loop keyword
     PRINT       : /print/             , // Match print keyword
     RETURN      : /return/            , // Match return keyword
-    JOIN        : /join/              , // Match join method
-    SPLIT       : /split/             , // Match split method
     ADD         : /(\+=|=\+)/         , // Match value adding
     REMOVE      : /(-=|=-)/           , // Match value removing
 
@@ -43,4 +43,5 @@ export default {
     NOT         : /not|!/             , // Match not keyword
     AND         : /and|&/             , // Match and keyword
     COMMENT     : /--.*/              , // Match comments
+
 }
