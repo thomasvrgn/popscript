@@ -148,15 +148,24 @@ export default class Transpiler {
 
                             case 'AND': {
                                 if (context.includes('STRING::REMOVE')) {
-                                    built.push(', ""), ')
+                                    built.push(', ""); ')
                                     context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
                                 } else if (context.includes('ARRAY::REMOVE')) {
-                                    built.push('), ')
+                                    built.push('); ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
                                 } else if (context.includes('ARRAY::PUSH')) {
-                                    built.push(')')
+                                    built.push('); ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
+                                } else if (context.includes('PRINT::START')) {
+                                    built.push('); ')
+                                    context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                                 }
+                                break
+                            }
+
+                            case 'PRINT': {
+                                built.push('console.log(')
+                                context.push('PRINT::START')
                                 break
                             }
 
@@ -175,6 +184,9 @@ export default class Transpiler {
                 } else if (context.includes('ARRAY::PUSH')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
+                } else if (context.includes('PRINT::START')) {
+                    built.push(')')
+                    context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                 }
 
                 code.push(built.join(''))
@@ -183,7 +195,6 @@ export default class Transpiler {
                 context = []
 
             }
-
 
         }
 

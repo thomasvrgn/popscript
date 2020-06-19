@@ -122,17 +122,26 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'AND': {
                                 if (context.includes('STRING::REMOVE')) {
-                                    built.push(', ""), ');
+                                    built.push(', ""); ');
                                     context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
                                 }
                                 else if (context.includes('ARRAY::REMOVE')) {
-                                    built.push('), ');
+                                    built.push('); ');
                                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::REMOVE'; }), 1);
                                 }
                                 else if (context.includes('ARRAY::PUSH')) {
-                                    built.push(')');
+                                    built.push('); ');
                                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::PUSH'; }), 1);
                                 }
+                                else if (context.includes('PRINT::START')) {
+                                    built.push('); ');
+                                    context.splice(context.findIndex(function (x) { return x === 'PRINT::START'; }), 1);
+                                }
+                                break;
+                            }
+                            case 'PRINT': {
+                                built.push('console.log(');
+                                context.push('PRINT::START');
                                 break;
                             }
                         }
@@ -149,6 +158,10 @@ var Transpiler = /** @class */ (function () {
                 else if (context.includes('ARRAY::PUSH')) {
                     built.push(')');
                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::PUSH'; }), 1);
+                }
+                else if (context.includes('PRINT::START')) {
+                    built.push(')');
+                    context.splice(context.findIndex(function (x) { return x === 'PRINT::START'; }), 1);
                 }
                 code.push(built.join(''));
                 built = [];
