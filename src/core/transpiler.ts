@@ -44,7 +44,7 @@ export default class Transpiler {
 
                         switch (token) {
 
-                            case 'STRING': {
+                            case 'STRING': case 'INT': {
                                 built.push(value)
                                 break
                             }
