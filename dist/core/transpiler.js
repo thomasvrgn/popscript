@@ -63,6 +63,10 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 break;
                             }
+                            case 'INDEX': {
+                                built.push('[' + value.slice(1, value.length - 1) + ']');
+                                break;
+                            }
                             case 'L_PAREN':
                             case 'R_PAREN': {
                                 if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
@@ -131,7 +135,7 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        console.log(code);
+        //console.log(code)
     };
     return Transpiler;
 }());

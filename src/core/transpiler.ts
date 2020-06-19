@@ -81,6 +81,11 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'INDEX': {
+                                built.push('[' + value.slice(1, value.length - 1) + ']')
+                                break
+                            }
+
                             case 'L_PAREN': case 'R_PAREN': {
                                 if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
                                     if (token === 'L_PAREN') built.push('[')
@@ -163,7 +168,7 @@ export default class Transpiler {
 
         }
 
-        console.log(code)
+        //console.log(code)
 
     }
 
