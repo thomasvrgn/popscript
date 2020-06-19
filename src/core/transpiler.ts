@@ -219,6 +219,23 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'LOOP': {
+                                built.push('for(')
+                                context.push('LOOP::START')
+                                break
+                            }
+
+                            case 'WHILE': {
+                                built.push('while(')
+                                context.push('LOOP::START')
+                                break
+                            }
+
+                            case 'IN': {
+                                built.push(' in ')
+                                break
+                            }
+
                             case 'PRINT': {
                                 built.push('console.log(')
                                 context.push('PRINT::START')
@@ -250,6 +267,10 @@ export default class Transpiler {
                 if (context.includes('CONDITION::START')) {
                     built.push('):')
                     context.splice(context.findIndex(x => x === 'CONDITION::START'), 1)
+                }
+                if (context.includes('LOOP::START')) {
+                    built.push('):')
+                    context.splice(context.findIndex(x => x === 'LOOP::START'), 1)
                 }
 
                 code.push(built.join(''))

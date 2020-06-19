@@ -27,7 +27,7 @@ exports["default"] = {
     ELSE: /else/,
     WHILE: /while/,
     LOOP: /loop/,
-    AS: /as/,
+    IN: /in/,
     PRINT: /print/,
     RETURN: /return/,
     ADD: /(\+=|=\+)/,

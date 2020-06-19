@@ -54,12 +54,16 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'SIGNS': {
                                 if (value === '=') {
-                                    if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
+                                    if (context.includes('CONDITION::START')) {
+                                        built.push('==');
+                                    }
+                                    else if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
                                         built.push('=');
                                     }
                                 }
                                 else {
                                     if (value === '-') {
+                                        console.log(this.variables[var_name]);
                                         if (!var_name)
                                             break;
                                         if (!this.variables[var_name])
@@ -75,7 +79,7 @@ var Transpiler = /** @class */ (function () {
                                                 context.push('ARRAY::REMOVE');
                                                 break;
                                             }
-                                            case 'number': {
+                                            case 'int': {
                                                 built.push(value);
                                                 break;
                                             }
@@ -181,6 +185,23 @@ var Transpiler = /** @class */ (function () {
                                     built.push('); ');
                                     context.splice(context.findIndex(function (x) { return x === 'PRINT::START'; }), 1);
                                 }
+                                if (context.includes('CONDITION::START')) {
+                                    built.push('&&');
+                                }
+                                break;
+                            }
+                            case 'LOOP': {
+                                built.push('for(');
+                                context.push('LOOP::START');
+                                break;
+                            }
+                            case 'WHILE': {
+                                built.push('while(');
+                                context.push('LOOP::START');
+                                break;
+                            }
+                            case 'IN': {
+                                built.push(' in ');
                                 break;
                             }
                             case 'PRINT': {
@@ -209,7 +230,11 @@ var Transpiler = /** @class */ (function () {
                 }
                 if (context.includes('CONDITION::START')) {
                     built.push('):');
-                    context.splice(context.findIndex(function (x) { return x === 'CONDITION:START'; }), 1);
+                    context.splice(context.findIndex(function (x) { return x === 'CONDITION::START'; }), 1);
+                }
+                if (context.includes('LOOP::START')) {
+                    built.push('):');
+                    context.splice(context.findIndex(function (x) { return x === 'LOOP::START'; }), 1);
                 }
                 code.push(built.join(''));
                 built = [];
