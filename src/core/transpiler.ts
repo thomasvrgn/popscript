@@ -58,15 +58,31 @@ export default class Transpiler {
                             }
 
                             case 'WORD': {
-                                if (this.variables[value] !== undefined) {
+                                if (!context.includes('FUNCTION::START')) {
+                                    if (this.variables[value] !== undefined) {
+                                        built.push(value)
+                                        context.push('VARIABLE::USE')
+                                    } else if (this.functions.includes(value)) {
+                                        built.push(value)
+                                        context.push('FUNCTION::CALL')
+                                    } else {
+                                        built.push(`var ${value}`)
+                                        this.variables[value] = ''
+                                        context.push('VARIABLE::DECLARATION')
+                                    }
+                                } else if (context.includes('FUNCTION::START')) {
                                     built.push(value)
-                                    context.push('VARIABLE::USE')
-                                } else {
-                                    built.push(`var ${value}`)
-                                    this.variables[value] = ''
-                                    context.push('VARIABLE::DECLARATION')
+                                    this.functions.push(value)
+                                } else{
+                                    built.push(value)
                                 }
                                 var_name = value
+                                break
+                            }
+
+                            case 'ARGUMENTS': {
+                                built.push('(')
+                                context.push('FUNCTION::ARGUMENTS')
                                 break
                             }
 
@@ -122,6 +138,8 @@ export default class Transpiler {
                                     if (token === 'L_PAREN') built.push('[')
                                     else if (token === 'R_PAREN') built.push(']')
                                     this.variables[var_name] = 'array'
+                                } else if (context.includes('FUNCTION::CALL')) {
+                                    built.push(value)
                                 }
                                 break
                             }
@@ -231,6 +249,12 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'FUNCTION': {
+                                built.push('function ')
+                                context.push('FUNCTION::START')
+                                break
+                            }
+
                             case 'IN': {
                                 built.push(' in ')
                                 break
@@ -272,6 +296,10 @@ export default class Transpiler {
                     built.push('):')
                     context.splice(context.findIndex(x => x === 'LOOP::START'), 1)
                 }
+                if (context.includes('FUNCTION::ARGUMENTS')) {
+                    built.push('):')
+                    context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
+                }
 
                 code.push(built.join(''))
 
@@ -282,7 +310,7 @@ export default class Transpiler {
 
         }
 
-        console.log(code)
+        eval(new Tabdown(code).tab().join('\n'))
 
     }
 

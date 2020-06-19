@@ -6,6 +6,7 @@
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var Transpiler = /** @class */ (function () {
     function Transpiler(content) {
         this.variables = {};
@@ -40,16 +41,34 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'WORD': {
-                                if (this.variables[value] !== undefined) {
+                                if (!context.includes('FUNCTION::START')) {
+                                    if (this.variables[value] !== undefined) {
+                                        built.push(value);
+                                        context.push('VARIABLE::USE');
+                                    }
+                                    else if (this.functions.includes(value)) {
+                                        built.push(value);
+                                        context.push('FUNCTION::CALL');
+                                    }
+                                    else {
+                                        built.push("var " + value);
+                                        this.variables[value] = '';
+                                        context.push('VARIABLE::DECLARATION');
+                                    }
+                                }
+                                else if (context.includes('FUNCTION::START')) {
                                     built.push(value);
-                                    context.push('VARIABLE::USE');
+                                    this.functions.push(value);
                                 }
                                 else {
-                                    built.push("var " + value);
-                                    this.variables[value] = '';
-                                    context.push('VARIABLE::DECLARATION');
+                                    built.push(value);
                                 }
                                 var_name = value;
+                                break;
+                            }
+                            case 'ARGUMENTS': {
+                                built.push('(');
+                                context.push('FUNCTION::ARGUMENTS');
                                 break;
                             }
                             case 'SIGNS': {
@@ -107,6 +126,9 @@ var Transpiler = /** @class */ (function () {
                                     else if (token === 'R_PAREN')
                                         built.push(']');
                                     this.variables[var_name] = 'array';
+                                }
+                                else if (context.includes('FUNCTION::CALL')) {
+                                    built.push(value);
                                 }
                                 break;
                             }
@@ -200,6 +222,11 @@ var Transpiler = /** @class */ (function () {
                                 context.push('LOOP::START');
                                 break;
                             }
+                            case 'FUNCTION': {
+                                built.push('function ');
+                                context.push('FUNCTION::START');
+                                break;
+                            }
                             case 'IN': {
                                 built.push(' in ');
                                 break;
@@ -236,12 +263,16 @@ var Transpiler = /** @class */ (function () {
                     built.push('):');
                     context.splice(context.findIndex(function (x) { return x === 'LOOP::START'; }), 1);
                 }
+                if (context.includes('FUNCTION::ARGUMENTS')) {
+                    built.push('):');
+                    context.splice(context.findIndex(function (x) { return x === 'FUNCTION::ARGUMENTS'; }), 1);
+                }
                 code.push(built.join(''));
                 built = [];
                 context = [];
             }
         }
-        console.log(code);
+        eval(new tabdown_1["default"](code).tab().join('\n'));
     };
     return Transpiler;
 }());
