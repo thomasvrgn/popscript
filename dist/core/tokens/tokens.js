@@ -17,18 +17,17 @@ exports["default"] = {
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,
-    TYPE: /int|str|list/,
-    OPTIONAL: /optional/,
+    OPTIONAL: /opt/,
     BOOLEAN: /true|false/,
     // KEYWORDS
     FUNCTION: /fn/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,
+    WHILE: /while/,
+    LOOP: /loop/,
     PRINT: /print/,
     RETURN: /return/,
-    JOIN: /join/,
-    SPLIT: /split/,
     ADD: /(\+=|=\+)/,
     REMOVE: /(-=|=-)/,
     // OTHER

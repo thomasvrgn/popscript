@@ -23,7 +23,18 @@ var Transpiler = /** @class */ (function () {
                 for (var item_token in tokens) {
                     if (tokens.hasOwnProperty(item_token)) {
                         var item = tokens[item_token], value = item.value, token = item.token;
-                        console.log(token, value);
+                        if (!token)
+                            return console.log('Can\'t understand this keyword "' + value + '" at line', index);
+                        switch (token) {
+                            case 'STRING': {
+                                built.push(value);
+                                break;
+                            }
+                            case 'COMMENT': {
+                                built.push('//' + value.trim().slice(2));
+                                break;
+                            }
+                        }
                     }
                 }
                 code.push(built.join(''));
@@ -31,7 +42,7 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        console.log(code);
+        //console.log(code)
     };
     return Transpiler;
 }());

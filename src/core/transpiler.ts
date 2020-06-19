@@ -39,7 +39,23 @@ export default class Transpiler {
                         let item  : Token  = tokens[item_token],
                             value : string = item.value,
                             token : string = item.token
-                        console.log(token, value)
+
+                        if (!token) return console.log('Can\'t understand this keyword "' + value + '" at line', index)
+
+                        switch (token) {
+
+                            case 'STRING': {
+                                built.push(value)
+                                break
+                            }
+
+                            case 'COMMENT': {
+                                built.push('//' + value.trim().slice(2))
+                                break
+                            }
+
+                        }
+
                     }
 
                 }
@@ -53,7 +69,7 @@ export default class Transpiler {
 
         }
 
-        console.log(code)
+        //console.log(code)
 
     }
 
