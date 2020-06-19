@@ -13,7 +13,8 @@ exports["default"] = {
     L_PAREN: /\(/,
     R_PAREN: /\)/,
     ARGUMENTS: /=>/,
-    INDEX: /:/,
+    PROPERTY: /:/,
+    INDEX: /<.*?>/,
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,
@@ -26,6 +27,7 @@ exports["default"] = {
     ELSE: /else/,
     WHILE: /while/,
     LOOP: /loop/,
+    AS: /as/,
     PRINT: /print/,
     RETURN: /return/,
     ADD: /(\+=|=\+)/,

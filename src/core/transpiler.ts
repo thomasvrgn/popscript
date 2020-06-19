@@ -67,6 +67,15 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'SIGNS': {
+                                if (value === '=') {
+                                    if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
+                                        built.push('=')
+                                    }
+                                }
+                                break
+                            }
+
                         }
 
                     }

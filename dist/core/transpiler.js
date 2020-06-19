@@ -48,6 +48,14 @@ var Transpiler = /** @class */ (function () {
                                 var_name = value;
                                 break;
                             }
+                            case 'SIGNS': {
+                                if (value === '=') {
+                                    if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
+                                        built.push('=');
+                                    }
+                                }
+                                break;
+                            }
                         }
                     }
                 }
