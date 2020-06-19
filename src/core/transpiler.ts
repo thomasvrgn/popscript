@@ -169,6 +169,30 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'IF': {
+                                built.push('if(')
+                                context.push('CONDITION::START')
+                                break
+                            }
+
+                            case 'ELIF': {
+                                built.push('else if(')
+                                context.push('CONDITION::START')
+                                break
+                            }
+
+                            case 'ELSE': {
+                                built.push('else:')
+                                break
+                            }
+
+                            case 'TABS': {
+                                if (parseInt(item_token) === 0) {
+                                    built.push(value)
+                                }
+                                break
+                            }
+
                             case 'AND': {
                                 if (context.includes('STRING::REMOVE')) {
                                     built.push(', ""); ')
@@ -213,6 +237,10 @@ export default class Transpiler {
                 if (context.includes('PRINT::START')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
+                }
+                if (context.includes('CONDITION::START')) {
+                    built.push('):')
+                    context.splice(context.findIndex(x => x === 'CONDITION:START'), 1)
                 }
 
                 code.push(built.join(''))
