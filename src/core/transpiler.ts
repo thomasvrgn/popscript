@@ -72,11 +72,14 @@ export default class Transpiler {
 
                             case 'SIGNS': {
                                 if (value === '=') {
-                                    if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
+                                    if (context.includes('CONDITION::START')) {
+                                        built.push('==')
+                                    } else if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
                                         built.push('=')
                                     }
                                 } else {
                                     if (value === '-') {
+                                        console.log(this.variables[var_name])
                                         if (!var_name) break
                                         if (!this.variables[var_name]) break
                                         switch (this.variables[var_name]) {
@@ -91,7 +94,7 @@ export default class Transpiler {
                                                 break
                                             }
 
-                                            case 'number': {
+                                            case 'int': {
                                                 built.push(value)
                                                 break
                                             }
@@ -210,6 +213,9 @@ export default class Transpiler {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                                 }
+                                if (context.includes('CONDITION::START')) {
+                                    built.push('&&')
+                                }
                                 break
                             }
 
@@ -243,7 +249,7 @@ export default class Transpiler {
                 }
                 if (context.includes('CONDITION::START')) {
                     built.push('):')
-                    context.splice(context.findIndex(x => x === 'CONDITION:START'), 1)
+                    context.splice(context.findIndex(x => x === 'CONDITION::START'), 1)
                 }
 
                 code.push(built.join(''))
