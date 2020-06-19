@@ -59,7 +59,31 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else {
-                                    built.push(value);
+                                    if (value === '-') {
+                                        if (!var_name)
+                                            break;
+                                        if (!this.variables[var_name])
+                                            break;
+                                        switch (this.variables[var_name]) {
+                                            case 'string': {
+                                                built.push('.replace(');
+                                                context.push('STRING::REMOVE');
+                                                break;
+                                            }
+                                            case 'array': {
+                                                built.push('.filter(x => x !== ');
+                                                context.push('ARRAY::REMOVE');
+                                                break;
+                                            }
+                                            case 'number': {
+                                                built.push(value);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        built.push(value);
+                                    }
                                 }
                                 break;
                             }
@@ -151,15 +175,15 @@ var Transpiler = /** @class */ (function () {
                     built.push(', "")');
                     context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
                 }
-                else if (context.includes('ARRAY::REMOVE')) {
+                if (context.includes('ARRAY::REMOVE')) {
                     built.push(')');
                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::REMOVE'; }), 1);
                 }
-                else if (context.includes('ARRAY::PUSH')) {
+                if (context.includes('ARRAY::PUSH')) {
                     built.push(')');
                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::PUSH'; }), 1);
                 }
-                else if (context.includes('PRINT::START')) {
+                if (context.includes('PRINT::START')) {
                     built.push(')');
                     context.splice(context.findIndex(function (x) { return x === 'PRINT::START'; }), 1);
                 }
