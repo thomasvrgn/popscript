@@ -95,7 +95,6 @@ export default class Transpiler {
                                     }
                                 } else {
                                     if (value === '-') {
-                                        console.log(this.variables[var_name])
                                         if (!var_name) break
                                         if (!this.variables[var_name]) break
                                         switch (this.variables[var_name]) {
@@ -276,6 +275,7 @@ export default class Transpiler {
                     built.push(', "")')
                     context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
                 }
+
                 if (context.includes('ARRAY::REMOVE')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)

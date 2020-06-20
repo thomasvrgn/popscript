@@ -82,7 +82,6 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else {
                                     if (value === '-') {
-                                        console.log(this.variables[var_name]);
                                         if (!var_name)
                                             break;
                                         if (!this.variables[var_name])
