@@ -1,2 +1,2 @@
-var coucou= require("./example/export.js")
-coucou.send("Ness")
+var export_test = require("./export.js")
+export_test.welcome("Ness")

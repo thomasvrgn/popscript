@@ -9,6 +9,7 @@ import {Token}       from './scanner'
 import Tabdown       from './tabdown'
 import * as FS       from 'fs'
 import * as PATH     from 'path'
+import * as Beautify from 'js-beautify'
 
 let content   : any
 let variables : Object        = {}
@@ -51,7 +52,7 @@ export default class Transpiler {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase()
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        built.push('"' + folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
+                                        built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
                                         FS.readFile(folder + '/' + value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
                                             if (error) throw error
                                             new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js'))
@@ -62,6 +63,11 @@ export default class Transpiler {
                                 } else {
                                     built.push(value)
                                 }
+                                break
+                            }
+
+                            case 'OPTIONAL': {
+                                context.push('FUNCTION::OPTIONAL')
                                 break
                             }
 
@@ -94,6 +100,12 @@ export default class Transpiler {
                                     } else {
                                         built.push(value)
                                         variables[value] = ''
+                                        if (context.includes('FUNCTION::OPTIONAL')) {
+                                            built.push(' = \'\',')
+                                            context.splice(context.findIndex(x => x === 'FUNCTION::OPTIONAL'), 1)
+                                        } else {
+                                            built.push(',')
+                                        }
                                     }
 
                                 } else{
@@ -363,7 +375,7 @@ export default class Transpiler {
 
         }
 
-        FS.writeFile(filename, new Tabdown(code).tab().join('\n'), error => {
+        FS.writeFile(filename, Beautify(new Tabdown(code).tab().join('\n')), error => {
             if (error) throw error
         })
 

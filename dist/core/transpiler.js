@@ -9,6 +9,7 @@ var tokens_1 = require("./tokens/tokens");
 var tabdown_1 = require("./tabdown");
 var FS = require("fs");
 var PATH = require("path");
+var Beautify = require("js-beautify");
 var content;
 var variables = {};
 var functions = [];
@@ -40,7 +41,7 @@ var Transpiler = /** @class */ (function () {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase();
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        built.push('"' + folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
+                                        built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
                                         FS.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
                                             if (error)
                                                 throw error;
@@ -54,6 +55,10 @@ var Transpiler = /** @class */ (function () {
                                 else {
                                     built.push(value_1);
                                 }
+                                break;
+                            }
+                            case 'OPTIONAL': {
+                                context.push('FUNCTION::OPTIONAL');
                                 break;
                             }
                             case 'COMMENT': {
@@ -89,6 +94,13 @@ var Transpiler = /** @class */ (function () {
                                     else {
                                         built.push(value_1);
                                         variables[value_1] = '';
+                                        if (context.includes('FUNCTION::OPTIONAL')) {
+                                            built.push(' = \'\',');
+                                            context.splice(context.findIndex(function (x) { return x === 'FUNCTION::OPTIONAL'; }), 1);
+                                        }
+                                        else {
+                                            built.push(',');
+                                        }
                                     }
                                 }
                                 else {
@@ -332,7 +344,7 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        FS.writeFile(filename, new tabdown_1["default"](code).tab().join('\n'), function (error) {
+        FS.writeFile(filename, Beautify(new tabdown_1["default"](code).tab().join('\n')), function (error) {
             if (error)
                 throw error;
         });
