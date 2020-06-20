@@ -1,4 +1,4 @@
-# 🍿 Popscript programming la
+# 🍿 Popscript programming language
 Popscript is a programming language focused on simplicity, productivity and speed.
 ## 📦 Install it
 You'll need:
