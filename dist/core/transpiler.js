@@ -8,15 +8,19 @@ var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var tabdown_1 = require("./tabdown");
 var FS = require("fs");
+var PATH = require("path");
 var content;
 var variables = {};
 var functions = [];
+var folder;
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         content = file_content.split(/\n/g);
     }
     Transpiler.prototype.transpile = function (filename) {
+        if (!folder)
+            folder = PATH.dirname(filename);
         var code = [];
         var export_stat = false;
         for (var index in content) {
@@ -36,11 +40,11 @@ var Transpiler = /** @class */ (function () {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase();
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
-                                        FS.readFile(value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
+                                        built.push('"' + folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
+                                        FS.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
                                             if (error)
                                                 throw error;
-                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
+                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
                                         });
                                     }
                                     else {

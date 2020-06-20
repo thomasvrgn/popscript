@@ -13,6 +13,7 @@ import * as PATH     from 'path'
 let content   : any
 let variables : Object        = {}
 let functions : Array<string> = []
+let folder    : string
 
 export default class Transpiler {
 
@@ -25,7 +26,7 @@ export default class Transpiler {
     }
 
     transpile (filename) {
-
+        if (!folder) folder = PATH.dirname(filename)
         const code        = []
         let   export_stat = false
         for (const index in content) {
@@ -50,10 +51,10 @@ export default class Transpiler {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase()
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
-                                        FS.readFile(value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
+                                        built.push('"' + folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
+                                        FS.readFile(folder + '/' + value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
                                             if (error) throw error
-                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(value.slice(1, value.length - 1).replace('.ps', '.js'))
+                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js'))
                                         })
                                     } else {
                                         built.push(value)
