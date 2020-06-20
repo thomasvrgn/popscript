@@ -16,6 +16,7 @@ export default {
     ARGUMENTS   : /=>/                , // Match arguments start like fn test => coucou
     PROPERTY    : /:\w+/              , // Match property
     INDEX       : /<.*?>/             , // Match index
+    CALL        : /->\w+/             , // Match module call
 
     // TYPES
 

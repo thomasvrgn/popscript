@@ -15,6 +15,7 @@ exports["default"] = {
     ARGUMENTS: /=>/,
     PROPERTY: /:\w+/,
     INDEX: /<.*?>/,
+    CALL: /->\w+/,
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,

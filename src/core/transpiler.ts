@@ -180,6 +180,11 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'CALL': {
+                                built.push('.' + value.slice(2))
+                                break
+                            }
+
                             case 'L_PAREN': case 'R_PAREN': {
                                 built.push(value)
                                 break
@@ -375,9 +380,11 @@ export default class Transpiler {
 
         }
 
-        FS.writeFile(filename, Beautify(new Tabdown(code).tab().join('\n')), error => {
-            if (error) throw error
-        })
+        console.log(Beautify(new Tabdown(code).tab().join('\n')))
+
+        // FS.writeFile(filename, Beautify(new Tabdown(code).tab().join('\n')), error => {
+        //     if (error) throw error
+        // })
 
     }
 

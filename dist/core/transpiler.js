@@ -171,6 +171,10 @@ var Transpiler = /** @class */ (function () {
                                 built.push('.' + value_1.slice(1));
                                 break;
                             }
+                            case 'CALL': {
+                                built.push('.' + value_1.slice(2));
+                                break;
+                            }
                             case 'L_PAREN':
                             case 'R_PAREN': {
                                 built.push(value_1);
@@ -344,10 +348,10 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        FS.writeFile(filename, Beautify(new tabdown_1["default"](code).tab().join('\n')), function (error) {
-            if (error)
-                throw error;
-        });
+        console.log(Beautify(new tabdown_1["default"](code).tab().join('\n')));
+        // FS.writeFile(filename, Beautify(new Tabdown(code).tab().join('\n')), error => {
+        //     if (error) throw error
+        // })
     };
     return Transpiler;
 }());
