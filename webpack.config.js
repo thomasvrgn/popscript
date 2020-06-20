@@ -6,7 +6,7 @@ module.exports = {
   entry: './dist/index.js',
   target: 'node',
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'dist', 'build'),
     filename: 'popscript.js'
   }
 }

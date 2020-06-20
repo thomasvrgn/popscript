@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node_modules/.bin/tsc",
     "build": "node_modules/.bin/webpack --config webpack.config.js",
-    "start": "node_modules/.bin/nodemon ./build/popscript.js"
+    "start": "node_modules/.bin/nodemon ./dist/build/popscript.js"
   },
   "repository": {
     "type": "git",
