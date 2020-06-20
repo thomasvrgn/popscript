@@ -32,6 +32,10 @@ exports["default"] = {
     RETURN: /return/,
     ADD: /(\+=|=\+)/,
     REMOVE: /(-=|=-)/,
+    IMPORT: /import/,
+    EXPORT: /export/,
+    FROM: /from/,
+    ARRAY: /(:=|=:)/,
     // OTHER
     AND: /and|&/,
     WORD: /\w+/,

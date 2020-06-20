@@ -7,28 +7,30 @@ import { Tokenizer } from './parser'
 import Tokens        from './tokens/tokens'
 import {Token}       from './scanner'
 import Tabdown       from './tabdown'
+import * as FS       from 'fs'
+import * as PATH     from 'path'
+
+let content   : any
+let variables : Object        = {}
+let functions : Array<string> = []
 
 export default class Transpiler {
 
-    private readonly content   : any
-    private readonly variables : Object = {}
-    private readonly functions : Array<string> = []
-
-    constructor (content) {
+    constructor (file_content) {
 
         Tokenizer.addTokenSet(Tokens)
 
-        this.content = content.split(/\n/g)
+        content = file_content.split(/\n/g)
 
     }
 
-    transpile () {
+    transpile (filename) {
 
-        const code = []
-
-        for (const index in this.content) {
-            if (this.content.hasOwnProperty(index)) {
-                const line     : string        = this.content[index]
+        const code        = []
+        let   export_stat = false
+        for (const index in content) {
+            if (content.hasOwnProperty(index)) {
+                const line     : string        = content[index]
                 const tokens   : Array<Token>  = Tokenizer.tokenize(line)
                 let   context  : Array<string> = [],
                       built    : Array<string> = [],
@@ -44,10 +46,20 @@ export default class Transpiler {
                         switch (token) {
 
                             case 'STRING': case 'INT': {
-                                built.push(value)
                                 if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0 &&
-                                    this.variables[var_name] !== 'array') {
-                                    this.variables[var_name] = token.toLowerCase()
+                                    variables[var_name] !== 'array') {
+                                    variables[var_name] = token.toLowerCase()
+                                    if (context.includes('MODULE::REQUIRE')) {
+                                        built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
+                                        FS.readFile(value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
+                                            if (error) throw error
+                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(value.slice(1, value.length - 1).replace('.ps', '.js'))
+                                        })
+                                    } else {
+                                        built.push(value)
+                                    }
+                                } else {
+                                    built.push(value)
                                 }
                                 break
                             }
@@ -59,20 +71,30 @@ export default class Transpiler {
 
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
-                                    if (this.variables[value] !== undefined) {
+                                    if (variables[value] !== undefined) {
                                         built.push(value)
                                         context.push('VARIABLE::USE')
-                                    } else if (this.functions.includes(value)) {
+                                    } else if (functions.includes(value)) {
                                         built.push(value)
                                         context.push('FUNCTION::CALL')
                                     } else {
                                         built.push(`var ${value}`)
-                                        this.variables[value] = ''
+                                        variables[value] = ''
                                         context.push('VARIABLE::DECLARATION')
                                     }
                                 } else if (context.includes('FUNCTION::START')) {
-                                    built.push(value)
-                                    this.functions.push(value)
+                                    if (!context.includes('FUNCTION::ARGUMENTS')) {
+                                        if (export_stat) {
+                                            built.push(value + '= function')
+                                        } else {
+                                            built.push(value)
+                                        }
+                                        functions.push(value)
+                                    } else {
+                                        built.push(value)
+                                        variables[value] = ''
+                                    }
+
                                 } else{
                                     built.push(value)
                                 }
@@ -86,6 +108,19 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'IMPORT': {
+                                context.push('MODULE::IMPORT')
+                                break
+                            }
+
+                            case 'FROM': {
+                                if (context.includes('MODULE::IMPORT')) {
+                                    built.push('= require(')
+                                    context.push('MODULE::REQUIRE')
+                                }
+                                break
+                            }
+
                             case 'SIGNS': {
                                 if (value === '=') {
                                     if (context.includes('CONDITION::START')) {
@@ -96,8 +131,8 @@ export default class Transpiler {
                                 } else {
                                     if (value === '-') {
                                         if (!var_name) break
-                                        if (!this.variables[var_name]) break
-                                        switch (this.variables[var_name]) {
+                                        if (!variables[var_name]) break
+                                        switch (variables[var_name]) {
                                             case 'string': {
                                                 built.push('.replace(')
                                                 context.push('STRING::REMOVE')
@@ -133,13 +168,13 @@ export default class Transpiler {
                             }
 
                             case 'L_PAREN': case 'R_PAREN': {
-                                if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
-                                    if (token === 'L_PAREN') built.push('[')
-                                    else if (token === 'R_PAREN') built.push(']')
-                                    this.variables[var_name] = 'array'
-                                } else if (context.includes('FUNCTION::CALL')) {
-                                    built.push(value)
-                                }
+                                built.push(value)
+                                break
+                            }
+                            
+                            case 'ARRAY': {
+                                if (value === ':=') built.push('[')
+                                else if (value === '=:') built.push(']')
                                 break
                             }
 
@@ -149,7 +184,7 @@ export default class Transpiler {
                             }
 
                             case 'ADD': {
-                                switch (this.variables[var_name]) {
+                                switch (variables[var_name]) {
 
                                     case 'string': case 'int': {
                                         built.push('+=')
@@ -166,7 +201,7 @@ export default class Transpiler {
                             }
 
                             case 'REMOVE': {
-                                switch (this.variables[var_name]) {
+                                switch (variables[var_name]) {
 
                                     case 'int': {
                                         built.push('-=')
@@ -186,6 +221,12 @@ export default class Transpiler {
                                     }
 
                                 }
+                                break
+                            }
+
+                            case 'EXPORT': {
+                                export_stat = true
+                                built.push('module.exports.')
                                 break
                             }
 
@@ -233,6 +274,10 @@ export default class Transpiler {
                                 if (context.includes('CONDITION::START')) {
                                     built.push('&&')
                                 }
+                                if (context.includes('MODULE::REQUIRE')) {
+                                    built.push('); ')
+                                    context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
+                                }
                                 break
                             }
 
@@ -249,7 +294,9 @@ export default class Transpiler {
                             }
 
                             case 'FUNCTION': {
-                                built.push('function ')
+                                if (!export_stat) {
+                                    built.push('function ')
+                                }
                                 context.push('FUNCTION::START')
                                 break
                             }
@@ -298,7 +345,12 @@ export default class Transpiler {
                 }
                 if (context.includes('FUNCTION::ARGUMENTS')) {
                     built.push('):')
+                    export_stat = false
                     context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
+                }
+                if (context.includes('MODULE::REQUIRE')) {
+                    built.push(')')
+                    context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
                 }
 
                 code.push(built.join(''))
@@ -310,7 +362,9 @@ export default class Transpiler {
 
         }
 
-        eval(new Tabdown(code).tab().join('\n'))
+        FS.writeFile(filename, new Tabdown(code).tab().join('\n'), error => {
+            if (error) throw error
+        })
 
     }
 

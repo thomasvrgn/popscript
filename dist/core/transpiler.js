@@ -7,63 +7,90 @@ exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var tabdown_1 = require("./tabdown");
+var FS = require("fs");
+var content;
+var variables = {};
+var functions = [];
 var Transpiler = /** @class */ (function () {
-    function Transpiler(content) {
-        this.variables = {};
-        this.functions = [];
+    function Transpiler(file_content) {
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
-        this.content = content.split(/\n/g);
+        content = file_content.split(/\n/g);
     }
-    Transpiler.prototype.transpile = function () {
+    Transpiler.prototype.transpile = function (filename) {
         var code = [];
-        for (var index in this.content) {
-            if (this.content.hasOwnProperty(index)) {
-                var line = this.content[index];
+        var export_stat = false;
+        for (var index in content) {
+            if (content.hasOwnProperty(index)) {
+                var line = content[index];
                 var tokens = parser_1.Tokenizer.tokenize(line);
                 var context = [], built = [], var_name = '';
-                for (var item_token in tokens) {
+                var _loop_1 = function (item_token) {
                     if (tokens.hasOwnProperty(item_token)) {
-                        var item = tokens[item_token], value = item.value, token = item.token;
+                        var item = tokens[item_token], value_1 = item.value, token = item.token;
                         if (!token)
-                            return console.log('Can\'t understand this keyword "' + value + '" at line', index);
+                            return { value: console.log('Can\'t understand this keyword "' + value_1 + '" at line', index) };
                         switch (token) {
                             case 'STRING':
                             case 'INT': {
-                                built.push(value);
                                 if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0 &&
-                                    this.variables[var_name] !== 'array') {
-                                    this.variables[var_name] = token.toLowerCase();
+                                    variables[var_name] !== 'array') {
+                                    variables[var_name] = token.toLowerCase();
+                                    if (context.includes('MODULE::REQUIRE')) {
+                                        built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
+                                        FS.readFile(value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
+                                            if (error)
+                                                throw error;
+                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
+                                        });
+                                    }
+                                    else {
+                                        built.push(value_1);
+                                    }
+                                }
+                                else {
+                                    built.push(value_1);
                                 }
                                 break;
                             }
                             case 'COMMENT': {
-                                built.push('//' + value.trim().slice(2));
+                                built.push('//' + value_1.trim().slice(2));
                                 break;
                             }
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
-                                    if (this.variables[value] !== undefined) {
-                                        built.push(value);
+                                    if (variables[value_1] !== undefined) {
+                                        built.push(value_1);
                                         context.push('VARIABLE::USE');
                                     }
-                                    else if (this.functions.includes(value)) {
-                                        built.push(value);
+                                    else if (functions.includes(value_1)) {
+                                        built.push(value_1);
                                         context.push('FUNCTION::CALL');
                                     }
                                     else {
-                                        built.push("var " + value);
-                                        this.variables[value] = '';
+                                        built.push("var " + value_1);
+                                        variables[value_1] = '';
                                         context.push('VARIABLE::DECLARATION');
                                     }
                                 }
                                 else if (context.includes('FUNCTION::START')) {
-                                    built.push(value);
-                                    this.functions.push(value);
+                                    if (!context.includes('FUNCTION::ARGUMENTS')) {
+                                        if (export_stat) {
+                                            built.push(value_1 + '= function');
+                                        }
+                                        else {
+                                            built.push(value_1);
+                                        }
+                                        functions.push(value_1);
+                                    }
+                                    else {
+                                        built.push(value_1);
+                                        variables[value_1] = '';
+                                    }
                                 }
                                 else {
-                                    built.push(value);
+                                    built.push(value_1);
                                 }
-                                var_name = value;
+                                var_name = value_1;
                                 break;
                             }
                             case 'ARGUMENTS': {
@@ -71,8 +98,19 @@ var Transpiler = /** @class */ (function () {
                                 context.push('FUNCTION::ARGUMENTS');
                                 break;
                             }
+                            case 'IMPORT': {
+                                context.push('MODULE::IMPORT');
+                                break;
+                            }
+                            case 'FROM': {
+                                if (context.includes('MODULE::IMPORT')) {
+                                    built.push('= require(');
+                                    context.push('MODULE::REQUIRE');
+                                }
+                                break;
+                            }
                             case 'SIGNS': {
-                                if (value === '=') {
+                                if (value_1 === '=') {
                                     if (context.includes('CONDITION::START')) {
                                         built.push('==');
                                     }
@@ -81,12 +119,12 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else {
-                                    if (value === '-') {
+                                    if (value_1 === '-') {
                                         if (!var_name)
                                             break;
-                                        if (!this.variables[var_name])
+                                        if (!variables[var_name])
                                             break;
-                                        switch (this.variables[var_name]) {
+                                        switch (variables[var_name]) {
                                             case 'string': {
                                                 built.push('.replace(');
                                                 context.push('STRING::REMOVE');
@@ -98,45 +136,43 @@ var Transpiler = /** @class */ (function () {
                                                 break;
                                             }
                                             case 'int': {
-                                                built.push(value);
+                                                built.push(value_1);
                                                 break;
                                             }
                                         }
                                     }
                                     else {
-                                        built.push(value);
+                                        built.push(value_1);
                                     }
                                 }
                                 break;
                             }
                             case 'INDEX': {
-                                built.push('[' + value.slice(1, value.length - 1) + ']');
+                                built.push('[' + value_1.slice(1, value_1.length - 1) + ']');
                                 break;
                             }
                             case 'PROPERTY': {
-                                built.push('.' + value.slice(1));
+                                built.push('.' + value_1.slice(1));
                                 break;
                             }
                             case 'L_PAREN':
                             case 'R_PAREN': {
-                                if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
-                                    if (token === 'L_PAREN')
-                                        built.push('[');
-                                    else if (token === 'R_PAREN')
-                                        built.push(']');
-                                    this.variables[var_name] = 'array';
-                                }
-                                else if (context.includes('FUNCTION::CALL')) {
-                                    built.push(value);
-                                }
+                                built.push(value_1);
+                                break;
+                            }
+                            case 'ARRAY': {
+                                if (value_1 === ':=')
+                                    built.push('[');
+                                else if (value_1 === '=:')
+                                    built.push(']');
                                 break;
                             }
                             case 'COMMA': {
-                                built.push(value);
+                                built.push(value_1);
                                 break;
                             }
                             case 'ADD': {
-                                switch (this.variables[var_name]) {
+                                switch (variables[var_name]) {
                                     case 'string':
                                     case 'int': {
                                         built.push('+=');
@@ -151,7 +187,7 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'REMOVE': {
-                                switch (this.variables[var_name]) {
+                                switch (variables[var_name]) {
                                     case 'int': {
                                         built.push('-=');
                                         break;
@@ -167,6 +203,11 @@ var Transpiler = /** @class */ (function () {
                                         break;
                                     }
                                 }
+                                break;
+                            }
+                            case 'EXPORT': {
+                                export_stat = true;
+                                built.push('module.exports.');
                                 break;
                             }
                             case 'IF': {
@@ -185,7 +226,7 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'TABS': {
                                 if (parseInt(item_token) === 0) {
-                                    built.push(value);
+                                    built.push(value_1);
                                 }
                                 break;
                             }
@@ -209,6 +250,10 @@ var Transpiler = /** @class */ (function () {
                                 if (context.includes('CONDITION::START')) {
                                     built.push('&&');
                                 }
+                                if (context.includes('MODULE::REQUIRE')) {
+                                    built.push('); ');
+                                    context.splice(context.findIndex(function (x) { return x === 'MODULE::REQUIRE'; }), 1);
+                                }
                                 break;
                             }
                             case 'LOOP': {
@@ -222,7 +267,9 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'FUNCTION': {
-                                built.push('function ');
+                                if (!export_stat) {
+                                    built.push('function ');
+                                }
                                 context.push('FUNCTION::START');
                                 break;
                             }
@@ -237,6 +284,11 @@ var Transpiler = /** @class */ (function () {
                             }
                         }
                     }
+                };
+                for (var item_token in tokens) {
+                    var state_1 = _loop_1(item_token);
+                    if (typeof state_1 === "object")
+                        return state_1.value;
                 }
                 if (context.includes('STRING::REMOVE')) {
                     built.push(', "")');
@@ -264,14 +316,22 @@ var Transpiler = /** @class */ (function () {
                 }
                 if (context.includes('FUNCTION::ARGUMENTS')) {
                     built.push('):');
+                    export_stat = false;
                     context.splice(context.findIndex(function (x) { return x === 'FUNCTION::ARGUMENTS'; }), 1);
+                }
+                if (context.includes('MODULE::REQUIRE')) {
+                    built.push(')');
+                    context.splice(context.findIndex(function (x) { return x === 'MODULE::REQUIRE'; }), 1);
                 }
                 code.push(built.join(''));
                 built = [];
                 context = [];
             }
         }
-        eval(new tabdown_1["default"](code).tab().join('\n'));
+        FS.writeFile(filename, new tabdown_1["default"](code).tab().join('\n'), function (error) {
+            if (error)
+                throw error;
+        });
     };
     return Transpiler;
 }());

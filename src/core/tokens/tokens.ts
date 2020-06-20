@@ -37,6 +37,10 @@ export default {
     RETURN      : /return/            , // Match return keyword
     ADD         : /(\+=|=\+)/         , // Match value adding
     REMOVE      : /(-=|=-)/           , // Match value removing
+    IMPORT      : /import/            , // Match import keyword
+    EXPORT      : /export/            , // Match export keyword
+    FROM        : /from/              , // Match import source
+    ARRAY       : /(:=|=:)/           , // Match array
 
     // OTHER
 
