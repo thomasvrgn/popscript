@@ -33,7 +33,6 @@
     "@types/node": "^14.0.13",
     "fs": "0.0.1-security",
     "js-beautify": "^1.11.0",
-    "terser": "^4.8.0",
-    "uglify-js": "^3.9.4"
+    "terser": "^4.8.0"
   }
 }
