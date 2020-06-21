@@ -27,7 +27,6 @@ exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var tabdown_1 = require("./tabdown");
-var fs = require("fs");
 var PATH = require("path");
 var Beautify = require("js-beautify");
 var Terser = require("terser");
@@ -35,6 +34,7 @@ var content;
 var variables = {};
 var functions = [];
 var folder;
+var files = [];
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
@@ -50,11 +50,11 @@ var Transpiler = /** @class */ (function () {
                 var line = content[index];
                 var tokens = parser_1.Tokenizer.tokenize(line);
                 var context = [], built = [], var_name = '';
-                var _loop_1 = function (item_token) {
+                for (var item_token in tokens) {
                     if (tokens.hasOwnProperty(item_token)) {
-                        var item = tokens[item_token], value_1 = item.value, token = item.token;
+                        var item = tokens[item_token], value = item.value, token = item.token;
                         if (!token)
-                            return { value: console.log('Can\'t understand this keyword "' + value_1 + '" at line', index) };
+                            return console.log('Can\'t understand this keyword "' + value + '" at line', index);
                         switch (token) {
                             case 'STRING':
                             case 'INT': {
@@ -63,28 +63,23 @@ var Transpiler = /** @class */ (function () {
                                     variables[var_name] = token.toLowerCase();
                                     if (context.includes('MODULE::REQUIRE')) {
                                         if (context.includes('MODULE::JAVASCRIPT')) {
-                                            built.push(value_1);
+                                            built.push(value);
                                         }
                                         else {
-                                            built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
-                                            fs.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
-                                                if (error)
-                                                    throw error;
-                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
-                                            });
+                                            built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"');
                                         }
                                     }
                                     else {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                            built.push(value_1 + ',');
+                                            built.push(value + ',');
                                         }
                                         else {
-                                            built.push(value_1);
+                                            built.push(value);
                                         }
                                     }
                                 }
                                 else {
-                                    built.push(value_1);
+                                    built.push(value);
                                 }
                                 if (context.includes('CONVERSION::INT')) {
                                     built.push(')');
@@ -101,7 +96,7 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'COMMENT': {
-                                built.push('//' + value_1.trim().slice(2));
+                                built.push('//' + value.trim().slice(2));
                                 break;
                             }
                             case 'JAVASCRIPT': {
@@ -110,38 +105,38 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
-                                    if (variables[value_1] !== undefined) {
+                                    if (variables[value] !== undefined) {
                                         context.push('VARIABLE::USE');
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                            built.push(value_1 + ',');
+                                            built.push(value + ',');
                                         }
                                         else {
-                                            built.push(value_1);
+                                            built.push(value);
                                         }
                                     }
-                                    else if (functions.includes(value_1)) {
-                                        built.push(value_1);
+                                    else if (functions.includes(value)) {
+                                        built.push(value);
                                         context.push('FUNCTION::CALL');
                                     }
                                     else {
-                                        built.push("var " + value_1);
-                                        variables[value_1] = '';
+                                        built.push("var " + value);
+                                        variables[value] = '';
                                         context.push('VARIABLE::DECLARATION');
                                     }
                                 }
                                 else if (context.includes('FUNCTION::START')) {
                                     if (!context.includes('FUNCTION::ARGUMENTS')) {
                                         if (export_stat) {
-                                            built.push(value_1 + '= function');
+                                            built.push(value + '= function');
                                         }
                                         else {
-                                            built.push(value_1);
+                                            built.push(value);
                                         }
-                                        functions.push(value_1);
+                                        functions.push(value);
                                     }
                                     else {
-                                        built.push(value_1);
-                                        variables[value_1] = '';
+                                        built.push(value);
+                                        variables[value] = '';
                                         if (context.includes('FUNCTION::OPTIONAL')) {
                                             built.push(' = \'\',');
                                             context.splice(context.findIndex(function (x) { return x === 'FUNCTION::OPTIONAL'; }), 1);
@@ -152,7 +147,7 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else {
-                                    built.push(value_1);
+                                    built.push(value);
                                 }
                                 if (context.includes('CONVERSION::INT')) {
                                     built.push(')');
@@ -162,7 +157,7 @@ var Transpiler = /** @class */ (function () {
                                     built.push('.toString()');
                                     context.splice(context.findIndex(function (x) { return x === 'CONVERSION::STRING'; }), 1);
                                 }
-                                var_name = value_1;
+                                var_name = value;
                                 break;
                             }
                             case 'ARGUMENTS': {
@@ -182,7 +177,7 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'SIGNS': {
-                                if (value_1 === '=') {
+                                if (value === '=') {
                                     if (context.includes('CONDITION::START')) {
                                         built.push('==');
                                     }
@@ -191,7 +186,7 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else {
-                                    if (value_1 === '-') {
+                                    if (value === '-') {
                                         if (!var_name)
                                             break;
                                         if (!variables[var_name])
@@ -208,48 +203,48 @@ var Transpiler = /** @class */ (function () {
                                                 break;
                                             }
                                             case 'int': {
-                                                built.push(value_1);
+                                                built.push(value);
                                                 break;
                                             }
                                         }
                                     }
                                     else {
-                                        built.push(value_1);
+                                        built.push(value);
                                     }
                                 }
                                 break;
                             }
                             case 'INDEX': {
-                                built.push('[' + value_1.slice(1, value_1.length - 1) + ']');
+                                built.push('[' + value.slice(1, value.length - 1) + ']');
                                 break;
                             }
                             case 'PROPERTY': {
-                                built.push('.' + value_1.slice(1));
+                                built.push('.' + value.slice(1));
                                 break;
                             }
                             case 'CALL': {
-                                built.push('.' + value_1.slice(2));
+                                built.push('.' + value.slice(2));
                                 break;
                             }
                             case 'L_PAREN':
                             case 'R_PAREN': {
                                 context.push('FUNCTION::CALL_ARGUMENTS');
-                                built.push(value_1);
+                                built.push(value);
                                 break;
                             }
                             case 'ARRAY': {
-                                if (value_1 === ':=')
+                                if (value === ':=')
                                     built.push('[');
-                                else if (value_1 === '=:')
+                                else if (value === '=:')
                                     built.push(']');
                                 break;
                             }
                             case 'COMMA': {
-                                built.push(value_1);
+                                built.push(value);
                                 break;
                             }
                             case 'CONVERSION': {
-                                var type = __spread(value_1).reverse().slice(1).reverse().join('').trim();
+                                var type = __spread(value).reverse().slice(1).reverse().join('').trim();
                                 switch (type) {
                                     case 'int': {
                                         built.push('parseInt(');
@@ -318,7 +313,7 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'TABS': {
                                 if (parseInt(item_token) === 0) {
-                                    built.push(value_1);
+                                    built.push(value);
                                 }
                                 break;
                             }
@@ -381,11 +376,6 @@ var Transpiler = /** @class */ (function () {
                             }
                         }
                     }
-                };
-                for (var item_token in tokens) {
-                    var state_1 = _loop_1(item_token);
-                    if (typeof state_1 === "object")
-                        return state_1.value;
                 }
                 if (context.includes('STRING::REMOVE')) {
                     built.push(', "")');
@@ -425,11 +415,7 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        console.log(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
-        console.log(code);
-        // fs.writeFile(filename, Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
-        //     if (error) throw error
-        // })
+        return Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code);
     };
     return Transpiler;
 }());

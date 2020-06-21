@@ -12,10 +12,11 @@ import * as PATH     from 'path'
 import * as Beautify from 'js-beautify'
 import * as Terser   from 'terser'
 
-let content   : any
-let variables : Object        = {}
-let functions : Array<string> = []
-let folder    : string
+let   content   : any
+let   variables : Object        = {}
+let   functions : Array<string> = []
+let   folder    : string
+const files     : Array<string> = []
 
 export default class Transpiler {
 
@@ -57,10 +58,6 @@ export default class Transpiler {
                                             built.push(value)
                                         } else {
                                             built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
-                                            fs.readFile(folder + '/' + value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
-                                                if (error) throw error
-                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js'))
-                                            })
                                         }
                                     } else {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
@@ -440,12 +437,7 @@ export default class Transpiler {
 
         }
 
-        console.log(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
-        console.log(code)
-
-        // fs.writeFile(filename, Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
-        //     if (error) throw error
-        // })
+        return Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code)
 
     }
 
