@@ -22,7 +22,7 @@ exports["default"] = {
     OPTIONAL: /opt/,
     BOOLEAN: /true|false/,
     // KEYWORDS
-    CONVERSION: /(int|string)+\s?:/,
+    CONVERSION: /(int|str)+\s?:/,
     FUNCTION: /fn/,
     IF: /if/,
     ELIF: /elif/,

@@ -64,6 +64,74 @@ Popscript is a tab-based language. Its particularity is that it does not require
    print "Switched: " + boolean
    
 ```
+#### • Remove values
+##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Strings
+```py
+
+   text = "My name is Ness"
+   print text - "Ness" ; Output : "My name is "
+
+```
+##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Numbers
+```py
+
+   number = 5
+   print number - 2 ; Output : 3
+
+```
+##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Arrays
+```py
+
+   array = := "item", "item2", "item3" =:
+   print array - "item" ; Output : ["item2", "item3"]
+
+```
+#### • Add values
+##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Strings
+```py
+
+   text = "My name is Ness"
+   text += "."
+   print text ; Output : "My name is Ness."
+
+```
+##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Numbers
+```py
+
+   number = 5
+   number += 5
+   print number ; Output : 10
+
+```
+##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Arrays
+```py
+
+   array = := "item", "item2", "item3" =:
+   array += "item4"
+   print array ; Output : ["item", "item1", "item2", "item3"]
+
+```
+#### • Indexes
+```py
+   array = := "item", "item2", "item3" =:
+   print array<0> ; Output : "item"
+```
+#### • Properties
+```py
+
+   array = := "item", "item2", "item3" =:
+   print array:length ; Output : 2
+```
+#### • Type conversion
+```py
+
+   number = 5
+   print str : number
+   
+   number = "10"
+   print int : number
+   
+```
 #### • Comments
 
 ```clj
@@ -121,7 +189,13 @@ Popscript is a tab-based language. Its particularity is that it does not require
     welcome("Ness")
 
 ```
+#### • And / Then
+```py
 
+   username = "Ness" and print username
+   number   = 5 and number += 5 then print number
+   
+```
 #### • Modules
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Export
 ```py
@@ -132,7 +206,7 @@ Popscript is a tab-based language. Its particularity is that it does not require
 	
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Import
-```py
+```lsp
    
    import module from "module.ps"
    module->welcome("Ness") -- Output: "Welcome Ness!"
