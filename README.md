@@ -27,7 +27,9 @@ You'll need:
 ## 💬 Simple hello world script
 
 ```py
-print "Hello world!"
+
+   print "Hello world!"
+
 ```
 
 ## 🔨 How it works
@@ -48,7 +50,7 @@ Popscript is a tab-based language. Its particularity is that it does not require
 
    number = 10
    print "Number is " + number
-   
+
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Arrays
 ```py
