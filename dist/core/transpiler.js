@@ -7,9 +7,10 @@ exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var tabdown_1 = require("./tabdown");
-var FS = require("fs");
+var fs = require("fs");
 var PATH = require("path");
 var Beautify = require("js-beautify");
+var Terser = require("terser");
 var content;
 var variables = {};
 var functions = [];
@@ -46,7 +47,7 @@ var Transpiler = /** @class */ (function () {
                                         }
                                         else {
                                             built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
-                                            FS.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
+                                            fs.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
                                                 if (error)
                                                     throw error;
                                                 new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
@@ -82,11 +83,16 @@ var Transpiler = /** @class */ (function () {
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
                                     if (variables[value_1] !== undefined) {
-                                        built.push(value_1);
                                         context.push('VARIABLE::USE');
+                                        if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                            built.push(value_1 + ',');
+                                        }
+                                        else {
+                                            built.push(value_1);
+                                        }
                                     }
                                     else if (functions.includes(value_1)) {
-                                        built.push(value_1 + ',');
+                                        built.push(value_1);
                                         context.push('FUNCTION::CALL');
                                     }
                                     else {
@@ -116,9 +122,6 @@ var Transpiler = /** @class */ (function () {
                                             built.push(',');
                                         }
                                     }
-                                }
-                                else if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                    console.log('ARGUMENT');
                                 }
                                 else {
                                     built.push(value_1);
@@ -371,10 +374,10 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        console.log(Beautify(new tabdown_1["default"](code).tab().join('\n')));
-        // FS.writeFile(filename, Beautify(new Tabdown(code).tab().join('\n')), error => {
-        //     if (error) throw error
-        // })
+        fs.writeFile(filename, Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code), function (error) {
+            if (error)
+                throw error;
+        });
     };
     return Transpiler;
 }());

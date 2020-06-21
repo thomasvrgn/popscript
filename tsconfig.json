@@ -7,6 +7,10 @@
             "ES2015",
             "dom",
             "es7"
+        ],
+        "typeRoots": [],
+        "types": [
+          "node"
         ]
     },
     "exclude": [
