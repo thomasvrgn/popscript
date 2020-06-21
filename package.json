@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node_modules/.bin/tsc",
     "build": "node_modules/.bin/webpack --config webpack.config.js",
-    "start": "node_modules/.bin/nodemon ./dist/build/popscript.js"
+    "start": "node_modules/.bin/nodemon ./dist/build/popscript.js --ignore './example/'"
   },
   "repository": {
     "type": "git",
@@ -31,15 +31,10 @@
   },
   "dependencies": {
     "@types/node": "^14.0.13",
-    "detective": "^5.2.0",
+    "@zeit/ncc": "^0.22.3",
     "fs": "0.0.1-security",
     "glob": "^7.1.6",
-    "google-closure-compiler": "^20200614.0.0",
-    "gulp-util": "^3.0.8",
     "js-beautify": "^1.11.0",
-    "terser": "^4.8.0",
-    "uglify-es": "^3.3.9",
-    "uglify-js": "^3.10.0",
-    "yuicompressor": "^2.4.8"
+    "terser": "^4.8.0"
   }
 }

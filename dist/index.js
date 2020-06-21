@@ -19,6 +19,7 @@ var transpiler_1 = require("./core/transpiler");
 var FS = require("fs");
 var PATH = require("path");
 var GLOB = require("glob");
+var NCC = require("@zeit/ncc");
 var input = PATH.resolve('example/index.ps');
 FS.exists(input, function (bool) {
     if (!bool)
@@ -27,19 +28,39 @@ FS.exists(input, function (bool) {
         if (error)
             throw error;
         if (stats.isFile()) {
-            var filename = PATH.basename(input), foldername = PATH.dirname(input);
-            GLOB(PATH.join(foldername, '**', '*.ps'), function (error, content) {
+            var filename_1 = PATH.basename(input), foldername_1 = PATH.dirname(input);
+            GLOB(PATH.join(foldername_1, '**', '*.ps'), function (error, content) {
                 var e_1, _a;
                 if (error)
                     throw error;
+                var counter = 0, files = content, codes = {};
                 var _loop_1 = function (file) {
                     FS.readFile(file, 'UTF-8', function (error, content) {
                         if (error)
                             throw error;
                         var code = new transpiler_1["default"](content.split(/\r?\n/g).join('\n')).transpile(file);
+                        ++counter;
+                        codes[file] = code;
                         FS.writeFile(file.replace('.ps', '.js'), code, function (error) {
                             if (error)
                                 throw error;
+                            if (counter === files.length) {
+                                NCC(input.replace('.ps', '.js'), {
+                                    externals: ["externalpackage"],
+                                    filterAssetBase: process.cwd(),
+                                    minify: true,
+                                    watch: false,
+                                    v8cache: false,
+                                    quiet: true,
+                                    debugLog: false
+                                }).then(function (_a) {
+                                    var code = _a.code, map = _a.map, assets = _a.assets;
+                                    FS.writeFile(PATH.join(foldername_1, filename_1.replace('.ps', '') + '_output.js'), code, function (error) {
+                                        if (error)
+                                            throw error;
+                                    });
+                                });
+                            }
                         });
                     });
                 };
