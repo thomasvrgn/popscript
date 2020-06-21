@@ -45,5 +45,5 @@ exports["default"] = {
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]/,
     NOT: /not|!/,
-    COMMENT: /--.*/
+    COMMENT: /;.*/
 };

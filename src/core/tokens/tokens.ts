@@ -52,6 +52,6 @@ export default {
     WORD        : /\w+/                   , // Match any words
     SIGNS       : /[><=+\-*\/%|]/         , // Match any sign
     NOT         : /not|!/                 , // Match not keyword
-    COMMENT     : /--.*/                  , // Match comments
+    COMMENT     : /;.*/                  , // Match comments
 
 }

@@ -66,10 +66,10 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ```
 #### • Comments
 
-```py
+```clj
 
-   -- This is a comment
-   comment = "coucou" -- Comments can follow any declaration.
+   ; This is a comment
+   comment = "coucou" ; Comments can follow any declaration.
 
 ```
 
