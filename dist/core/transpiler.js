@@ -3,6 +3,26 @@
          POPSCRIPT LANGUAGE
              Transpiler
 //////////////////////////////////*/
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
@@ -66,6 +86,14 @@ var Transpiler = /** @class */ (function () {
                                 else {
                                     built.push(value_1);
                                 }
+                                if (context.includes('CONVERSION::INT')) {
+                                    built.push(')');
+                                    context.splice(context.findIndex(function (x) { return x === 'CONVERSION::INT'; }), 1);
+                                }
+                                else if (context.includes('CONVERSION::STRING')) {
+                                    built.push('.toString()');
+                                    context.splice(context.findIndex(function (x) { return x === 'CONVERSION::STRING'; }), 1);
+                                }
                                 break;
                             }
                             case 'OPTIONAL': {
@@ -125,6 +153,14 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else {
                                     built.push(value_1);
+                                }
+                                if (context.includes('CONVERSION::INT')) {
+                                    built.push(')');
+                                    context.splice(context.findIndex(function (x) { return x === 'CONVERSION::INT'; }), 1);
+                                }
+                                else if (context.includes('CONVERSION::STRING')) {
+                                    built.push('.toString()');
+                                    context.splice(context.findIndex(function (x) { return x === 'CONVERSION::STRING'; }), 1);
                                 }
                                 var_name = value_1;
                                 break;
@@ -210,6 +246,21 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'COMMA': {
                                 built.push(value_1);
+                                break;
+                            }
+                            case 'CONVERSION': {
+                                var type = __spread(value_1).reverse().slice(1).reverse().join('').trim();
+                                switch (type) {
+                                    case 'int': {
+                                        built.push('parseInt(');
+                                        context.push('CONVERSION::INT');
+                                        break;
+                                    }
+                                    case 'string': {
+                                        context.push('CONVERSION::STRING');
+                                        break;
+                                    }
+                                }
                                 break;
                             }
                             case 'ADD': {
@@ -374,10 +425,11 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
-        fs.writeFile(filename, Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code), function (error) {
-            if (error)
-                throw error;
-        });
+        console.log(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
+        console.log(code);
+        // fs.writeFile(filename, Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
+        //     if (error) throw error
+        // })
     };
     return Transpiler;
 }());

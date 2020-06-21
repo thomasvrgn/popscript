@@ -72,6 +72,13 @@ export default class Transpiler {
                                 } else {
                                     built.push(value)
                                 }
+                                if (context.includes('CONVERSION::INT')) {
+                                    built.push(')')
+                                    context.splice(context.findIndex(x => x === 'CONVERSION::INT'), 1)
+                                } else if (context.includes('CONVERSION::STRING')) {
+                                    built.push('.toString()')
+                                    context.splice(context.findIndex(x => x === 'CONVERSION::STRING'), 1)
+                                }
                                 break
                             }
 
@@ -130,6 +137,15 @@ export default class Transpiler {
                                 } else {
                                     built.push(value)
                                 }
+                                
+                                if (context.includes('CONVERSION::INT')) {
+                                    built.push(')')
+                                    context.splice(context.findIndex(x => x === 'CONVERSION::INT'), 1)
+                                } else if (context.includes('CONVERSION::STRING')) {
+                                    built.push('.toString()')
+                                    context.splice(context.findIndex(x => x === 'CONVERSION::STRING'), 1)
+                                }
+
                                 var_name = value
                                 break
                             }
@@ -218,6 +234,26 @@ export default class Transpiler {
 
                             case 'COMMA': {
                                 built.push(value)
+                                break
+                            }
+
+                            case 'CONVERSION': {
+                                const type = [...value].reverse().slice(1).reverse().join('').trim()
+                                switch (type) {
+
+                                    case 'int': {
+                                        built.push('parseInt(')
+                                        context.push('CONVERSION::INT')
+                                        break
+                                    }
+
+                                    case 'string': {
+                                        context.push('CONVERSION::STRING')
+                                        break
+                                    }
+
+                                }
+
                                 break
                             }
 
@@ -404,9 +440,12 @@ export default class Transpiler {
 
         }
 
-        fs.writeFile(filename, Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
-            if (error) throw error
-        })
+        console.log(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
+        console.log(code)
+
+        // fs.writeFile(filename, Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
+        //     if (error) throw error
+        // })
 
     }
 
