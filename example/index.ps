@@ -1,3 +1,8 @@
-import export_test from "export.ps"
+import fs as javascript from "fs"
 
-export_test->welcome("Ness")
+fn callback => error content
+  if error
+    print "Une erreur est survenue : " + error
+  print content
+
+fs->readFile("export.ps" "UTF-8" callback)

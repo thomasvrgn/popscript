@@ -52,13 +52,21 @@ export default class Transpiler {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase()
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
-                                        FS.readFile(folder + '/' + value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
-                                            if (error) throw error
-                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js'))
-                                        })
+                                        if (context.includes('MODULE::JAVASCRIPT')) {
+                                            built.push(value)
+                                        } else {
+                                            built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
+                                            FS.readFile(folder + '/' + value.slice(1, value.length - 1), 'UTF-8', (error, content) => {
+                                                if (error) throw error
+                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value.slice(1, value.length - 1).replace('.ps', '.js'))
+                                            })
+                                        }
                                     } else {
-                                        built.push(value)
+                                        if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                            built.push(value + ',')
+                                        } else {
+                                            built.push(value)
+                                        }
                                     }
                                 } else {
                                     built.push(value)
@@ -76,13 +84,18 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'JAVASCRIPT': {
+                                context.push('MODULE::JAVASCRIPT')
+                                break
+                            }
+
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
                                     if (variables[value] !== undefined) {
                                         built.push(value)
                                         context.push('VARIABLE::USE')
                                     } else if (functions.includes(value)) {
-                                        built.push(value)
+                                        built.push(value + ',')
                                         context.push('FUNCTION::CALL')
                                     } else {
                                         built.push(`var ${value}`)
@@ -93,6 +106,7 @@ export default class Transpiler {
                                     if (!context.includes('FUNCTION::ARGUMENTS')) {
                                         if (export_stat) {
                                             built.push(value + '= function')
+
                                         } else {
                                             built.push(value)
                                         }
@@ -108,7 +122,9 @@ export default class Transpiler {
                                         }
                                     }
 
-                                } else{
+                                } else if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                    console.log('ARGUMENT')
+                                } else {
                                     built.push(value)
                                 }
                                 var_name = value
@@ -186,6 +202,7 @@ export default class Transpiler {
                             }
 
                             case 'L_PAREN': case 'R_PAREN': {
+                                context.push('FUNCTION::CALL_ARGUMENTS')
                                 built.push(value)
                                 break
                             }
@@ -272,17 +289,17 @@ export default class Transpiler {
                                 break
                             }
 
-                            case 'AND': {
+                            case 'AND': case 'THEN': {
                                 if (context.includes('STRING::REMOVE')) {
-                                    built.push(', ""); ')
+                                    built.push(', "") ')
                                     context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
                                 }
                                 if (context.includes('ARRAY::REMOVE')) {
-                                    built.push('); ')
+                                    built.push(') ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
                                 }
                                 if (context.includes('ARRAY::PUSH')) {
-                                    built.push('); ')
+                                    built.push(') ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
                                 }
                                 if (context.includes('PRINT::START')) {
@@ -295,6 +312,10 @@ export default class Transpiler {
                                 if (context.includes('MODULE::REQUIRE')) {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
+                                }
+                                if (context.includes('VARIABLE::USE')) {
+                                    built.push('; ')
+                                    context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                 }
                                 break
                             }

@@ -41,15 +41,25 @@ var Transpiler = /** @class */ (function () {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase();
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
-                                        FS.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
-                                            if (error)
-                                                throw error;
-                                            new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
-                                        });
+                                        if (context.includes('MODULE::JAVASCRIPT')) {
+                                            built.push(value_1);
+                                        }
+                                        else {
+                                            built.push('"./' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js') + '"');
+                                            FS.readFile(folder + '/' + value_1.slice(1, value_1.length - 1), 'UTF-8', function (error, content) {
+                                                if (error)
+                                                    throw error;
+                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '/' + value_1.slice(1, value_1.length - 1).replace('.ps', '.js'));
+                                            });
+                                        }
                                     }
                                     else {
-                                        built.push(value_1);
+                                        if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                            built.push(value_1 + ',');
+                                        }
+                                        else {
+                                            built.push(value_1);
+                                        }
                                     }
                                 }
                                 else {
@@ -65,6 +75,10 @@ var Transpiler = /** @class */ (function () {
                                 built.push('//' + value_1.trim().slice(2));
                                 break;
                             }
+                            case 'JAVASCRIPT': {
+                                context.push('MODULE::JAVASCRIPT');
+                                break;
+                            }
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
                                     if (variables[value_1] !== undefined) {
@@ -72,7 +86,7 @@ var Transpiler = /** @class */ (function () {
                                         context.push('VARIABLE::USE');
                                     }
                                     else if (functions.includes(value_1)) {
-                                        built.push(value_1);
+                                        built.push(value_1 + ',');
                                         context.push('FUNCTION::CALL');
                                     }
                                     else {
@@ -102,6 +116,9 @@ var Transpiler = /** @class */ (function () {
                                             built.push(',');
                                         }
                                     }
+                                }
+                                else if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                    console.log('ARGUMENT');
                                 }
                                 else {
                                     built.push(value_1);
@@ -177,6 +194,7 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'L_PAREN':
                             case 'R_PAREN': {
+                                context.push('FUNCTION::CALL_ARGUMENTS');
                                 built.push(value_1);
                                 break;
                             }
@@ -250,17 +268,18 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 break;
                             }
-                            case 'AND': {
+                            case 'AND':
+                            case 'THEN': {
                                 if (context.includes('STRING::REMOVE')) {
-                                    built.push(', ""); ');
+                                    built.push(', "") ');
                                     context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
                                 }
                                 if (context.includes('ARRAY::REMOVE')) {
-                                    built.push('); ');
+                                    built.push(') ');
                                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::REMOVE'; }), 1);
                                 }
                                 if (context.includes('ARRAY::PUSH')) {
-                                    built.push('); ');
+                                    built.push(') ');
                                     context.splice(context.findIndex(function (x) { return x === 'ARRAY::PUSH'; }), 1);
                                 }
                                 if (context.includes('PRINT::START')) {
@@ -273,6 +292,10 @@ var Transpiler = /** @class */ (function () {
                                 if (context.includes('MODULE::REQUIRE')) {
                                     built.push('); ');
                                     context.splice(context.findIndex(function (x) { return x === 'MODULE::REQUIRE'; }), 1);
+                                }
+                                if (context.includes('VARIABLE::USE')) {
+                                    built.push('; ');
+                                    context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
                                 }
                                 break;
                             }

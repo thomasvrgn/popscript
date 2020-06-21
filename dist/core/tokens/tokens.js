@@ -37,7 +37,9 @@ exports["default"] = {
     EXPORT: /export/,
     FROM: /from/,
     ARRAY: /(:=|=:)/,
+    JAVASCRIPT: /as (javascript|js)/,
     // OTHER
+    THEN: /then/,
     AND: /and|&/,
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]/,
