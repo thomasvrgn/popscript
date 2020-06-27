@@ -39,7 +39,8 @@ exports["default"] = {
     JAVASCRIPT: /as (javascript|js)/,
     // OTHER
     THEN: /then/,
-    AND: /and|&/,
+    ARGUMENT: /and/,
+    AND: /&/,
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]/,
     NOT: /not|!/,

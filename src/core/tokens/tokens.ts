@@ -46,10 +46,11 @@ export default {
     // OTHER
 
     THEN        : /then/                  , // Match then keyword
-    AND         : /and|&/                 , // Match and keyword
+    ARGUMENT    : /and/                   , // Match argument
+    AND         : /&/                     , // Match and keyword
     WORD        : /\w+/                   , // Match any words
     SIGNS       : /[><=+\-*\/%|]/         , // Match any sign
     NOT         : /not|!/                 , // Match not keyword
-    COMMENT     : /;.*/                  , // Match comments
+    COMMENT     : /;.*/                   , // Match comments
 
 }
