@@ -234,8 +234,10 @@ var Transpiler = /** @class */ (function () {
                                     context.push('FUNCTION::CALL_ARGUMENTS');
                                 }
                                 else {
-                                    if (value === '(')
+                                    if (value === '(') {
                                         built.push('[');
+                                        context.push('ARRAY::START');
+                                    }
                                     else if (value === ')')
                                         built.push(']');
                                     variables[var_name] = 'array';
@@ -272,6 +274,19 @@ var Transpiler = /** @class */ (function () {
                                         built.push('.push(');
                                         context.push('ARRAY::PUSH');
                                         break;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'SPACE': {
+                                if (context.includes('ARRAY::START')) {
+                                    if (['STRING', 'INT'].includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token)) {
+                                        built.push(', ');
+                                    }
+                                }
+                                else if (context.includes('PRINT::START')) {
+                                    if (['STRING', 'INT', 'WORD', 'L_PAREN', 'R_PAREN'].includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token)) {
+                                        built.push(', ');
                                     }
                                 }
                                 break;
