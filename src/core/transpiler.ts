@@ -286,7 +286,7 @@ export default class Transpiler {
                                         built.push(', ')
                                     }
                                 }
-                                
+
                                 break
                             }
 
@@ -297,6 +297,7 @@ export default class Transpiler {
                                         built.push('-=')
                                         break
                                     }
+
 
                                     case 'string': {
                                         built.push(' = ' + var_name + '.replace(')
@@ -340,6 +341,14 @@ export default class Transpiler {
                             case 'TABS': {
                                 if (parseInt(item_token) === 0) {
                                     built.push(value)
+                                } else if (context.includes('ARRAY::START')) {
+                                    if (['STRING', 'INT'].includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token)) {
+                                        built.push(', ')
+                                    }
+                                } else if (context.includes('PRINT::START')) {
+                                    if (['STRING', 'INT', 'WORD', 'L_PAREN', 'R_PAREN'].includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token)) {
+                                        built.push(', ')
+                                    }
                                 }
                                 break
                             }
