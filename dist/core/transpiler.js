@@ -238,8 +238,10 @@ var Transpiler = /** @class */ (function () {
                                         built.push('[');
                                         context.push('ARRAY::START');
                                     }
-                                    else if (value === ')')
+                                    else if (value === ')') {
                                         built.push(']');
+                                        context.push('ARRAY::END');
+                                    }
                                     variables[var_name] = 'array';
                                 }
                                 break;
@@ -374,6 +376,10 @@ var Transpiler = /** @class */ (function () {
                                     built.push('; ');
                                     context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
                                 }
+                                if (context.includes('ARRAY::END')) {
+                                    built.push('; ');
+                                    context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
+                                }
                                 break;
                             }
                             case 'LOOP': {
@@ -437,6 +443,10 @@ var Transpiler = /** @class */ (function () {
                 if (context.includes('MODULE::REQUIRE')) {
                     built.push(')');
                     context.splice(context.findIndex(function (x) { return x === 'MODULE::REQUIRE'; }), 1);
+                }
+                if (context.includes('ARRAY::END')) {
+                    built.push('; ');
+                    context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
                 }
                 code.push(built.join(''));
                 built = [];

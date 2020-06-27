@@ -228,7 +228,10 @@ export default class Transpiler {
                                         built.push('[')
                                         context.push('ARRAY::START')
                                     }
-                                    else if (value === ')') built.push(']')
+                                    else if (value === ')') {
+                                        built.push(']')
+                                        context.push('ARRAY::END')
+                                    }
                                     variables[var_name] = 'array'
                                 }
                                 break
@@ -381,6 +384,10 @@ export default class Transpiler {
                                     built.push('; ')
                                     context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                 }
+                                if (context.includes('ARRAY::END')) {
+                                    built.push('; ')
+                                    context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
+                                }
                                 break
                             }
 
@@ -421,6 +428,7 @@ export default class Transpiler {
 
                 }
 
+
                 if (context.includes('STRING::REMOVE')) {
                     built.push(', "")')
                     context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
@@ -454,6 +462,10 @@ export default class Transpiler {
                 if (context.includes('MODULE::REQUIRE')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
+                }
+                if (context.includes('ARRAY::END')) {
+                    built.push('; ')
+                    context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                 }
 
                 code.push(built.join(''))
