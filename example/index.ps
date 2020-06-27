@@ -1,6 +1,9 @@
 fn factorial => num
   if num > 1
-    num *= factorial => num - 1 and factorial => 5
+    num *= factorial => num - 1
   return num
 
 print factorial => 5
+
+loop i in factorial => 10
+  print "test"

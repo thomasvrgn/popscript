@@ -389,6 +389,10 @@ var Transpiler = /** @class */ (function () {
                             case 'AND':
                             case 'THEN': {
                                 for (var i = 0; i < context.length; i++) {
+                                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                        built.push(')');
+                                        context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
+                                    }
                                     if (context.includes('STRING::REMOVE')) {
                                         built.push(', "") ');
                                         context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
@@ -419,10 +423,6 @@ var Transpiler = /** @class */ (function () {
                                     if (context.includes('ARRAY::END')) {
                                         built.push('; ');
                                         context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
-                                    }
-                                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                        built.push(')');
-                                        context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
                                     }
                                 }
                                 break;
@@ -461,6 +461,10 @@ var Transpiler = /** @class */ (function () {
                     }
                 }
                 for (var i = 0; i < context.length; i++) {
+                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                        built.push(')');
+                        context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
+                    }
                     if (context.includes('STRING::REMOVE')) {
                         built.push(', "")');
                         context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
@@ -477,6 +481,14 @@ var Transpiler = /** @class */ (function () {
                         built.push(')');
                         context.splice(context.findIndex(function (x) { return x === 'PRINT::START'; }), 1);
                     }
+                    if (context.includes('MODULE::REQUIRE')) {
+                        built.push(')');
+                        context.splice(context.findIndex(function (x) { return x === 'MODULE::REQUIRE'; }), 1);
+                    }
+                    if (context.includes('ARRAY::END')) {
+                        built.push('; ');
+                        context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
+                    }
                     if (context.includes('CONDITION::START')) {
                         built.push('):');
                         context.splice(context.findIndex(function (x) { return x === 'CONDITION::START'; }), 1);
@@ -489,18 +501,6 @@ var Transpiler = /** @class */ (function () {
                         built.push('):');
                         export_stat = false;
                         context.splice(context.findIndex(function (x) { return x === 'FUNCTION::ARGUMENTS'; }), 1);
-                    }
-                    if (context.includes('MODULE::REQUIRE')) {
-                        built.push(')');
-                        context.splice(context.findIndex(function (x) { return x === 'MODULE::REQUIRE'; }), 1);
-                    }
-                    if (context.includes('ARRAY::END')) {
-                        built.push('; ');
-                        context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
-                    }
-                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                        built.push(')');
-                        context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
                     }
                 }
                 code.push(built.join(''));

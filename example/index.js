@@ -1,4 +1,4 @@
-function factorial(a) {
-    return a > 1 && (a *= factorial(a - 1, factorial(5))), a
+function factorial(o) {
+    return o > 1 && (o *= factorial(o - 1)), o
 }
-console.log(factorial(5));
+for (var i in console.log(factorial(5)), factorial(10)) console.log("test");

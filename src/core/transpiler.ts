@@ -393,6 +393,12 @@ export default class Transpiler {
 
                             case 'AND': case 'THEN': {
                                 for (let i = 0; i < context.length; i++) {
+
+                                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                        built.push(')')
+                                        context.splice(context.findIndex(x => x === 'FUNCTION::CALL_ARGUMENTS'), 1)
+                                    }
+
                                     if (context.includes('STRING::REMOVE')) {
                                         built.push(', "") ')
                                         context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
@@ -431,11 +437,7 @@ export default class Transpiler {
                                         built.push('; ')
                                         context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                     }
-    
-                                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                        built.push(')')
-                                        context.splice(context.findIndex(x => x === 'FUNCTION::CALL_ARGUMENTS'), 1)
-                                    }
+                                    
                                 }
                                 
                                 break
@@ -484,6 +486,12 @@ export default class Transpiler {
                 }
 
                 for (let i = 0; i < context.length; i++) {
+    
+                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                        built.push(')')
+                        context.splice(context.findIndex(x => x === 'FUNCTION::CALL_ARGUMENTS'), 1)
+                    }
+
                     if (context.includes('STRING::REMOVE')) {
                         built.push(', "")')
                         context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
@@ -504,6 +512,16 @@ export default class Transpiler {
                         context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                     }
     
+                    if (context.includes('MODULE::REQUIRE')) {
+                        built.push(')')
+                        context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
+                    }
+    
+                    if (context.includes('ARRAY::END')) {
+                        built.push('; ')
+                        context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
+                    }
+    
                     if (context.includes('CONDITION::START')) {
                         built.push('):')
                         context.splice(context.findIndex(x => x === 'CONDITION::START'), 1)
@@ -519,21 +537,6 @@ export default class Transpiler {
                         export_stat = false
                         context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
                     }
-    
-                    if (context.includes('MODULE::REQUIRE')) {
-                        built.push(')')
-                        context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
-                    }
-    
-                    if (context.includes('ARRAY::END')) {
-                        built.push('; ')
-                        context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
-                    }
-    
-                    if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                        built.push(')')
-                        context.splice(context.findIndex(x => x === 'FUNCTION::CALL_ARGUMENTS'), 1)
-                    }
                 }
 
                 code.push(built.join(''))
@@ -547,6 +550,7 @@ export default class Transpiler {
 
         console.log(new Tabdown(code).tab())
         
+
         return Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code)
 
     }
