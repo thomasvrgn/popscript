@@ -95,6 +95,7 @@ export default class Transpiler {
                             }
 
                             case 'WORD': {
+                                
                                 if (!context.includes('FUNCTION::START')) {
                                     if (variables[value] !== undefined) {
                                         context.push('VARIABLE::USE')
@@ -213,19 +214,20 @@ export default class Transpiler {
                             }
 
                             case 'CALL': {
+                                context.push('FUNCTION::CALL')
                                 built.push('.' + value.slice(2))
                                 break
                             }
 
                             case 'L_PAREN': case 'R_PAREN': {
-                                context.push('FUNCTION::CALL_ARGUMENTS')
-                                built.push(value)
-                                break
-                            }
-                            
-                            case 'ARRAY': {
-                                if (value === ':=') built.push('[')
-                                else if (value === '=:') built.push(']')
+                                if (context.slice(-1)[0] === 'FUNCTION::CALL' || context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                    built.push(value)
+                                    context.push('FUNCTION::CALL_ARGUMENTS')
+                                } else {
+                                    if (value === '(') built.push('[')
+                                    else if (value === ')') built.push(']')
+                                    variables[var_name] = 'array'
+                                }
                                 break
                             }
 
