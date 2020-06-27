@@ -6,8 +6,6 @@
 import Transpiler from './core/transpiler'
 import * as FS    from 'fs'
 import * as PATH  from 'path'
-import * as GLOB  from 'glob'
-import * as NCC   from '@zeit/ncc'
 
 const input = PATH.resolve('example/index.ps')
 
