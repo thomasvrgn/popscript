@@ -357,37 +357,46 @@ export default class Transpiler {
                             }
 
                             case 'AND': case 'THEN': {
+
                                 if (context.includes('STRING::REMOVE')) {
                                     built.push(', "") ')
                                     context.splice(context.findIndex(x => x === 'STRING::REMOVE'), 1)
                                 }
+
                                 if (context.includes('ARRAY::REMOVE')) {
                                     built.push(') ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
                                 }
+
                                 if (context.includes('ARRAY::PUSH')) {
                                     built.push(') ')
                                     context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
                                 }
+
                                 if (context.includes('PRINT::START')) {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                                 }
+
                                 if (context.includes('CONDITION::START')) {
                                     built.push('&&')
                                 }
+
                                 if (context.includes('MODULE::REQUIRE')) {
                                     built.push('); ')
                                     context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
                                 }
+
                                 if (context.includes('VARIABLE::USE')) {
                                     built.push('; ')
                                     context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                 }
+
                                 if (context.includes('ARRAY::END')) {
                                     built.push('; ')
                                     context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                 }
+                                
                                 break
                             }
 
@@ -438,31 +447,38 @@ export default class Transpiler {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'ARRAY::REMOVE'), 1)
                 }
+
                 if (context.includes('ARRAY::PUSH')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'ARRAY::PUSH'), 1)
                 }
+
                 if (context.includes('PRINT::START')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'PRINT::START'), 1)
                 }
+
                 if (context.includes('CONDITION::START')) {
                     built.push('):')
                     context.splice(context.findIndex(x => x === 'CONDITION::START'), 1)
                 }
+
                 if (context.includes('LOOP::START')) {
                     built.push('):')
                     context.splice(context.findIndex(x => x === 'LOOP::START'), 1)
                 }
+
                 if (context.includes('FUNCTION::ARGUMENTS')) {
                     built.push('):')
                     export_stat = false
                     context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
                 }
+
                 if (context.includes('MODULE::REQUIRE')) {
                     built.push(')')
                     context.splice(context.findIndex(x => x === 'MODULE::REQUIRE'), 1)
                 }
+
                 if (context.includes('ARRAY::END')) {
                     built.push('; ')
                     context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
