@@ -42,28 +42,28 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ```py
 
    username = "Ness"
-   print "Welcome " + username + "!"
+   print "Welcome" username + "!"
 
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Numbers
 ```py
 
    number = 10
-   print "Number is " + number
+   print "Number is" number
 
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Arrays
 ```py
 
-   array = := "item", "item", "item" =:
-   print "Array is " + array
+   array = ( "item" "item" "item" )
+   print "Array is" array
 
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Booleans
 ```py
 
    boolean = true
-   print "Switched: " + boolean
+   print "Switched:" boolean
    
 ```
 #### • Remove values
@@ -84,7 +84,7 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Arrays
 ```py
 
-   array = := "item", "item2", "item3" =:
+   array = ( "item" "item2" "item3" )
    print array - "item" ; Output : ["item2", "item3"]
 
 ```
@@ -108,20 +108,20 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Arrays
 ```py
 
-   array = := "item", "item2", "item3" =:
+   array = ( "item" "item2" "item3" )
    array += "item4"
    print array ; Output : ["item", "item1", "item2", "item3"]
 
 ```
 #### • Indexes
 ```py
-   array = := "item", "item2", "item3" =:
-   print array<0> ; Output : "item"
+   array = ( "item" "item2" "item3" )
+   print array:0 ; Output : "item"
 ```
 #### • Properties
 ```py
 
-   array = := "item", "item2", "item3" =:
+   array = ( "item" "item2" "item3" )
    print array:length ; Output : 2
 ```
 #### • Type conversion
@@ -161,9 +161,9 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • For loops
 ```py
 
-   array = := "item1", "item2", "item3" =:
+   array = ( "item1" "item2" "item3" )
    for item in array
-	   print "Item is " + item
+	   print "Item is" item
 
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • While loops
@@ -172,7 +172,7 @@ Popscript is a tab-based language. Its particularity is that it does not require
    number = 0
    while number < 10
 	   number += 1
-	   print "Number value is " + number
+	   print "Number value is" number
 
 ```
 
@@ -181,14 +181,14 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ```py
 
     fn welcome => user
-	    print "Welcome " + user + "!"
+	    print "Welcome" user + "!"
 
 ```
 
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Call functions
 ```py
 
-    welcome("Ness")
+    welcome => "Ness"
 
 ```
 #### • And / Then
@@ -202,15 +202,15 @@ Popscript is a tab-based language. Its particularity is that it does not require
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Export
 ```py
 
-   -- File is module.ps
+   ; File is module.ps
    export fn welcome => user
-	   print "Welcome " + user + "!"
+	   print "Welcome" user + "!"
 	
 ```
 ##### &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; • Import
 ```lsp
    
-   import module from "module.ps"
-   module->welcome("Ness") -- Output: "Welcome Ness!"
+   import module from "module"
+   module -> welcome => "Ness" ; Output: "Welcome Ness!"
 	
 ```
