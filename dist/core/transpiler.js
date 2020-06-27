@@ -214,12 +214,13 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 break;
                             }
-                            case 'INDEX': {
-                                built.push('[' + value.slice(1, value.length - 1) + ']');
-                                break;
-                            }
                             case 'PROPERTY': {
-                                built.push('.' + value.slice(1));
+                                if (Number.isNaN(value.slice(1))) {
+                                    built.push('.' + value.slice(1));
+                                }
+                                else {
+                                    built.push('[' + value.slice(1) + ']');
+                                }
                                 break;
                             }
                             case 'CALL': {

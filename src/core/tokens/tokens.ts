@@ -14,8 +14,7 @@ export default {
     L_PAREN     : /\(/                    , // Match any left parenthesis
     R_PAREN     : /\)/                    , // Match any right parenthesis
     ARGUMENTS   : /=>/                    , // Match arguments start like fn test => coucou
-    PROPERTY    : /:\w+/                  , // Match property
-    INDEX       : /<.*?>/                 , // Match index
+    PROPERTY    : /:(\w|\d)+/             , // Match property
     CALL        : /->\w+/                 , // Match module call
 
     // TYPES
