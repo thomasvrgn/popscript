@@ -50,6 +50,7 @@ var Transpiler = /** @class */ (function () {
                 var line = content[index];
                 var tokens = parser_1.Tokenizer.tokenize(line);
                 var context = [], built = [], var_name = '';
+                var array_cnt = 0, item_cnt = 0;
                 for (var item_token in tokens) {
                     if (tokens.hasOwnProperty(item_token)) {
                         var item = tokens[item_token], value = item.value, token = item.token;
@@ -80,6 +81,10 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else {
                                     built.push(value);
+                                    if (variables[var_name] === 'array' && array_cnt > 0) {
+                                        variables[var_name + (array_cnt > 1 ? '[' + (array_cnt + 1) + ']' : '') + '[' + (item_cnt) + ']'] = token.toLowerCase();
+                                        item_cnt += 1;
+                                    }
                                 }
                                 if (context.includes('CONVERSION::INT')) {
                                     built.push(')');
@@ -238,10 +243,17 @@ var Transpiler = /** @class */ (function () {
                                     if (value === '(') {
                                         built.push('[');
                                         context.push('ARRAY::START');
+                                        if (array_cnt > 0) {
+                                            variables[var_name + (array_cnt > 1 ? '[' + (array_cnt - 1) + ']' : '') + '[' + (item_cnt) + ']'] = 'array';
+                                        }
+                                        item_cnt = 0;
+                                        array_cnt += 1;
                                     }
                                     else if (value === ')') {
                                         built.push(']');
                                         context.push('ARRAY::END');
+                                        array_cnt -= 1;
+                                        item_cnt = 0;
                                     }
                                     variables[var_name] = 'array';
                                 }
@@ -267,6 +279,7 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'ADD': {
+                                var_name = built.slice(built.indexOf(var_name)).join('');
                                 switch (variables[var_name]) {
                                     case 'string':
                                     case 'int': {
