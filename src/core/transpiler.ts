@@ -16,7 +16,7 @@ let   content   : any
 let   variables : Object        = {}
 let   functions : Array<string> = []
 let   folder    : string
-const code                      = []
+let   code                      = []
 
 export default class Transpiler {
 
@@ -28,8 +28,14 @@ export default class Transpiler {
 
     }
 
-    transpile (filename) {
+    transpile (filename, modname = undefined) {
         if (!folder) folder = PATH.dirname(filename)
+        let mod_name  = modname,
+            temp_code = []
+        
+        if (modname) {
+            temp_code.push(`var ${mod_name} = {}`)
+        }
         for (const index in content) {
             if (content.hasOwnProperty(index)) {
                 const line     : string        = content[index]
@@ -54,17 +60,21 @@ export default class Transpiler {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase()
                                     if (context.includes('MODULE::REQUIRE')) {
+                                        variables[var_name] = 'javascript'
+                                        built = []
                                         if (context.includes('MODULE::JAVASCRIPT')) {
                                             built.push(value)
+                                            fs.readFile(PATH.join(folder, value.slice(1, value.length - 1)), 'UTF-8', (error, content) => {
+                                                if (error) throw error
+                                                built.push(content)
+                                            })
                                         } else {
                                             fs.readFile(folder + '\\' + value.slice(1, value.length - 1) + '.ps', 'UTF-8', (error, content) => {
                                                 if (error) throw error
-                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value.slice(1, value.length - 1) + '.ps')
+                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value.slice(1, value.length - 1) + '.ps', var_name)
                                             })
-                                            built   = []
-                                            context = []
-                                            variables[var_name] = 'module'
                                         }
+                                        context = []
                                     } else {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
                                             built.push(value)
@@ -126,7 +136,11 @@ export default class Transpiler {
                                     }
                                 } else if (context.includes('FUNCTION::START')) {
                                     if (!context.includes('FUNCTION::ARGUMENTS')) {
-                                        built.push(value)
+                                        if (mod_name) {
+                                            built.push(mod_name + '.' + value + '= function')
+                                        } else {
+                                            built.push(value)
+                                        }
                                         functions.push(value)
                                     } else {
                                         built.push(value)
@@ -227,6 +241,8 @@ export default class Transpiler {
                                 context.push('FUNCTION::CALL')
                                 if (variables[var_name] === 'module') {
                                     built.push(value.slice(2))
+                                } else if (variables[var_name] === 'javascript') {
+                                    built.push('.' + value.slice(2))
                                 }
                                 break
                             }
@@ -455,7 +471,7 @@ export default class Transpiler {
                             }
 
                             case 'FUNCTION': {
-                                built.push('function ')
+                                if (!mod_name) built.push('function ')
                                 context.push('FUNCTION::START')
                                 break
                             }
@@ -535,7 +551,11 @@ export default class Transpiler {
                     }
                 }
 
-                code.push(built.join(''))
+                if (mod_name) {
+                    temp_code.push(built.join(''))
+                } else {
+                    code.push(built.join(''))
+                }
 
                 built   = []
                 context = []
@@ -544,6 +564,10 @@ export default class Transpiler {
             
         }
         
+        code = temp_code.concat(code)
+
+        console.log(code)
+
         fs.writeFile(PATH.join(folder, 'output.js'), Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
             if (error) throw error
         })
