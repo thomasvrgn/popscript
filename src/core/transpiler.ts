@@ -16,7 +16,7 @@ let   content   : any
 let   variables : Object        = {}
 let   functions : Array<string> = []
 let   folder    : string
-const files     : Array<string> = []
+const code                      = []
 
 export default class Transpiler {
 
@@ -30,8 +30,6 @@ export default class Transpiler {
 
     transpile (filename) {
         if (!folder) folder = PATH.dirname(filename)
-        const code        = []
-        let   export_stat = false
         for (const index in content) {
             if (content.hasOwnProperty(index)) {
                 const line     : string        = content[index]
@@ -48,6 +46,7 @@ export default class Transpiler {
                             token : string = item.token
 
                         if (!token) return console.log('Can\'t understand this keyword "' + value + '" at line', index)
+
                         switch (token) {
 
                             case 'STRING': case 'INT': {
@@ -58,7 +57,13 @@ export default class Transpiler {
                                         if (context.includes('MODULE::JAVASCRIPT')) {
                                             built.push(value)
                                         } else {
-                                            built.push('"./' + value.slice(1, value.length - 1).replace('.ps', '.js') + '"')
+                                            fs.readFile(folder + '\\' + value.slice(1, value.length - 1) + '.ps', 'UTF-8', (error, content) => {
+                                                if (error) throw error
+                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value.slice(1, value.length - 1) + '.ps')
+                                            })
+                                            built   = []
+                                            context = []
+                                            variables[var_name] = 'module'
                                         }
                                     } else {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
@@ -107,7 +112,9 @@ export default class Transpiler {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
                                             built.push(value)
                                         } else {
-                                            built.push(value)
+                                            if (variables[value] !== 'module') {
+                                                built.push(value)
+                                            }
                                         }
                                     } else if (functions.includes(value)) {
                                         built.push(value)
@@ -119,12 +126,7 @@ export default class Transpiler {
                                     }
                                 } else if (context.includes('FUNCTION::START')) {
                                     if (!context.includes('FUNCTION::ARGUMENTS')) {
-                                        if (export_stat) {
-                                            built.push(value + '= function')
-
-                                        } else {
-                                            built.push(value)
-                                        }
+                                        built.push(value)
                                         functions.push(value)
                                     } else {
                                         built.push(value)
@@ -223,7 +225,9 @@ export default class Transpiler {
 
                             case 'CALL': {
                                 context.push('FUNCTION::CALL')
-                                built.push('.' + value.slice(2))
+                                if (variables[var_name] === 'module') {
+                                    built.push(value.slice(2))
+                                }
                                 break
                             }
 
@@ -346,12 +350,6 @@ export default class Transpiler {
                                 break
                             }
 
-                            case 'EXPORT': {
-                                export_stat = true
-                                built.push('module.exports.')
-                                break
-                            }
-
                             case 'IF': {
                                 built.push('if(')
                                 context.push('CONDITION::START')
@@ -457,9 +455,7 @@ export default class Transpiler {
                             }
 
                             case 'FUNCTION': {
-                                if (!export_stat) {
-                                    built.push('function ')
-                                }
+                                built.push('function ')
                                 context.push('FUNCTION::START')
                                 break
                             }
@@ -535,7 +531,6 @@ export default class Transpiler {
     
                     if (context.includes('FUNCTION::ARGUMENTS')) {
                         built.push('):')
-                        export_stat = false
                         context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
                     }
                 }
@@ -548,9 +543,10 @@ export default class Transpiler {
             }
             
         }
-
-        console.log(new Tabdown(code).tab())
         
+        fs.writeFile(PATH.join(folder, 'output.js'), Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
+            if (error) throw error
+        })
 
         return Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code)
 
