@@ -72,7 +72,7 @@ var Transpiler = /** @class */ (function () {
                                     }
                                     else {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                            built.push(value + ',');
+                                            built.push(value);
                                         }
                                         else {
                                             built.push(value);
@@ -113,7 +113,7 @@ var Transpiler = /** @class */ (function () {
                                     if (variables[value] !== undefined) {
                                         context.push('VARIABLE::USE');
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                            built.push(value + ',');
+                                            built.push(value);
                                         }
                                         else {
                                             built.push(value);
@@ -299,11 +299,20 @@ var Transpiler = /** @class */ (function () {
                                     if (['STRING', 'INT'].includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token)) {
                                         built.push(', ');
                                     }
+                                    else {
+                                        built.push(value);
+                                    }
                                 }
                                 else if (context.includes('PRINT::START')) {
                                     if (['STRING', 'INT', 'WORD', 'L_PAREN', 'R_PAREN'].includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token)) {
                                         built.push(', ');
                                     }
+                                    else {
+                                        built.push(value);
+                                    }
+                                }
+                                else {
+                                    built.push(value);
                                 }
                                 break;
                             }
@@ -395,6 +404,10 @@ var Transpiler = /** @class */ (function () {
                                     built.push('; ');
                                     context.splice(context.findIndex(function (x) { return x === 'VARIABLE::USE'; }), 1);
                                 }
+                                if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                    built.push(', ');
+                                    context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
+                                }
                                 break;
                             }
                             case 'LOOP': {
@@ -421,6 +434,10 @@ var Transpiler = /** @class */ (function () {
                             case 'PRINT': {
                                 built.push('console.log(');
                                 context.push('PRINT::START');
+                                break;
+                            }
+                            case 'RETURN': {
+                                built.push('return');
                                 break;
                             }
                         }
@@ -468,6 +485,7 @@ var Transpiler = /** @class */ (function () {
                 context = [];
             }
         }
+        console.log(new tabdown_1["default"](code).tab());
         return Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code);
     };
     return Transpiler;

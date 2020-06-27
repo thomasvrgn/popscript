@@ -1,9 +1,6 @@
-import mod from "export"
+fn factorial => num
+  if num > 1
+    num *= factorial(num - 1)
+  return num
 
-mod->welcome("Ness")
-
-liste = ("test" "coucou" 5 ("bruh" 5)) and print liste
-
-liste += "bruh"
-
-liste:3 += "coucou"
+print factorial(5)

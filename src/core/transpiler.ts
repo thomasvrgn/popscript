@@ -62,7 +62,7 @@ export default class Transpiler {
                                         }
                                     } else {
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                            built.push(value + ',')
+                                            built.push(value)
                                         } else {
                                             built.push(value)
                                         }
@@ -105,7 +105,7 @@ export default class Transpiler {
                                     if (variables[value] !== undefined) {
                                         context.push('VARIABLE::USE')
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
-                                            built.push(value + ',')
+                                            built.push(value)
                                         } else {
                                             built.push(value)
                                         }
@@ -295,11 +295,17 @@ export default class Transpiler {
                                 if (context.includes('ARRAY::START')) {
                                     if (['STRING', 'INT'].includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token)) {
                                         built.push(', ')
+                                    } else {
+                                        built.push(value)
                                     }
                                 } else if (context.includes('PRINT::START')) {
                                     if (['STRING', 'INT', 'WORD', 'L_PAREN', 'R_PAREN'].includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token)) {
                                         built.push(', ')
+                                    } else {
+                                        built.push(value)
                                     }
+                                } else {
+                                    built.push(value)
                                 }
 
                                 break
@@ -328,6 +334,7 @@ export default class Transpiler {
                                     }
 
                                 }
+
                                 break
                             }
 
@@ -409,6 +416,11 @@ export default class Transpiler {
                                     built.push('; ')
                                     context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                 }
+
+                                if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
+                                    built.push(', ')
+                                    context.splice(context.findIndex(x => x === 'FUNCTION::CALL_ARGUMENTS'), 1)
+                                }
                                 
                                 break
                             }
@@ -444,12 +456,16 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'RETURN': {
+                                built.push('return')
+                                break
+                            }
+
                         }
 
                     }
 
                 }
-
 
                 if (context.includes('STRING::REMOVE')) {
                     built.push(', "")')
@@ -503,8 +519,10 @@ export default class Transpiler {
                 context = []
 
             }
-
+            
         }
+
+        console.log(new Tabdown(code).tab())
 
         return Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code)
 

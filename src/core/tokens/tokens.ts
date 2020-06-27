@@ -41,7 +41,6 @@ export default {
     IMPORT      : /import/                , // Match import keyword
     EXPORT      : /export/                , // Match export keyword
     FROM        : /from/                  , // Match import source
-    ARRAY       : /(:=|=:)/               , // Match array
     JAVASCRIPT  : /as (javascript|js)/    , // Match javascript module
 
     // OTHER

@@ -36,7 +36,6 @@ exports["default"] = {
     IMPORT: /import/,
     EXPORT: /export/,
     FROM: /from/,
-    ARRAY: /(:=|=:)/,
     JAVASCRIPT: /as (javascript|js)/,
     // OTHER
     THEN: /then/,
