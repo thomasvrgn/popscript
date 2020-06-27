@@ -306,6 +306,7 @@ export default class Transpiler {
                             }
 
                             case 'REMOVE': {
+                                var_name = built.slice(built.indexOf(var_name)).join('')
                                 switch (variables[var_name]) {
 
                                     case 'int': {
@@ -504,7 +505,7 @@ export default class Transpiler {
             }
 
         }
-        
+
         return Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code)
 
     }

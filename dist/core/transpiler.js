@@ -308,6 +308,7 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'REMOVE': {
+                                var_name = built.slice(built.indexOf(var_name)).join('');
                                 switch (variables[var_name]) {
                                     case 'int': {
                                         built.push('-=');
