@@ -5,6 +5,7 @@ export default class Tabdown {
     private          parents : Array<string>;
     private readonly AST     : {root: {}};
     private readonly code    : Array<string>;
+    private          tabsize : any;
 
     constructor (content) {
         this.content = content.filter(x => x !== '')
@@ -33,12 +34,16 @@ export default class Tabdown {
 
     buildAST (index = 0) {
 
-
         const line    = this.content[index],
               ft_line = this.content[index + 1]
-
-        const depth    = line.match(/^\s+/) ? line.match(/^\s+/)[0].length / 2 : 0,
-              ft_depth = ft_line ? this.content[index + 1].match(/^\s+/) ? this.content[index + 1].match(/^\s+/)[0].length / 2 : 0 : undefined
+        if (line.match(/^\s+/)) {
+            if (!this.tabsize) {
+                this.tabsize = line.match(/^\s+/)[0].length
+            }
+        }
+        const depth    = line.match(/^\s+/) ? line.match(/^\s+/)[0].length / this.tabsize : 0,
+              ft_depth = ft_line ? this.content[index + 1].match(/^\s+/) ? this.content[index + 1].match(/^\s+/)[0].length / this.tabsize : 0 : undefined
+        
         if (line.trimRight().endsWith(':')) {
             this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, {})
             this.parents.push(line.trim() + '||' + index + '||' + depth)
@@ -60,11 +65,11 @@ export default class Tabdown {
         for (const child in item) {
             if (item.hasOwnProperty(child)) {
                 if (typeof item[child] === 'object') {
-                    this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + child.split('||')[0].slice(0, child.split('||')[0].length - 1) + '{')
+                    this.code.push(new Array(parseInt(child.split('||')[2])).fill(new Array(this.tabsize).fill(' ').join('')).join('') + child.split('||')[0].slice(0, child.split('||')[0].length - 1) + '{')
                     this.addBrackets(item[child])
-                    this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + '}')
+                    this.code.push(new Array(parseInt(child.split('||')[2])).fill(new Array(this.tabsize).fill(' ').join('')).join('') + '}')
                 } else {
-                    this.code.push(new Array(parseInt(child.split('||')[2])).fill('  ').join('') + child.split('||')[0])
+                    this.code.push(new Array(parseInt(child.split('||')[2])).fill(new Array(this.tabsize).fill(' ').join('')).join('') + child.split('||')[0])
                     this.addBrackets(item[child])
                 }
             }

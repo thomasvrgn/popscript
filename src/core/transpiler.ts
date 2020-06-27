@@ -437,10 +437,11 @@ export default class Transpiler {
                                         built.push('; ')
                                         context.splice(context.findIndex(x => x === 'VARIABLE::USE'), 1)
                                     }
-                                    
+
                                 }
                                 
                                 break
+                                
                             }
 
                             case 'LOOP': {
