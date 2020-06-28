@@ -55,6 +55,8 @@ var Transpiler = /** @class */ (function () {
         }
         if (module_cnt && !mod_count)
             mod_count = module_cnt;
+        else
+            mod_count = 0;
         var _loop_1 = function (index) {
             if (content.hasOwnProperty(index)) {
                 var line = content[index];

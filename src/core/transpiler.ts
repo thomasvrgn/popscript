@@ -40,6 +40,7 @@ export default class Transpiler {
             imported += 1
         }
         if (module_cnt && !mod_count) mod_count = module_cnt
+        else mod_count = 0
         for (const index in content) {
             if (content.hasOwnProperty(index)) {
                 const line     : string        = content[index]
