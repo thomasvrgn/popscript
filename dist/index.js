@@ -20,13 +20,14 @@ var parser_1 = require("./core/parser");
 var tokens_1 = require("./core/tokens/tokens");
 var FS = require("fs");
 var PATH = require("path");
-var input = PATH.resolve('example/index.ps');
-var module_count = 0, modules = [];
-parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
 var Popscript = /** @class */ (function () {
     function Popscript() {
+        this.module_count = 0;
+        this.modules = [];
+        parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
     }
     Popscript.prototype.file = function (path) {
+        var _this = this;
         function readFile(file) {
             var e_1, _a, e_2, _b;
             var content = FS.readFileSync(file, 'utf-8').split(/\r?\n/).join('\n').split('\n');
@@ -39,13 +40,13 @@ var Popscript = /** @class */ (function () {
                             var item = _d.value;
                             var token = item.token, value = item.value;
                             if (token === 'IMPORT') {
-                                ++module_count;
+                                ++this.module_count;
                                 context.push('MODULE::REQUIRE');
                             }
                             else if (token === 'STRING') {
                                 if (context.includes('MODULE::REQUIRE')) {
-                                    modules.push(PATH.join(PATH.dirname(input), value.slice(1, value.length - 1) + '.ps'));
-                                    readFile(PATH.join(PATH.dirname(input), value.slice(1, value.length - 1) + '.ps'));
+                                    this.modules.push(PATH.join(PATH.dirname(path), value.slice(1, value.length - 1) + '.ps'));
+                                    readFile(PATH.join(PATH.dirname(path), value.slice(1, value.length - 1) + '.ps'));
                                 }
                             }
                         }
@@ -67,13 +68,13 @@ var Popscript = /** @class */ (function () {
                 finally { if (e_1) throw e_1.error; }
             }
         }
-        FS.exists(input, function (bool) {
+        FS.exists(path, function (bool) {
             if (bool) {
-                readFile(input);
-                FS.readFile(input, 'utf-8', function (error, content) {
+                readFile(path);
+                FS.readFile(path, 'utf-8', function (error, content) {
                     if (error)
                         throw error;
-                    new transpiler_1["default"](content).transpile(input, undefined, module_count, function (code) {
+                    new transpiler_1["default"](content).transpile(path, undefined, _this.module_count, function (code) {
                         eval(code);
                     });
                 });
@@ -88,4 +89,3 @@ var Popscript = /** @class */ (function () {
     return Popscript;
 }());
 exports["default"] = Popscript;
-new Popscript().file('example/index.ps');

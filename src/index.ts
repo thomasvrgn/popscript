@@ -3,19 +3,20 @@
                 Main
 //////////////////////////////////*/
 
-import Transpiler  from './core/transpiler'
-import {Tokenizer} from './core/parser'
-import Tokens      from './core/tokens/tokens'
-import * as FS     from 'fs'
-import * as PATH   from 'path'
-
-const input        = PATH.resolve('example/index.ps')
-let   module_count = 0,
-      modules      = []
-
-Tokenizer.addTokenSet(Tokens)
+import Transpiler    from './core/transpiler'
+import { Tokenizer } from './core/parser'
+import Tokens        from './core/tokens/tokens'
+import * as FS       from 'fs'
+import * as PATH     from 'path'
 
 export default class Popscript {
+
+    private module_count : number        = 0
+    private modules      : Array<string> = []
+
+    constructor () {
+        Tokenizer.addTokenSet(Tokens)
+    }
 
     public file (path) {
         function readFile (file) {
@@ -27,12 +28,12 @@ export default class Popscript {
                           value = item.value
         
                     if (token === 'IMPORT') {
-                        ++module_count
+                        ++this.module_count
                         context.push('MODULE::REQUIRE')
                     } else if (token === 'STRING') {
                         if (context.includes('MODULE::REQUIRE')) {
-                            modules.push(PATH.join(PATH.dirname(input), value.slice(1, value.length - 1) + '.ps'))
-                            readFile(PATH.join(PATH.dirname(input), value.slice(1, value.length - 1) + '.ps'))
+                            this.modules.push(PATH.join(PATH.dirname(path), value.slice(1, value.length - 1) + '.ps'))
+                            readFile(PATH.join(PATH.dirname(path), value.slice(1, value.length - 1) + '.ps'))
                         }
                     }
         
@@ -40,17 +41,18 @@ export default class Popscript {
             }
         }
         
-        FS.exists(input, bool => {
+        FS.exists(path, bool => {
             if (bool) {
-                readFile(input)
-                FS.readFile(input, 'utf-8', (error, content) => {
+                readFile(path)
+                FS.readFile(path, 'utf-8', (error, content) => {
                     if (error) throw error
-                    new Transpiler(content).transpile(input, undefined, module_count, code => {
+                    new Transpiler(content).transpile(path, undefined, this.module_count, code => {
                         eval(code)
                     })
                 })
             }
         })
+        
     }
 
     public text (content) {
@@ -62,5 +64,3 @@ export default class Popscript {
     }
 
 }
-
-new Popscript().file('example/index.ps')
