@@ -26,7 +26,7 @@ var Popscript = /** @class */ (function () {
         this.modules = [];
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
     }
-    Popscript.prototype.file = function (path) {
+    Popscript.prototype.file = function (path, callback) {
         var _this = this;
         function readFile(file) {
             var e_1, _a, e_2, _b;
@@ -76,14 +76,16 @@ var Popscript = /** @class */ (function () {
                         throw error;
                     new transpiler_1["default"](content).transpile(path, undefined, _this.module_count, function (code) {
                         eval(code);
+                        callback();
                     });
                 });
             }
         });
     };
-    Popscript.prototype.text = function (content) {
+    Popscript.prototype.text = function (content, callback) {
         new transpiler_1["default"](content).transpile(undefined, undefined, 0, function (code) {
             eval(code);
+            callback();
         });
     };
     return Popscript;

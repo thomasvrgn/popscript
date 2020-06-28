@@ -18,7 +18,7 @@ export default class Popscript {
         Tokenizer.addTokenSet(Tokens)
     }
 
-    public file (path) {
+    public file (path, callback) {
         function readFile (file) {
             const content: any = FS.readFileSync(file, 'utf-8').split(/\r?\n/).join('\n').split('\n')
             for (const line of content) {
@@ -48,6 +48,7 @@ export default class Popscript {
                     if (error) throw error
                     new Transpiler(content).transpile(path, undefined, this.module_count, code => {
                         eval(code)
+                        callback()
                     })
                 })
             }
@@ -55,10 +56,11 @@ export default class Popscript {
         
     }
 
-    public text (content) {
+    public text (content, callback) {
 
         new Transpiler(content).transpile(undefined, undefined, 0, code => {
             eval(code)
+            callback()
         })
 
     }
