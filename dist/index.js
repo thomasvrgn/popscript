@@ -70,7 +70,7 @@ FS.exists(input, function (bool) {
             if (error)
                 throw error;
             new transpiler_1["default"](content).transpile(input, undefined, module_count, function (code) {
-                eval(code);
+                console.log(code);
             });
         });
     }

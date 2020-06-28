@@ -43,7 +43,7 @@ FS.exists(input, bool => {
         FS.readFile(input, 'utf-8', (error, content) => {
             if (error) throw error
             new Transpiler(content).transpile(input, undefined, module_count, code => {
-                eval(code)
+                console.log(code)
             })
         })
     }

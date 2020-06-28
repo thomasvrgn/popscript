@@ -15,7 +15,7 @@ export default {
     R_PAREN     : /\)/                    , // Match any right parenthesis
     ARGUMENTS   : /=>/                    , // Match arguments start like fn test => coucou
     PROPERTY    : /:(\w|\d)+/             , // Match property
-    CALL        : /->\w+/                 , // Match module call
+    CALL        : /(\w|\d)+->\w+/                 , // Match module call
 
     // TYPES
 

@@ -14,7 +14,7 @@ exports["default"] = {
     R_PAREN: /\)/,
     ARGUMENTS: /=>/,
     PROPERTY: /:(\w|\d)+/,
-    CALL: /->\w+/,
+    CALL: /(\w|\d)+->\w+/,
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,

@@ -64,7 +64,7 @@ export default class Transpiler {
                                     variables[var_name] !== 'array') {
                                     variables[var_name] = token.toLowerCase()
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        variables[var_name] = 'javascript'
+                                        variables[var_name] = 'module'
                                         built = []
                                         if (context.includes('MODULE::JAVASCRIPT')) {
                                             built.push(value)
@@ -123,25 +123,27 @@ export default class Transpiler {
                             }
 
                             case 'WORD': {
-                                
                                 if (!context.includes('FUNCTION::START')) {
                                     if (variables[value] !== undefined) {
                                         context.push('VARIABLE::USE')
                                         if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
                                             built.push(value)
                                         } else {
-                                            if (variables[value] !== 'module') {
-                                                built.push(value)
-                                            }
+                                            built.push(value)
                                         }
                                     } else if (functions.includes(value)) {
                                         built.push(value)
                                         context.push('FUNCTION::CALL')
                                     } else {
-                                        built.push(`var ${value}`)
-                                        variables[value] = ''
-                                        context.push('VARIABLE::DECLARATION')
+                                        if (variables[value] === 'module') {
+                                            built.push(value)
+                                        } else {
+                                            built.push(`var ${value}`)
+                                            variables[value] = ''
+                                            context.push('VARIABLE::DECLARATION')
+                                        }
                                     }
+
                                 } else if (context.includes('FUNCTION::START')) {
                                     if (!context.includes('FUNCTION::ARGUMENTS')) {
                                         if (mod_name) {
@@ -247,11 +249,8 @@ export default class Transpiler {
 
                             case 'CALL': {
                                 context.push('FUNCTION::CALL')
-                                if (variables[var_name] === 'module') {
-                                    built.push(value.slice(2))
-                                } else if (variables[var_name] === 'javascript') {
-                                    built.push('.' + value.slice(2))
-                                }
+                                var_name = value.split('->')[0]
+                                built.push(value.replace('->', '.'))
                                 break
                             }
 
@@ -573,7 +572,6 @@ export default class Transpiler {
         }
         
         code = temp_code.concat(code)
-
         if (mod_count === imported) {
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
         }

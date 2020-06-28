@@ -73,7 +73,7 @@ var Transpiler = /** @class */ (function () {
                                     variables[var_name_1] !== 'array') {
                                     variables[var_name_1] = token.toLowerCase();
                                     if (context.includes('MODULE::REQUIRE')) {
-                                        variables[var_name_1] = 'javascript';
+                                        variables[var_name_1] = 'module';
                                         built_1 = [];
                                         if (context.includes('MODULE::JAVASCRIPT')) {
                                             built_1.push(value_1);
@@ -142,9 +142,7 @@ var Transpiler = /** @class */ (function () {
                                             built_1.push(value_1);
                                         }
                                         else {
-                                            if (variables[value_1] !== 'module') {
-                                                built_1.push(value_1);
-                                            }
+                                            built_1.push(value_1);
                                         }
                                     }
                                     else if (functions.includes(value_1)) {
@@ -152,9 +150,14 @@ var Transpiler = /** @class */ (function () {
                                         context.push('FUNCTION::CALL');
                                     }
                                     else {
-                                        built_1.push("var " + value_1);
-                                        variables[value_1] = '';
-                                        context.push('VARIABLE::DECLARATION');
+                                        if (variables[value_1] === 'module') {
+                                            built_1.push(value_1);
+                                        }
+                                        else {
+                                            built_1.push("var " + value_1);
+                                            variables[value_1] = '';
+                                            context.push('VARIABLE::DECLARATION');
+                                        }
                                     }
                                 }
                                 else if (context.includes('FUNCTION::START')) {
@@ -263,12 +266,8 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'CALL': {
                                 context.push('FUNCTION::CALL');
-                                if (variables[var_name_1] === 'module') {
-                                    built_1.push(value_1.slice(2));
-                                }
-                                else if (variables[var_name_1] === 'javascript') {
-                                    built_1.push('.' + value_1.slice(2));
-                                }
+                                var_name_1 = value_1.split('->')[0];
+                                built_1.push(value_1.replace('->', '.'));
                                 break;
                             }
                             case 'L_PAREN':
