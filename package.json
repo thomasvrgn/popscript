@@ -4,9 +4,9 @@
   "description": "🍿 Popscript programming language.",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "node_modules/.bin/tsc",
-    "build": "node_modules/.bin/webpack --config webpack.config.js",
-    "start": "node_modules/.bin/nodemon ./dist/build/popscript.js --ignore './example/'"
+    "dev": "tsc",
+    "build": "webpack --config webpack.config.js",
+    "start": "nodemon ./dist/build/popscript.js --ignore './example/'"
   },
   "repository": {
     "type": "git",
@@ -34,5 +34,8 @@
     "fs": "0.0.1-security",
     "js-beautify": "^1.11.0",
     "terser": "^4.8.0"
+  },
+  "directories": {
+    "example": "example"
   }
 }
