@@ -1,5 +1,5 @@
 {
-  "name": "popscript",
+  "name": "@popscript/core",
   "version": "1.0.0",
   "description": "🍿 Popscript programming language.",
   "main": "src/index.ts",
