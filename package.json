@@ -2,11 +2,10 @@
   "name": "@popscript/core",
   "version": "1.0.0",
   "description": "🍿 Popscript programming language.",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "tsc",
-    "build": "webpack --config webpack.config.js",
-    "start": "nodemon ./dist/build/popscript.js --ignore './example/'"
+    "start": "nodemon ./dist/index.js --ignore \"./example/\""
   },
   "repository": {
     "type": "git",

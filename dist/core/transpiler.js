@@ -553,6 +553,13 @@ var Transpiler = /** @class */ (function () {
         code = temp_code.concat(code);
         if (mod_count === imported) {
             callback(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
+            content = '';
+            variables = {};
+            functions = [];
+            folder = '';
+            code = [];
+            mod_count = 0;
+            imported = 0;
         }
     };
     return Transpiler;

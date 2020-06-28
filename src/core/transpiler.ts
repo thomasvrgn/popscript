@@ -575,6 +575,15 @@ export default class Transpiler {
         code = temp_code.concat(code)
         if (mod_count === imported) {
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
+
+            content   = ''
+            variables = {}
+            functions = []
+            folder    = ''
+            code      = []
+            mod_count = 0
+            imported  = 0
+            
         }
 
     }
