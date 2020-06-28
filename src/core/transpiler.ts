@@ -17,6 +17,8 @@ let   variables : Object        = {}
 let   functions : Array<string> = []
 let   folder    : string
 let   code                      = []
+let   mod_count : number        = undefined
+let   imported  : number        = 0
 
 export default class Transpiler {
 
@@ -28,14 +30,16 @@ export default class Transpiler {
 
     }
 
-    transpile (filename, modname = undefined) {
+    transpile (filename, modname = undefined, module_cnt, callback: Function = Function) {
         if (!folder) folder = PATH.dirname(filename)
         let mod_name  = modname,
             temp_code = []
         
         if (modname) {
             temp_code.push(`var ${mod_name} = {}`)
+            imported += 1
         }
+        if (module_cnt && !mod_count) mod_count = module_cnt
         for (const index in content) {
             if (content.hasOwnProperty(index)) {
                 const line     : string        = content[index]
@@ -71,7 +75,11 @@ export default class Transpiler {
                                         } else {
                                             fs.readFile(folder + '\\' + value.slice(1, value.length - 1) + '.ps', 'UTF-8', (error, content) => {
                                                 if (error) throw error
-                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value.slice(1, value.length - 1) + '.ps', var_name)
+                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value.slice(1, value.length - 1) + '.ps', var_name, mod_count, code => {
+                                                    if (mod_count === imported) {
+                                                        callback(code)
+                                                    }
+                                                })
                                             })
                                         }
                                         context = []
@@ -566,13 +574,9 @@ export default class Transpiler {
         
         code = temp_code.concat(code)
 
-        console.log(code)
-
-        fs.writeFile(PATH.join(folder, 'output.js'), Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code), error => {
-            if (error) throw error
-        })
-
-        return Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code)
+        if (mod_count === imported) {
+            callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
+        }
 
     }
 

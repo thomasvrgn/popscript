@@ -36,19 +36,25 @@ var variables = {};
 var functions = [];
 var folder;
 var code = [];
+var mod_count = undefined;
+var imported = 0;
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         content = file_content.split(/\n/g);
     }
-    Transpiler.prototype.transpile = function (filename, modname) {
+    Transpiler.prototype.transpile = function (filename, modname, module_cnt, callback) {
         if (modname === void 0) { modname = undefined; }
+        if (callback === void 0) { callback = Function; }
         if (!folder)
             folder = PATH.dirname(filename);
         var mod_name = modname, temp_code = [];
         if (modname) {
             temp_code.push("var " + mod_name + " = {}");
+            imported += 1;
         }
+        if (module_cnt && !mod_count)
+            mod_count = module_cnt;
         var _loop_1 = function (index) {
             if (content.hasOwnProperty(index)) {
                 var line = content[index];
@@ -81,7 +87,11 @@ var Transpiler = /** @class */ (function () {
                                             fs.readFile(folder + '\\' + value_1.slice(1, value_1.length - 1) + '.ps', 'UTF-8', function (error, content) {
                                                 if (error)
                                                     throw error;
-                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value_1.slice(1, value_1.length - 1) + '.ps', var_name_1);
+                                                new Transpiler(content.split(/\r?\n/g).join('\n')).transpile(folder + '\\' + value_1.slice(1, value_1.length - 1) + '.ps', var_name_1, mod_count, function (code) {
+                                                    if (mod_count === imported) {
+                                                        callback(code);
+                                                    }
+                                                });
                                             });
                                         }
                                         context = [];
@@ -540,12 +550,9 @@ var Transpiler = /** @class */ (function () {
                 return state_1.value;
         }
         code = temp_code.concat(code);
-        console.log(code);
-        fs.writeFile(PATH.join(folder, 'output.js'), Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code), function (error) {
-            if (error)
-                throw error;
-        });
-        return Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code);
+        if (mod_count === imported) {
+            callback(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
+        }
     };
     return Transpiler;
 }());
