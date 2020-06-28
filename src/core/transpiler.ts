@@ -31,7 +31,7 @@ export default class Transpiler {
     }
 
     transpile (filename, modname = undefined, module_cnt, callback: Function = Function) {
-        if (!folder) folder = PATH.dirname(filename)
+        if (!folder && filename) folder = PATH.dirname(filename)
         let mod_name  = modname,
             temp_code = []
         

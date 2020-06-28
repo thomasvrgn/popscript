@@ -46,7 +46,7 @@ var Transpiler = /** @class */ (function () {
     Transpiler.prototype.transpile = function (filename, modname, module_cnt, callback) {
         if (modname === void 0) { modname = undefined; }
         if (callback === void 0) { callback = Function; }
-        if (!folder)
+        if (!folder && filename)
             folder = PATH.dirname(filename);
         var mod_name = modname, temp_code = [];
         if (modname) {
