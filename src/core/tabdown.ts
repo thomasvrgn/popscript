@@ -1,5 +1,3 @@
-const fs = require('fs')
-
 export default class Tabdown {
     private readonly content : Array<string>;
     private          parents : Array<string>;

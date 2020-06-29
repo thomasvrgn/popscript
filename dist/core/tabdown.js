@@ -1,6 +1,5 @@
 "use strict";
 exports.__esModule = true;
-var fs = require('fs');
 var Tabdown = /** @class */ (function () {
     function Tabdown(content) {
         this.content = content.filter(function (x) { return x !== ''; });
