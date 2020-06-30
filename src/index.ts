@@ -66,3 +66,5 @@ export default class Popscript {
     }
 
 }
+
+new Popscript().file(PATH.join(__dirname, '..', 'example', 'index.ps'), () => {})

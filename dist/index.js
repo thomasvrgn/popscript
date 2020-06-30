@@ -91,3 +91,4 @@ var Popscript = /** @class */ (function () {
     return Popscript;
 }());
 exports["default"] = Popscript;
+new Popscript().file(PATH.join(__dirname, '..', 'example', 'index.ps'), function () { });

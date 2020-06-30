@@ -46,7 +46,7 @@ export default class Transpiler {
                 const line     : string        = content[index]
                 const tokens   : Array<Token>  = Tokenizer.tokenize(line)
                 let   context  : Array<string> = [],
-                      built    : Array<string> = [],
+                      built    : any           = [],
                       var_name : string        = ''
                 let array_cnt  = 0,
                     item_cnt   = 0
@@ -375,8 +375,12 @@ export default class Transpiler {
                             }
 
                             case 'IF': {
-                                built.push('if(')
-                                context.push('CONDITION::START')
+                                if (context.includes('VARIABLE::DECLARATION')) {
+                                    context.push('VARIABLE::CONDITION')
+                                } else {
+                                    context.push('CONDITION::START')
+                                    built.push('if(')
+                                }
                                 break
                             }
 
@@ -556,6 +560,17 @@ export default class Transpiler {
                     if (context.includes('FUNCTION::ARGUMENTS')) {
                         built.push('):')
                         context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
+                    }
+                    
+                    if (context.includes('VARIABLE::CONDITION')) {
+                        const variable_index = tokens.filter(x => !['SPACE', 'TABS'].includes(x.token)).findIndex(x => x.value === '=') + 1,
+                              variable_value = tokens.filter(x => !['SPACE', 'TABS'].includes(x.token))[variable_index]
+
+                        built = built.map(x => x === variable_value.value ? x = '%CONDITION%' : x)
+
+                        const condition      = /%CONDITION%(.*?)(then|and)?$/.exec(built.join('').trim())[1]
+                              built          = built.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value.value + ' : undefined').split('')
+                        context.splice(context.findIndex(x => x === 'VARIABLE::CONDITION'), 1)
                     }
                 }
 

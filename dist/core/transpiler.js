@@ -380,8 +380,13 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'IF': {
-                                built_1.push('if(');
-                                context.push('CONDITION::START');
+                                if (context.includes('VARIABLE::DECLARATION')) {
+                                    context.push('VARIABLE::CONDITION');
+                                }
+                                else {
+                                    context.push('CONDITION::START');
+                                    built_1.push('if(');
+                                }
                                 break;
                             }
                             case 'ELIF': {
@@ -493,7 +498,7 @@ var Transpiler = /** @class */ (function () {
                     if (typeof state_2 === "object")
                         return state_2;
                 }
-                for (var i = 0; i < context.length; i++) {
+                var _loop_3 = function (i) {
                     if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
                         built_1.push(')');
                         context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
@@ -534,6 +539,16 @@ var Transpiler = /** @class */ (function () {
                         built_1.push('):');
                         context.splice(context.findIndex(function (x) { return x === 'FUNCTION::ARGUMENTS'; }), 1);
                     }
+                    if (context.includes('VARIABLE::CONDITION')) {
+                        var variable_index = tokens.filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).findIndex(function (x) { return x.value === '='; }) + 1, variable_value_1 = tokens.filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[variable_index];
+                        built_1 = built_1.map(function (x) { return x === variable_value_1.value ? x = '%CONDITION%' : x; });
+                        var condition = /%CONDITION%(.*?)(then|and)?$/.exec(built_1.join('').trim())[1];
+                        built_1 = built_1.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value_1.value + ' : undefined').split('');
+                        context.splice(context.findIndex(function (x) { return x === 'VARIABLE::CONDITION'; }), 1);
+                    }
+                };
+                for (var i = 0; i < context.length; i++) {
+                    _loop_3(i);
                 }
                 if (mod_name) {
                     temp_code.push(built_1.join(''));
