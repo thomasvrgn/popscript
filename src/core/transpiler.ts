@@ -391,7 +391,13 @@ export default class Transpiler {
                             }
 
                             case 'ELSE': {
-                                built.push('else:')
+                                if (context.includes('VARIABLE::DECLARATION')) {
+                                    context.push('VARIABLE::CONDITION::ELSE')
+                                    built.push(' : ')
+                                } else {
+                                    context.push('CONDITION::START')
+                                    built.push('else:')
+                                }
                                 break
                             }
 
@@ -567,9 +573,13 @@ export default class Transpiler {
                               variable_value = tokens.filter(x => !['SPACE', 'TABS'].includes(x.token))[variable_index]
 
                         built = built.map(x => x === variable_value.value ? x = '%CONDITION%' : x)
-
-                        const condition      = /%CONDITION%(.*?)(then|and)?$/.exec(built.join('').trim())[1]
-                              built          = built.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value.value + ' : undefined').split('')
+                        const condition      = /%CONDITION%(.*?)(then|and|:.*)?$/.exec(built.join('').trim())[1]
+                        if (context.includes('VARIABLE::CONDITION::ELSE')) {
+                            built            = built.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value.value + ' ').split('')
+                            context.splice(context.findIndex(x => x === 'VARIABLE::CONDITION::ELSE'), 1)
+                        } else {
+                            built            = built.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value.value + ' : undefined').split('')
+                        }
                         context.splice(context.findIndex(x => x === 'VARIABLE::CONDITION'), 1)
                     }
                 }
@@ -589,6 +599,7 @@ export default class Transpiler {
         
         code = temp_code.concat(code)
         if (mod_count === imported) {
+            
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
 
             content   = ''

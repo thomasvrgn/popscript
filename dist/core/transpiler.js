@@ -395,7 +395,14 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'ELSE': {
-                                built_1.push('else:');
+                                if (context.includes('VARIABLE::DECLARATION')) {
+                                    context.push('VARIABLE::CONDITION::ELSE');
+                                    built_1.push(' : ');
+                                }
+                                else {
+                                    context.push('CONDITION::START');
+                                    built_1.push('else:');
+                                }
                                 break;
                             }
                             case 'TABS': {
@@ -542,8 +549,14 @@ var Transpiler = /** @class */ (function () {
                     if (context.includes('VARIABLE::CONDITION')) {
                         var variable_index = tokens.filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).findIndex(function (x) { return x.value === '='; }) + 1, variable_value_1 = tokens.filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[variable_index];
                         built_1 = built_1.map(function (x) { return x === variable_value_1.value ? x = '%CONDITION%' : x; });
-                        var condition = /%CONDITION%(.*?)(then|and)?$/.exec(built_1.join('').trim())[1];
-                        built_1 = built_1.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value_1.value + ' : undefined').split('');
+                        var condition = /%CONDITION%(.*?)(then|and|:.*)?$/.exec(built_1.join('').trim())[1];
+                        if (context.includes('VARIABLE::CONDITION::ELSE')) {
+                            built_1 = built_1.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value_1.value + ' ').split('');
+                            context.splice(context.findIndex(function (x) { return x === 'VARIABLE::CONDITION::ELSE'; }), 1);
+                        }
+                        else {
+                            built_1 = built_1.join('').replace(condition, '').replace('%CONDITION%', condition + ' ? ' + variable_value_1.value + ' : undefined').split('');
+                        }
                         context.splice(context.findIndex(function (x) { return x === 'VARIABLE::CONDITION'; }), 1);
                     }
                 };
