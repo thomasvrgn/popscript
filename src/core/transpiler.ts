@@ -102,7 +102,7 @@ export default class Transpiler {
                                     built.push(')')
                                     context.splice(context.findIndex(x => x === 'CONVERSION::INT'), 1)
                                 } else if (context.includes('CONVERSION::STRING')) {
-                                    built.push('.toString()')
+                                    built.push(').toString()')
                                     context.splice(context.findIndex(x => x === 'CONVERSION::STRING'), 1)
                                 }
                                 break
@@ -295,8 +295,9 @@ export default class Transpiler {
                                         break
                                     }
 
-                                    case 'string': {
+                                    case 'str': {
                                         context.push('CONVERSION::STRING')
+                                        built.push('(')
                                         break
                                     }
 
@@ -596,10 +597,11 @@ export default class Transpiler {
             }
             
         }
-        
+
         code = temp_code.concat(code)
+        
         if (mod_count === imported) {
-            
+
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
 
             content   = ''

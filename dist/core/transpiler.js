@@ -119,7 +119,7 @@ var Transpiler = /** @class */ (function () {
                                     context.splice(context.findIndex(function (x) { return x === 'CONVERSION::INT'; }), 1);
                                 }
                                 else if (context.includes('CONVERSION::STRING')) {
-                                    built_1.push('.toString()');
+                                    built_1.push(').toString()');
                                     context.splice(context.findIndex(function (x) { return x === 'CONVERSION::STRING'; }), 1);
                                 }
                                 break;
@@ -310,8 +310,9 @@ var Transpiler = /** @class */ (function () {
                                         context.push('CONVERSION::INT');
                                         break;
                                     }
-                                    case 'string': {
+                                    case 'str': {
                                         context.push('CONVERSION::STRING');
+                                        built_1.push('(');
                                         break;
                                     }
                                 }

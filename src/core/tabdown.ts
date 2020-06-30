@@ -58,8 +58,7 @@ export default class Tabdown {
     }
 
     addBrackets (item) {
-
-
+        
         for (const child in item) {
             if (item.hasOwnProperty(child)) {
                 if (typeof item[child] === 'object') {
