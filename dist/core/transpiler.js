@@ -404,9 +404,25 @@ var Transpiler = /** @class */ (function () {
                                             !prototypes.includes((tokens.slice(parseInt(item_token) + 1).filter(function (x) { return !['ARGUMENTS', 'SPACE'].includes(x.token); })[0] ? tokens.slice(parseInt(item_token) + 1).filter(function (x) { return !['ARGUMENTS', 'SPACE'].includes(x.token); })[0].value : ''))) {
                                             built_1.push(', ');
                                         }
+                                        else {
+                                            built_1.push(' ');
+                                        }
                                     }
                                     else {
                                         built_1.push(value_1);
+                                    }
+                                }
+                                else if (context.includes('RETURN::START')) {
+                                    if (tokens.slice(parseInt(item_token) + 1).length > 0) {
+                                        if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return !['SPACE', 'TABS', 'RETURN'].includes(x.token); }).length > 0) {
+                                            built_1.push(' + " " + ');
+                                        }
+                                        else {
+                                            built_1.push(' ');
+                                        }
+                                    }
+                                    else {
+                                        built_1.push(' ');
                                     }
                                 }
                                 else {
@@ -554,6 +570,7 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'RETURN': {
                                 built_1.push('return');
+                                context.push('RETURN::START');
                                 break;
                             }
                         }

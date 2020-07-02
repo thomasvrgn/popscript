@@ -1,9 +1,4 @@
-fn say => message
-    print message
+fn say => message user
+    return "Message de" user ":" message
 
-say => "coucou"
-
-prop split => string
-    return self
-
-print "coucou" => split => ""
+print say => "coucou" "Ness"

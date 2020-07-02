@@ -396,9 +396,21 @@ export default class Transpiler {
                                             
                                                 built.push(', ')
 
+                                        } else {
+                                            built.push(' ')
                                         }
                                     } else {
                                         built.push(value)
+                                    }
+                                } else if (context.includes('RETURN::START')) {
+                                    if (tokens.slice(parseInt(item_token) + 1).length > 0) {
+                                        if (tokens.slice(0, parseInt(item_token)).filter(x => !['SPACE', 'TABS', 'RETURN'].includes(x.token)).length > 0) {
+                                            built.push(' + " " + ')
+                                        } else {
+                                            built.push(' ')
+                                        }
+                                    } else {
+                                        built.push(' ')
                                     }
                                 } else {
                                     built.push(value)
@@ -572,6 +584,7 @@ export default class Transpiler {
 
                             case 'RETURN': {
                                 built.push('return')
+                                context.push('RETURN::START')
                                 break
                             }
 
