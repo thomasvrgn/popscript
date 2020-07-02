@@ -167,6 +167,11 @@ export default class Transpiler {
                                                 break
                                             }
 
+                                            case 'any': {
+                                                built.unshift('Object')
+                                                break
+                                            }
+
                                             default: {
                                                 built.unshift(value)
                                                 break
@@ -260,6 +265,10 @@ export default class Transpiler {
                                     built.push('(')
                                 } else {
                                     if (prototypes.includes(tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].value)) {
+                                        if (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token === 'INT') {
+                                            built.push(')')
+                                            built.splice(tokens.slice(0, parseInt(item_token)).findIndex(x => x.token === 'INT'), 0, '(')
+                                        }
                                         built.push('.')
                                     } else {
                                         context.push('FUNCTION::CALL_ARGUMENTS')
@@ -756,10 +765,14 @@ export default class Transpiler {
         code = temp_code.concat(code)
         
         if (mod_count === imported) {
-    
-            console.log(code)
-
-            callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
+            let code_tabbed = Beautify(new Tabdown(code).tab().join('\n')).split('\n').filter(x => x.trim().length > 0)
+            for (const line in code_tabbed) {
+                if (!code_tabbed[line].endsWith('{')) {
+                    code_tabbed[line] += ';'
+                }
+            }
+            
+            callback(Beautify(Terser.minify(code_tabbed.join('\n')).code))
 
             content    = ''
             variables  = {}

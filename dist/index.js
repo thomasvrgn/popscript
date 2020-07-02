@@ -76,6 +76,7 @@ var Popscript = /** @class */ (function () {
                         throw error;
                     new transpiler_1["default"](content).transpile(path, undefined, _this.module_count, function (code) {
                         eval(code);
+                        console.log(code);
                         callback();
                     });
                 });

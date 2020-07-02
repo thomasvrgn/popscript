@@ -179,6 +179,10 @@ var Transpiler = /** @class */ (function () {
                                                 built_1.unshift('Array');
                                                 break;
                                             }
+                                            case 'any': {
+                                                built_1.unshift('Object');
+                                                break;
+                                            }
                                             default: {
                                                 built_1.unshift(value_1);
                                                 break;
@@ -279,6 +283,10 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else {
                                     if (prototypes.includes(tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].value)) {
+                                        if (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token === 'INT') {
+                                            built_1.push(')');
+                                            built_1.splice(tokens.slice(0, parseInt(item_token)).findIndex(function (x) { return x.token === 'INT'; }), 0, '(');
+                                        }
                                         built_1.push('.');
                                     }
                                     else {
@@ -729,8 +737,13 @@ var Transpiler = /** @class */ (function () {
         }
         code = temp_code.concat(code);
         if (mod_count === imported) {
-            console.log(code);
-            callback(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
+            var code_tabbed = Beautify(new tabdown_1["default"](code).tab().join('\n')).split('\n').filter(function (x) { return x.trim().length > 0; });
+            for (var line in code_tabbed) {
+                if (!code_tabbed[line].endsWith('{')) {
+                    code_tabbed[line] += ';';
+                }
+            }
+            callback(Beautify(Terser.minify(code_tabbed.join('\n')).code));
             content = '';
             variables = {};
             functions = [];

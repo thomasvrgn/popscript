@@ -1,23 +1,6 @@
-fn say => message
-    print message
-
-say => "coucou"
-
-prop repeat => string => times
-    result = ""
-    while times > 0
-        times -= 1
-        result += self
-    return result
-
-print "coucou" => repeat => 2
-
-prop test=> string
+prop log => any
     print self
 
-print "cpicpi" => test
+"Hello world" => log
 
-fn welcome
-    print "Hello world!"
-
-welcome
+15 => log

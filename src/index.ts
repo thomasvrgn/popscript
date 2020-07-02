@@ -48,6 +48,8 @@ export default class Popscript {
                     if (error) throw error
                     new Transpiler(content).transpile(path, undefined, this.module_count, code => {
                         eval(code)
+                        console.log(code)
+                    
                         callback()
                     })
                 })
