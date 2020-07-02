@@ -158,10 +158,10 @@ var Transpiler = /** @class */ (function () {
                                     }
                                     else if (context.includes('PROTOTYPE::START') && !context.includes('PROTOTYPE::ARGUMENTS')) {
                                         prototypes.push(value_1);
-                                        built_1.push(value_1 + '= function ():');
+                                        built_1.push(value_1 + '= function');
                                         context.push('PROTOTYPE::ARGUMENTS');
                                     }
-                                    else if (context.includes('PROTOTYPE::ARGUMENTS')) {
+                                    else if (context.includes('PROTOTYPE::ARGUMENTS') && !context.includes('PROTOTYPE::NAME')) {
                                         switch (value_1) {
                                             case 'string': {
                                                 built_1.unshift('String');
@@ -180,6 +180,11 @@ var Transpiler = /** @class */ (function () {
                                                 break;
                                             }
                                         }
+                                        context.push('PROTOTYPE::NAME');
+                                    }
+                                    else if (context.includes('PROTOTYPE::FUNCTION_ARGUMENTS')) {
+                                        built_1.push(value_1 + ',');
+                                        variables[value_1] = '';
                                     }
                                     else {
                                         if (variables[value_1] === 'module') {
@@ -248,6 +253,10 @@ var Transpiler = /** @class */ (function () {
                                         built_1.push('(');
                                         context.push('PROTOTYPE::CALL_ARGUMENTS');
                                     }
+                                }
+                                else if (context.includes('PROTOTYPE::NAME')) {
+                                    context.push('PROTOTYPE::FUNCTION_ARGUMENTS');
+                                    built_1.push('(');
                                 }
                                 else {
                                     if (prototypes.includes(tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].value)) {
@@ -604,6 +613,10 @@ var Transpiler = /** @class */ (function () {
                         built_1.push(')');
                         context.splice(context.findIndex(function (x) { return x === 'FUNCTION::CALL_ARGUMENTS'; }), 1);
                     }
+                    if (context.includes('PROTOTYPE::CALL_ARGUMENTS')) {
+                        built_1.push(')');
+                        context.splice(context.findIndex(function (x) { return x === 'PROTOTYPE::CALL_ARGUMENTS'; }), 1);
+                    }
                     if (context.includes('STRING::REMOVE')) {
                         built_1.push(', "")');
                         context.splice(context.findIndex(function (x) { return x === 'STRING::REMOVE'; }), 1);
@@ -640,9 +653,9 @@ var Transpiler = /** @class */ (function () {
                         built_1.push('):');
                         context.splice(context.findIndex(function (x) { return x === 'FUNCTION::ARGUMENTS'; }), 1);
                     }
-                    if (context.includes('PROTOTYPE::CALL_ARGUMENTS')) {
-                        built_1.push(')');
-                        context.splice(context.findIndex(function (x) { return x === 'PROTOTYPE::CALL_ARGUMENTS'; }), 1);
+                    if (context.includes('PROTOTYPE::FUNCTION_ARGUMENTS')) {
+                        built_1.push('):');
+                        context.splice(context.findIndex(function (x) { return x === 'PROTOTYPE::FUNCTION_ARGUMENTS'; }), 1);
                     }
                     if (context.includes('VARIABLE::CONDITION')) {
                         var variable_index = tokens.filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).findIndex(function (x) { return x.value === '='; }) + 1, variable_value_1 = tokens.filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[variable_index];
@@ -678,6 +691,7 @@ var Transpiler = /** @class */ (function () {
         }
         code = temp_code.concat(code);
         if (mod_count === imported) {
+            console.log(code);
             callback(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
             content = '';
             variables = {};
