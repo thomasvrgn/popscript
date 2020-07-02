@@ -288,6 +288,9 @@ var Transpiler = /** @class */ (function () {
                                     else if (context.filter(function (x) { return ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x); }).length > 0) {
                                         built_1.push('=');
                                     }
+                                    else {
+                                        built_1.push(value_1);
+                                    }
                                 }
                                 else {
                                     if (value_1 === '-') {
@@ -307,6 +310,10 @@ var Transpiler = /** @class */ (function () {
                                                     built_1.push(value_1);
                                                     break;
                                                 }
+                                                default: {
+                                                    built_1.push(value_1);
+                                                    break;
+                                                }
                                             }
                                         }
                                         else {
@@ -322,6 +329,10 @@ var Transpiler = /** @class */ (function () {
                                                     break;
                                                 }
                                                 case 'int': {
+                                                    built_1.push(value_1);
+                                                    break;
+                                                }
+                                                default: {
                                                     built_1.push(value_1);
                                                     break;
                                                 }
@@ -408,6 +419,10 @@ var Transpiler = /** @class */ (function () {
                                         context.push('ARRAY::PUSH');
                                         break;
                                     }
+                                    default: {
+                                        built_1.push(value_1);
+                                        break;
+                                    }
                                 }
                                 break;
                             }
@@ -472,6 +487,10 @@ var Transpiler = /** @class */ (function () {
                                     case 'array': {
                                         built_1.push(' = ' + var_name_1 + '.filter(x => x !== ');
                                         context.push('ARRAY::REMOVE');
+                                        break;
+                                    }
+                                    default: {
+                                        built_1.push(value_1);
                                         break;
                                     }
                                 }

@@ -271,6 +271,8 @@ export default class Transpiler {
                                         built.push('==')
                                     } else if (context.filter(x => ['VARIABLE::USE', 'VARIABLE::DECLARATION'].includes(x)).length > 0) {
                                         built.push('=')
+                                    } else {
+                                        built.push(value)
                                     }
                                 } else {
                                     if (value === '-') {
@@ -292,6 +294,11 @@ export default class Transpiler {
                                                     built.push(value)
                                                     break
                                                 }
+
+                                                default: {
+                                                    built.push(value)
+                                                    break
+                                                }
                                             }
                                         } else {
                                             switch (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token.toLowerCase()) {
@@ -307,6 +314,11 @@ export default class Transpiler {
                                                 }
     
                                                 case 'int': {
+                                                    built.push(value)
+                                                    break
+                                                }
+
+                                                default: {
                                                     built.push(value)
                                                     break
                                                 }
@@ -401,6 +413,11 @@ export default class Transpiler {
                                         context.push('ARRAY::PUSH')
                                         break
                                     }
+
+                                    default: {
+                                        built.push(value)
+                                        break
+                                    }
                                 }
                                 break
                             }
@@ -466,6 +483,11 @@ export default class Transpiler {
                                     case 'array': {
                                         built.push(' = ' + var_name + '.filter(x => x !== ')
                                         context.push('ARRAY::REMOVE')
+                                        break
+                                    }
+
+                                    default: {
+                                        built.push(value)
                                         break
                                     }
 
@@ -717,7 +739,6 @@ export default class Transpiler {
         
         if (mod_count === imported) {
 
-            
             console.log(code)
 
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))

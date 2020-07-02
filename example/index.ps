@@ -3,7 +3,11 @@ fn say => message
 
 say => "coucou"
 
-prop split => string => number
-    print number
+prop repeat => string => times
+    result = ""
+    while times > 0
+        times -= 1
+        result += self
+    return result
 
-"coucou" => split => "bruh"
+print "coucou" => repeat => 2
