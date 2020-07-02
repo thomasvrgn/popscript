@@ -11,3 +11,13 @@ prop repeat => string => times
     return result
 
 print "coucou" => repeat => 2
+
+prop test=> string
+    print self
+
+print "cpicpi" => test
+
+fn welcome
+    print "Hello world!"
+
+welcome

@@ -155,6 +155,10 @@ var Transpiler = /** @class */ (function () {
                                     else if (functions.includes(value_1)) {
                                         built_1.push(value_1);
                                         context.push('FUNCTION::CALL');
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0] ||
+                                            tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'ARGUMENTS') {
+                                            built_1.push('()');
+                                        }
                                     }
                                     else if (context.includes('PROTOTYPE::START') && !context.includes('PROTOTYPE::ARGUMENTS')) {
                                         prototypes.push(value_1);
@@ -180,11 +184,22 @@ var Transpiler = /** @class */ (function () {
                                                 break;
                                             }
                                         }
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0] ||
+                                            tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'ARGUMENTS') {
+                                            built_1.push('():');
+                                        }
                                         context.push('PROTOTYPE::NAME');
                                     }
                                     else if (context.includes('PROTOTYPE::FUNCTION_ARGUMENTS')) {
                                         built_1.push(value_1 + ',');
                                         variables[value_1] = '';
+                                    }
+                                    else if (prototypes.includes(value_1)) {
+                                        built_1.push(value_1);
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0] ||
+                                            tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'ARGUMENTS') {
+                                            built_1.push('()');
+                                        }
                                     }
                                     else {
                                         if (variables[value_1] === 'module') {
@@ -211,6 +226,10 @@ var Transpiler = /** @class */ (function () {
                                             built_1.push(value_1);
                                         }
                                         functions.push(value_1);
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0] ||
+                                            tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'ARGUMENTS') {
+                                            built_1.push('():');
+                                        }
                                     }
                                     else {
                                         built_1.push(value_1);

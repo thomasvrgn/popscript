@@ -141,6 +141,10 @@ export default class Transpiler {
                                     } else if (functions.includes(value)) {
                                         built.push(value)
                                         context.push('FUNCTION::CALL')
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0] ||
+                                        tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'ARGUMENTS') {
+                                            built.push('()')
+                                        } 
                                     } else if (context.includes('PROTOTYPE::START') && !context.includes('PROTOTYPE::ARGUMENTS')) {
                                         prototypes.push(value)
                                         built.push(value + '= function')
@@ -169,10 +173,20 @@ export default class Transpiler {
                                             }
 
                                         }
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0] ||
+                                        tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'ARGUMENTS') {
+                                            built.push('():')
+                                        } 
                                         context.push('PROTOTYPE::NAME')
                                     } else if (context.includes('PROTOTYPE::FUNCTION_ARGUMENTS')) {
                                         built.push(value + ',')
                                         variables[value] = ''
+                                    } else if (prototypes.includes(value)) {
+                                        built.push(value)
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0] ||
+                                        tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'ARGUMENTS') {
+                                            built.push('()')
+                                        } 
                                     } else {
                                         if (variables[value] === 'module') {
                                             built.push(value)
@@ -195,6 +209,10 @@ export default class Transpiler {
                                             built.push(value)
                                         }
                                         functions.push(value)
+                                        if (!tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0] ||
+                                        tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'ARGUMENTS') {
+                                            built.push('():')
+                                        } 
                                     } else {
                                         built.push(value)
                                         variables[value] = ''
@@ -738,7 +756,7 @@ export default class Transpiler {
         code = temp_code.concat(code)
         
         if (mod_count === imported) {
-
+    
             console.log(code)
 
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
