@@ -267,23 +267,42 @@ export default class Transpiler {
                                     }
                                 } else {
                                     if (value === '-') {
-                                        if (!var_name) break
-                                        if (!variables[var_name]) break
-                                        switch (variables[var_name]) {
-                                            case 'string': {
-                                                built.push('.replace(')
-                                                context.push('STRING::REMOVE')
-                                                break
+                                        
+                                        if (var_name && variables[var_name]) {
+                                            switch (variables[var_name]) {
+                                                case 'string': {
+                                                    built.push('.replace(')
+                                                    context.push('STRING::REMOVE')
+                                                    break
+                                                }
+                                                case 'array': {
+                                                    built.push('.filter(x => x !== ')
+                                                    context.push('ARRAY::REMOVE')
+                                                    break
+                                                }
+    
+                                                case 'int': {
+                                                    built.push(value)
+                                                    break
+                                                }
                                             }
-                                            case 'array': {
-                                                built.push('.filter(x => x !== ')
-                                                context.push('ARRAY::REMOVE')
-                                                break
-                                            }
-
-                                            case 'int': {
-                                                built.push(value)
-                                                break
+                                        } else {
+                                            switch (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token.toLowerCase()) {
+                                                case 'string': {
+                                                    built.push('.replace(')
+                                                    context.push('STRING::REMOVE')
+                                                    break
+                                                }
+                                                case 'array': {
+                                                    built.push('.filter(x => x !== ')
+                                                    context.push('ARRAY::REMOVE')
+                                                    break
+                                                }
+    
+                                                case 'int': {
+                                                    built.push(value)
+                                                    break
+                                                }
                                             }
                                         }
 
@@ -394,7 +413,7 @@ export default class Transpiler {
                                             !prototypes.includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].value) &&
                                             !prototypes.includes((tokens.slice(parseInt(item_token) + 1).filter(x => !['ARGUMENTS', 'SPACE'].includes(x.token))[0] ? tokens.slice(parseInt(item_token) + 1).filter(x => !['ARGUMENTS', 'SPACE'].includes(x.token))[0].value : ''))) {
                                             
-                                                if (tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'SIGNS') {
+                                                if (tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0] && tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].token !== 'SIGNS') {
                                                     built.push(', ')
                                                 }
 
@@ -685,8 +704,6 @@ export default class Transpiler {
         code = temp_code.concat(code)
         
         if (mod_count === imported) {
-
-            console.log(code)
 
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
 

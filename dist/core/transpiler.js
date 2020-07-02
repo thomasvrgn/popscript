@@ -282,24 +282,40 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else {
                                     if (value_1 === '-') {
-                                        if (!var_name_1)
-                                            break;
-                                        if (!variables[var_name_1])
-                                            break;
-                                        switch (variables[var_name_1]) {
-                                            case 'string': {
-                                                built_1.push('.replace(');
-                                                context.push('STRING::REMOVE');
-                                                break;
+                                        if (var_name_1 && variables[var_name_1]) {
+                                            switch (variables[var_name_1]) {
+                                                case 'string': {
+                                                    built_1.push('.replace(');
+                                                    context.push('STRING::REMOVE');
+                                                    break;
+                                                }
+                                                case 'array': {
+                                                    built_1.push('.filter(x => x !== ');
+                                                    context.push('ARRAY::REMOVE');
+                                                    break;
+                                                }
+                                                case 'int': {
+                                                    built_1.push(value_1);
+                                                    break;
+                                                }
                                             }
-                                            case 'array': {
-                                                built_1.push('.filter(x => x !== ');
-                                                context.push('ARRAY::REMOVE');
-                                                break;
-                                            }
-                                            case 'int': {
-                                                built_1.push(value_1);
-                                                break;
+                                        }
+                                        else {
+                                            switch (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token.toLowerCase()) {
+                                                case 'string': {
+                                                    built_1.push('.replace(');
+                                                    context.push('STRING::REMOVE');
+                                                    break;
+                                                }
+                                                case 'array': {
+                                                    built_1.push('.filter(x => x !== ');
+                                                    context.push('ARRAY::REMOVE');
+                                                    break;
+                                                }
+                                                case 'int': {
+                                                    built_1.push(value_1);
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -402,7 +418,7 @@ var Transpiler = /** @class */ (function () {
                                         if (!functions.includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].value) &&
                                             !prototypes.includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].value) &&
                                             !prototypes.includes((tokens.slice(parseInt(item_token) + 1).filter(function (x) { return !['ARGUMENTS', 'SPACE'].includes(x.token); })[0] ? tokens.slice(parseInt(item_token) + 1).filter(function (x) { return !['ARGUMENTS', 'SPACE'].includes(x.token); })[0].value : ''))) {
-                                            if (tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'SIGNS') {
+                                            if (tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0] && tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'SIGNS') {
                                                 built_1.push(', ');
                                             }
                                         }
@@ -662,7 +678,6 @@ var Transpiler = /** @class */ (function () {
         }
         code = temp_code.concat(code);
         if (mod_count === imported) {
-            console.log(code);
             callback(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
             content = '';
             variables = {};
