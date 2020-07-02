@@ -402,7 +402,9 @@ var Transpiler = /** @class */ (function () {
                                         if (!functions.includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].value) &&
                                             !prototypes.includes(tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].value) &&
                                             !prototypes.includes((tokens.slice(parseInt(item_token) + 1).filter(function (x) { return !['ARGUMENTS', 'SPACE'].includes(x.token); })[0] ? tokens.slice(parseInt(item_token) + 1).filter(function (x) { return !['ARGUMENTS', 'SPACE'].includes(x.token); })[0].value : ''))) {
-                                            built_1.push(', ');
+                                            if (tokens.slice(parseInt(item_token) + 1).filter(function (x) { return x.token !== 'SPACE'; })[0].token !== 'SIGNS') {
+                                                built_1.push(', ');
+                                            }
                                         }
                                         else {
                                             built_1.push(' ');
@@ -660,6 +662,7 @@ var Transpiler = /** @class */ (function () {
         }
         code = temp_code.concat(code);
         if (mod_count === imported) {
+            console.log(code);
             callback(Beautify(Terser.minify(Beautify(new tabdown_1["default"](code).tab().join('\n'))).code));
             content = '';
             variables = {};
