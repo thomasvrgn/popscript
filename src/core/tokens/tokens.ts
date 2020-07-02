@@ -27,7 +27,9 @@ export default {
     // KEYWORDS
 
     CONVERSION  : /(int|str)+\s?:/        , // Match type conversion
-    FUNCTION    : /fn/                    , // Match function keyword
+    FUNCTION    : /fn/                    , // Match function keyword,
+    PROTOTYPE   : /prop/                  , // Match prototype keyword
+    THIS        : /self/                  , // Match this keyword
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
     ELSE        : /else/                  , // Match else condition

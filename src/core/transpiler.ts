@@ -12,13 +12,14 @@ import * as PATH     from 'path'
 import * as Beautify from 'js-beautify'
 import * as Terser   from 'terser'
 
-let   content   : any
-let   variables : Object        = {}
-let   functions : Array<string> = []
-let   folder    : string
+let   content    : any
+let   variables  : Object        = {}
+let   functions  : Array<string> = []
+let   folder     : string
 let   code                      = []
-let   mod_count : number        = undefined
-let   imported  : number        = 0
+let   mod_count  : number        = undefined
+let   imported   : number        = 0
+let   prototypes : Array<string> = []
 
 export default class Transpiler {
 
@@ -123,6 +124,11 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'THIS': {
+                                built.push('this')
+                                break
+                            }
+
                             case 'WORD': {
                                 if (!context.includes('FUNCTION::START')) {
                                     if (variables[value] !== undefined) {
@@ -135,13 +141,45 @@ export default class Transpiler {
                                     } else if (functions.includes(value)) {
                                         built.push(value)
                                         context.push('FUNCTION::CALL')
+                                    } else if (context.includes('PROTOTYPE::START') && !context.includes('PROTOTYPE::ARGUMENTS')) {
+                                        prototypes.push(value)
+                                        built.push(value + '= function ():')
+                                        context.push('PROTOTYPE::ARGUMENTS')
+                                    } else if (context.includes('PROTOTYPE::ARGUMENTS')) {
+                                        switch (value) {
+
+                                            case 'string': {
+                                                built.unshift('String')
+                                                break
+                                            }
+
+                                            case 'int': {
+                                                built.unshift('Number')
+                                                break
+                                            }
+
+                                            case 'array': {
+                                                built.unshift('Array')
+                                                break
+                                            }
+
+                                            default: {
+                                                built.unshift(value)
+                                                break
+                                            }
+
+                                        }
                                     } else {
                                         if (variables[value] === 'module') {
                                             built.push(value)
                                         } else {
-                                            built.push(`var ${value}`)
-                                            variables[value] = ''
-                                            context.push('VARIABLE::DECLARATION')
+                                            if (prototypes.includes(value)) {
+                                                built.push(value)
+                                            } else {
+                                                built.push(`var ${value}`)
+                                                variables[value] = ''
+                                                context.push('VARIABLE::DECLARATION')
+                                            }
                                         }
                                     }
 
@@ -180,12 +218,29 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'PROTOTYPE': {
+                                context.push('PROTOTYPE::START')
+                                built.push('.prototype.')
+                                break
+                            }
+
                             case 'ARGUMENTS': {
-                                built.push('(')
                                 if (context.includes('FUNCTION::START')) {
                                     context.push('FUNCTION::ARGUMENTS')
+                                    built.push('(')
+                                } else if (prototypes.includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].value)) {
+                                    if (!context.includes('PROTOTYPE::ARGUMENTS')) {
+                                        built.push('(')
+                                        context.push('PROTOTYPE::CALL_ARGUMENTS')
+                                    }
                                 } else {
-                                    context.push('FUNCTION::CALL_ARGUMENTS')
+                                    if (prototypes.includes(tokens.slice(parseInt(item_token) + 1).filter(x => x.token !== 'SPACE')[0].value)) {
+                                        built.push('.')
+                                    } else {
+                                        context.push('FUNCTION::CALL_ARGUMENTS')
+                                        built.push('(')
+                                    }
+                                    
                                 }
                                 break
                             }
@@ -335,8 +390,12 @@ export default class Transpiler {
                                     }
                                 } else if (context.includes('PRINT::START')) {
                                     if (['STRING', 'INT', 'WORD', 'L_PAREN', 'R_PAREN'].includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token)) {
-                                        if (!functions.includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].value)) {
-                                            built.push(', ')
+                                        if (!functions.includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].value) &&
+                                            !prototypes.includes(tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].value) &&
+                                            !prototypes.includes((tokens.slice(parseInt(item_token) + 1).filter(x => !['ARGUMENTS', 'SPACE'].includes(x.token))[0] ? tokens.slice(parseInt(item_token) + 1).filter(x => !['ARGUMENTS', 'SPACE'].includes(x.token))[0].value : ''))) {
+                                            
+                                                built.push(', ')
+
                                         }
                                     } else {
                                         built.push(value)
@@ -430,6 +489,11 @@ export default class Transpiler {
                                     if (context.includes('FUNCTION::CALL_ARGUMENTS')) {
                                         built.push(')')
                                         context.splice(context.findIndex(x => x === 'FUNCTION::CALL_ARGUMENTS'), 1)
+                                    }
+
+                                    if (context.includes('PROTOTYPE::CALL_ARGUMENTS')) {
+                                        built.push(')')
+                                        context.splice(context.findIndex(x => x === 'PROTOTYPE::CALL_ARGUMENTS'), 1)
                                     }
 
                                     if (context.includes('STRING::REMOVE')) {
@@ -568,6 +632,11 @@ export default class Transpiler {
                         built.push('):')
                         context.splice(context.findIndex(x => x === 'FUNCTION::ARGUMENTS'), 1)
                     }
+
+                    if (context.includes('PROTOTYPE::CALL_ARGUMENTS')) {
+                        built.push(')')
+                        context.splice(context.findIndex(x => x === 'PROTOTYPE::CALL_ARGUMENTS'), 1)
+                    }
                     
                     if (context.includes('VARIABLE::CONDITION')) {
                         const variable_index = tokens.filter(x => !['SPACE', 'TABS'].includes(x.token)).findIndex(x => x.value === '=') + 1,
@@ -604,13 +673,14 @@ export default class Transpiler {
 
             callback(Beautify(Terser.minify(Beautify(new Tabdown(code).tab().join('\n'))).code))
 
-            content   = ''
-            variables = {}
-            functions = []
-            folder    = ''
-            code      = []
-            mod_count = 0
-            imported  = 0
+            content    = ''
+            variables  = {}
+            functions  = []
+            folder     = ''
+            code       = []
+            mod_count  = 0
+            imported   = 0
+            prototypes = []
             
         }
 

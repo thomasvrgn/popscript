@@ -23,6 +23,8 @@ exports["default"] = {
     // KEYWORDS
     CONVERSION: /(int|str)+\s?:/,
     FUNCTION: /fn/,
+    PROTOTYPE: /prop/,
+    THIS: /self/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,
