@@ -83,7 +83,7 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else {
-                                    built.push("var " + value);
+                                    built.push("var " + value + " ");
                                     this.specs.variables[value] = '';
                                 }
                                 break;
@@ -132,6 +132,19 @@ var Transpiler = /** @class */ (function () {
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push(' = function ():');
                                     }
+                                }
+                                break;
+                            }
+                            case 'SIGNS': {
+                                built.push(value);
+                                break;
+                            }
+                            case 'SPACE': {
+                                break;
+                            }
+                            case 'TABS': {
+                                if (parseInt(token_index) === 0) {
+                                    built.push(value);
                                 }
                                 break;
                             }

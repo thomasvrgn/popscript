@@ -99,7 +99,7 @@ export default class Transpiler {
                                         built.push('()')
                                     }
                                 } else {
-                                    built.push(`var ${value}`)
+                                    built.push(`var ${value} `)
                                     this.specs.variables[value] = ''
                                 }
                                 break
@@ -141,7 +141,7 @@ export default class Transpiler {
                                     else if (value === 'any') built.unshift('Object')
 
                                     this.specs.prototypes[this.specs.currents.prototype].type = value
-                                    
+
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push(' = function ():')
                                     }
@@ -150,6 +150,21 @@ export default class Transpiler {
                                 break
                             }
 
+                            case 'SIGNS': {
+                                built.push(value)
+                                break
+                            }
+
+                            case 'SPACE': {
+                                break
+                            }
+
+                            case 'TABS': {
+                                if (parseInt(token_index) === 0) {
+                                    built.push(value)
+                                }
+                                break
+                            }
                         }
                     }
                 }
