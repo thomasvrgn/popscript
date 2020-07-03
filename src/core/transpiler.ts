@@ -73,13 +73,13 @@ export default class Transpiler {
                                         built.push(' = function ():')
                                     }
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
-                                    if (!this.specs.prototypes[this.specs.currents.prototype].arguments) this.specs.prototypes[this.specs.currents.prototype].arguments = []
+                                    if (!this.specs.prototypes[this.specs.currents.prototype].arguments) this.specs.prototypes[this.specs.currents.prototype].arguments = {}
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
                                     } else {
                                         built.push(value + '):')
                                     }
-                                    this.specs.prototypes[this.specs.currents.prototype].arguments.push(value)
+                                    this.specs.prototypes[this.specs.currents.prototype].arguments[value] = ''
                                     this.specs.variables[value] = ''
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value)
@@ -91,6 +91,7 @@ export default class Transpiler {
                                     }
                                 } else if (this.specs.variables[value] !== undefined) {
                                     built.push(value)
+                                    context.push('VARIABLE::USE')
                                 } else if (this.specs.prototypes[value] !== undefined) {
                                     built.push('.' + value)
                                     context.push('PROTOTYPE::CALL')
@@ -100,7 +101,9 @@ export default class Transpiler {
                                     }
                                 } else {
                                     built.push(`var ${value} `)
-                                    this.specs.variables[value] = ''
+                                    this.specs.variables[value]  = ''
+                                    this.specs.currents.variable = value
+                                    context.push('VARIABLE::DECLARE')
                                 }
                                 break
                             }
@@ -122,14 +125,18 @@ export default class Transpiler {
                             case 'STRING': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value)
+                                    this.specs.prototypes[this.specs.currents.prototype].arguments[Object.keys(this.specs.prototypes[this.specs.currents.prototype].arguments)[this.specs.currents.count_args]] = 'string'
                                     ++this.specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(', ')
-                                    } else if (this.specs.currents.count_args === this.specs.prototypes[this.specs.currents.prototype].arguments.length) {
+                                    } else if (this.specs.currents.count_args === Object.values(this.specs.prototypes[this.specs.currents.prototype].arguments).length) {
                                         built.push(')')   
                                     } else {
                                         built.push(')')
                                     }
+                                } else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
+                                    this.specs.variables[this.specs.currents.variable] = 'string'
+                                    built.push(value)
                                 }
                             }
 
