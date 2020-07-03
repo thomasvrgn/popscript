@@ -367,7 +367,42 @@ var Transpiler = /** @class */ (function () {
                                         }
                                     }
                                     else {
-                                        built_1.push(value_1);
+                                        if (value_1 === '+') {
+                                            if (var_name_1 && variables[var_name_1]) {
+                                                switch (variables[var_name_1]) {
+                                                    case 'string':
+                                                    case 'int':
+                                                    default: {
+                                                        built_1.push(value_1);
+                                                        break;
+                                                    }
+                                                    case 'array': {
+                                                        built_1.push('.concat(');
+                                                        context.push('ARRAY::REMOVE');
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                switch (tokens.slice(0, parseInt(item_token)).filter(function (x) { return x.token !== 'SPACE'; }).slice(-1)[0].token.toLowerCase()) {
+                                                    case 'array':
+                                                    case 'r_paren': {
+                                                        built_1.push('.concat(');
+                                                        context.push('ARRAY::REMOVE');
+                                                        break;
+                                                    }
+                                                    default:
+                                                    case 'int':
+                                                    case 'string': {
+                                                        built_1.push(value_1);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            built_1.push(value_1);
+                                        }
                                     }
                                 }
                                 break;

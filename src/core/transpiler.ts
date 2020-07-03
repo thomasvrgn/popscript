@@ -353,7 +353,37 @@ export default class Transpiler {
                                         }
 
                                     } else {
-                                        built.push(value)
+                                        if (value === '+') {
+                                            if (var_name && variables[var_name]) {
+                                                switch (variables[var_name]) {
+                                                    case 'string': case 'int': default: {
+                                                        built.push(value)
+                                                        break
+                                                    }
+                                                    case 'array': {
+                                                        built.push('.concat(')
+                                                        context.push('ARRAY::REMOVE')
+                                                        break
+                                                    }
+                                                }
+                                            } else {
+                                                switch (tokens.slice(0, parseInt(item_token)).filter(x => x.token !== 'SPACE').slice(-1)[0].token.toLowerCase()) {
+
+                                                    case 'array': case 'r_paren': {
+                                                        built.push('.concat(')
+                                                        context.push('ARRAY::REMOVE')
+                                                        break
+                                                    }
+
+                                                    default: case 'int': case 'string': {
+                                                        built.push(value)
+                                                        break
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            built.push(value)
+                                        }
                                     }
                                 }
                                 break
@@ -766,6 +796,7 @@ export default class Transpiler {
         
         if (mod_count === imported) {
             let code_tabbed = Beautify(new Tabdown(code).tab().join('\n')).split('\n').filter(x => x.trim().length > 0)
+
             for (const line in code_tabbed) {
                 if (!code_tabbed[line].endsWith('{')) {
                     code_tabbed[line] += ';'
