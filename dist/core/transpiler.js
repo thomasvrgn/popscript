@@ -13,7 +13,8 @@ var Transpiler = /** @class */ (function () {
             currents: {
                 variable: '',
                 prototype: '',
-                "function": ''
+                "function": '',
+                count_args: 0
             },
             variables: {},
             functions: {},
@@ -58,6 +59,32 @@ var Transpiler = /** @class */ (function () {
                                         built.push(value + '):');
                                     }
                                     this.specs.prototypes[this.specs.currents.prototype].arguments.push(value);
+                                    this.specs.variables[value] = '';
+                                }
+                                else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                    built.push(value);
+                                    ++this.specs.currents.count_args;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(', ');
+                                    }
+                                    else {
+                                        built.push(')');
+                                    }
+                                }
+                                else if (this.specs.variables[value] !== undefined) {
+                                    built.push(value);
+                                }
+                                else if (this.specs.prototypes[value] !== undefined) {
+                                    built.push('.' + value);
+                                    context.push('PROTOTYPE::CALL');
+                                    this.specs.currents.prototype = value;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
+                                        built.push('()');
+                                    }
+                                }
+                                else {
+                                    built.push("var " + value);
+                                    this.specs.variables[value] = '';
                                 }
                                 break;
                             }
@@ -70,7 +97,26 @@ var Transpiler = /** @class */ (function () {
                                     built.push(' = function (');
                                     context.push('PROTOTYPE::ARGUMENTS');
                                 }
+                                else if (context.slice(-1)[0] === 'PROTOTYPE::CALL') {
+                                    built.push('(');
+                                    context.push('PROTOTYPE::CALL::ARGUMENTS');
+                                }
                                 break;
+                            }
+                            case 'STRING': {
+                                if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                    built.push(value);
+                                    ++this.specs.currents.count_args;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(', ');
+                                    }
+                                    else if (this.specs.currents.count_args === this.specs.prototypes[this.specs.currents.prototype].arguments.length) {
+                                        built.push(')');
+                                    }
+                                    else {
+                                        built.push(')');
+                                    }
+                                }
                             }
                             case 'TYPES': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
@@ -90,6 +136,7 @@ var Transpiler = /** @class */ (function () {
                     }
                 }
             }
+            context = [];
             console.log(built.join(''));
         }
     };

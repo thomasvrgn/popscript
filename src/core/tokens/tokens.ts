@@ -40,6 +40,7 @@ export default {
 
     PRINT       : /print/                 , // Match print keyword
     RETURN      : /return/                , // Match return keyword
+    SELF        : /self/                  , // Match self keyword
 
 
     // OTHER

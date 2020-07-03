@@ -15,9 +15,10 @@ export default class Transpiler {
     private content : Array<string> = []
     private specs                   = {
         currents : {
-            variable  : '',
-            prototype : '',
-            function  : ''
+            variable   : '',
+            prototype  : '',
+            function   : '',
+            count_args : 0 
         },
         variables: {
 
@@ -79,6 +80,27 @@ export default class Transpiler {
                                         built.push(value + '):')
                                     }
                                     this.specs.prototypes[this.specs.currents.prototype].arguments.push(value)
+                                    this.specs.variables[value] = ''
+                                } else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                    built.push(value)
+                                    ++this.specs.currents.count_args
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(', ')
+                                    } else {
+                                        built.push(')')
+                                    }
+                                } else if (this.specs.variables[value] !== undefined) {
+                                    built.push(value)
+                                } else if (this.specs.prototypes[value] !== undefined) {
+                                    built.push('.' + value)
+                                    context.push('PROTOTYPE::CALL')
+                                    this.specs.currents.prototype = value
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
+                                        built.push('()')
+                                    }
+                                } else {
+                                    built.push(`var ${value}`)
+                                    this.specs.variables[value] = ''
                                 }
                                 break
                             }
@@ -90,8 +112,25 @@ export default class Transpiler {
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
                                     built.push(' = function (')
                                     context.push('PROTOTYPE::ARGUMENTS')
+                                } else if (context.slice(-1)[0] === 'PROTOTYPE::CALL') {
+                                    built.push('(')
+                                    context.push('PROTOTYPE::CALL::ARGUMENTS')
                                 }
                                 break
+                            }
+
+                            case 'STRING': {
+                                if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                    built.push(value)
+                                    ++this.specs.currents.count_args
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(', ')
+                                    } else if (this.specs.currents.count_args === this.specs.prototypes[this.specs.currents.prototype].arguments.length) {
+                                        built.push(')')   
+                                    } else {
+                                        built.push(')')
+                                    }
+                                }
                             }
 
                             case 'TYPES': {
@@ -103,6 +142,7 @@ export default class Transpiler {
 
                                     this.specs.prototypes[this.specs.currents.prototype].type = value
                                 }
+
                                 break
                             }
 
@@ -110,6 +150,8 @@ export default class Transpiler {
                     }
                 }
             }
+
+            context = []
             console.log(built.join(''))
         }
 
