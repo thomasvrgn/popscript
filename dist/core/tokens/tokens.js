@@ -24,6 +24,7 @@ exports["default"] = {
     CONVERSION: /(int|str)+\s?:/,
     FUNCTION: /fn/,
     PROTOTYPE: /prop/,
+    ALIASE: /aliase/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,

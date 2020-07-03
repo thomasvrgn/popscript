@@ -43,7 +43,7 @@ export default class Transpiler {
         
         for (const index in this.content) {
             if (this.content.hasOwnProperty(index)) {
-                const line    : string        = this.content[index],
+                let   line    : string        = this.content[index],
                       tokens  : Array<Token>  = Tokenizer.tokenize(line),
                       context : Array<string> = [],
                       built   : any           = []
@@ -89,6 +89,21 @@ export default class Transpiler {
                                     } else {
                                         built.push(')')
                                     }
+                                } else if (context.slice(-1)[0] === 'ALIASE::DECLARE') {
+                                    built.push('.')
+                                    built.push(value)
+                                    this.specs.prototypes[value] = {}
+                                    this.specs.currents.prototype = value
+                                    context.push('ALIASE::PROTOTYPE')
+                                } else if (context.slice(-1)[0] === 'ALIASE::PROTOTYPE') {
+                                    const type = this.specs.prototypes[value].type
+                                    if (type === 'string') built.unshift('String')
+                                    else if (type === 'array') built.unshift('Array')
+                                    else if (type === 'int') built.unshift('Number')
+                                    else if (type === 'any') built.unshift('Object')
+
+                                    built.push(' = ' + value)
+                                    this.specs.prototypes[this.specs.currents.prototype] = this.specs.prototypes[value]
                                 } else if (this.specs.variables[value] !== undefined) {
                                     built.push(value)
                                     context.push('VARIABLE::USE')
@@ -119,6 +134,12 @@ export default class Transpiler {
                                     built.push('(')
                                     context.push('PROTOTYPE::CALL::ARGUMENTS')
                                 }
+                                break
+                            }
+
+                            case 'ALIASE': {
+                                built.push('.prototype')
+                                context.push('ALIASE::DECLARE')
                                 break
                             }
 
@@ -175,10 +196,12 @@ export default class Transpiler {
                         }
                     }
                 }
+                
+                context = []
+    
+                console.log(built.join(''))
             }
 
-            context = []
-            console.log(built.join(''))
         }
 
     }

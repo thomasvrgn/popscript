@@ -71,6 +71,26 @@ var Transpiler = /** @class */ (function () {
                                         built.push(')');
                                     }
                                 }
+                                else if (context.slice(-1)[0] === 'ALIASE::DECLARE') {
+                                    built.push('.');
+                                    built.push(value);
+                                    this.specs.prototypes[value] = {};
+                                    this.specs.currents.prototype = value;
+                                    context.push('ALIASE::PROTOTYPE');
+                                }
+                                else if (context.slice(-1)[0] === 'ALIASE::PROTOTYPE') {
+                                    var type = this.specs.prototypes[value].type;
+                                    if (type === 'string')
+                                        built.unshift('String');
+                                    else if (type === 'array')
+                                        built.unshift('Array');
+                                    else if (type === 'int')
+                                        built.unshift('Number');
+                                    else if (type === 'any')
+                                        built.unshift('Object');
+                                    built.push(' = ' + value);
+                                    this.specs.prototypes[this.specs.currents.prototype] = this.specs.prototypes[value];
+                                }
                                 else if (this.specs.variables[value] !== undefined) {
                                     built.push(value);
                                     context.push('VARIABLE::USE');
@@ -104,6 +124,11 @@ var Transpiler = /** @class */ (function () {
                                     built.push('(');
                                     context.push('PROTOTYPE::CALL::ARGUMENTS');
                                 }
+                                break;
+                            }
+                            case 'ALIASE': {
+                                built.push('.prototype');
+                                context.push('ALIASE::DECLARE');
                                 break;
                             }
                             case 'STRING': {
@@ -159,9 +184,9 @@ var Transpiler = /** @class */ (function () {
                         }
                     }
                 }
+                context = [];
+                console.log(built.join(''));
             }
-            context = [];
-            console.log(built.join(''));
         }
     };
     return Transpiler;

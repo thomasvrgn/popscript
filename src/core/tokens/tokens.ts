@@ -29,6 +29,7 @@ export default {
     CONVERSION  : /(int|str)+\s?:/        , // Match type conversion
     FUNCTION    : /fn/                    , // Match function keyword
     PROTOTYPE   : /prop/                  , // Match property keyword
+    ALIASE      : /aliase/                , // Match aliase keyword
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
