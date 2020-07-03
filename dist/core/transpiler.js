@@ -133,7 +133,8 @@ var Transpiler = /** @class */ (function () {
                                 context.push('ALIASE::DECLARE');
                                 break;
                             }
-                            case 'STRING': {
+                            case 'STRING':
+                            case 'INT': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value);
                                     this.specs.prototypes[this.specs.currents.prototype].arguments[Object.keys(this.specs.prototypes[this.specs.currents.prototype].arguments)[this.specs.currents.count_args]] = 'string';
@@ -151,6 +152,29 @@ var Transpiler = /** @class */ (function () {
                                 else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
                                     this.specs.variables[this.specs.currents.variable] = 'string';
                                     built.push(value);
+                                }
+                                else {
+                                    if (token === 'INT')
+                                        built.push('(' + value + ')');
+                                    else
+                                        built.push(value);
+                                    var prototype_name = tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['TABS', 'SPACE', 'CALL'].includes(x.token); });
+                                    if (prototype_name && prototype_name[0] && prototype_name[0].token === 'WORD') {
+                                        if (this.specs.prototypes[prototype_name[0].value]) {
+                                            var type = this.specs.prototypes[prototype_name[0].value].type;
+                                            if (type !== 'any') {
+                                                if (type !== token.toLowerCase()) {
+                                                    throw new Error('Property type is ' + type + ' and value is ' + token.toLowerCase() + '!');
+                                                }
+                                            }
+                                        }
+                                        else {
+                                            throw new Error('Property ' + prototype_name[0].value + 'does not exists!');
+                                        }
+                                    }
+                                    else if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return x.token === 'CALL'; }).filter(function (x) { return !['TABS', 'SPACE'].includes(x.token); }).length > 0) {
+                                        throw new Error('No properties were specified!');
+                                    }
                                 }
                             }
                             case 'TYPES': {

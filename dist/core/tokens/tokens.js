@@ -19,7 +19,7 @@ exports["default"] = {
     INT: /-?\d+/,
     OPTIONAL: /opt/,
     BOOLEAN: /true|false/,
-    TYPES: /string|int|array/,
+    TYPES: /string|int|array|any/,
     // KEYWORDS
     CONVERSION: /(int|str)+\s?:/,
     FUNCTION: /fn/,

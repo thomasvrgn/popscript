@@ -1,15 +1,4 @@
-prop => add : string => value test
-    return self + value
+prop => add : any => test
+    print "coucou"
 
-aliase => coucou : add
-
-example = 'Bonjour'
-example => add => "coucou" "test"
-
-example => coucou
-
-prop => remove : string
-    return self
-    
-
-example => remove
+5 => add

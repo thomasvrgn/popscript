@@ -22,7 +22,7 @@ export default {
     INT         : /-?\d+/                 , // Match any digits
     OPTIONAL    : /opt/                   , // Match optional type
     BOOLEAN     : /true|false/            , // Match boolean
-    TYPES       : /string|int|array/      , // Match types
+    TYPES       : /string|int|array|any/  , // Match types
 
     // KEYWORDS
 
