@@ -13,9 +13,8 @@ export default {
     COMMA       : /,/                     , // Match any comma
     L_PAREN     : /\(/                    , // Match any left parenthesis
     R_PAREN     : /\)/                    , // Match any right parenthesis
-    ARGUMENTS   : /=>/                    , // Match arguments start like fn test => coucou
-    PROPERTY    : /:(\w|\d)+/             , // Match property
-    CALL        : /(\w|\d)+->\w+/                 , // Match module call
+    COLON       : /:/                     , // Match colon char 
+    CALL        : /=>/                    , // Match arguments start like fn test => coucou
 
     // TYPES
 
@@ -23,31 +22,33 @@ export default {
     INT         : /-?\d+/                 , // Match any digits
     OPTIONAL    : /opt/                   , // Match optional type
     BOOLEAN     : /true|false/            , // Match boolean
+    TYPES       : /string|int|array/      , // Match types
 
     // KEYWORDS
 
     CONVERSION  : /(int|str)+\s?:/        , // Match type conversion
     FUNCTION    : /fn/                    , // Match function keyword
+    PROTOTYPE   : /prop/                  , // Match property keyword
+    ALIASE      : /aliase/                , // Match aliase keyword
+
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
     ELSE        : /else/                  , // Match else condition
+
     WHILE       : /while/                 , // Match while keyword
     LOOP        : /loop/                  , // Match loop keyword
     IN          : /in/                    , // Match "in" in loop keyword
+
     PRINT       : /print/                 , // Match print keyword
     RETURN      : /return/                , // Match return keyword
+
     ADD         : /(\+=|=\+)/             , // Match value adding
     REMOVE      : /(-=|=-)/               , // Match value removing
-    IMPORT      : /import/                , // Match import keyword
-    EXPORT      : /export/                , // Match export keyword
-    FROM        : /from/                  , // Match import source
-    JAVASCRIPT  : /as (javascript|js)/    , // Match javascript module
 
     // OTHER
 
-    THEN        : /then/                  , // Match then keyword
+    AFTER       : /then|and/              , // Match after keyword
     ARGUMENT    : /&/                     , // Match argument
-    AND         : /and/                   , // Match and keyword
     WORD        : /\w+/                   , // Match any words
     SIGNS       : /[><=+\-*\/%|]/         , // Match any sign
     NOT         : /not|!/                 , // Match not keyword

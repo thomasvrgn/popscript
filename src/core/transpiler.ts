@@ -44,10 +44,59 @@ export default class Transpiler {
                         const item  : Token  = tokens[token_index],
                               value : string = item.value,
                               token : string = item.token
+                        switch (token) {
 
+                            case 'PROTOTYPE': {
+                                built.push('.prototype')
+                                context.push('PROTOTYPE::DECLARE')
+                                break
+                            }
+
+                            case 'WORD': {
+                                if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
+                                    built.push(value)
+                                    context.push('PROTOTYPE::TYPE')
+                                } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                    built.unshift(value)
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
+                                        built.push(' = function ():')
+                                    }
+                                } else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(value + ', ')
+                                    } else {
+                                        built.push(value + '):')
+                                    }
+                                }
+                                break
+                            }
+
+                            case 'CALL': {
+                                if (context.slice(-1)[0] === 'PROTOTYPE::DECLARE') {
+                                    built.push('.')
+                                    context.push('PROTOTYPE::INFORMATIONS')
+                                } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                    built.push(' = function (')
+                                    context.push('PROTOTYPE::ARGUMENTS')
+                                }
+                                break
+                            }
+
+                            case 'TYPES': {
+                                if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                    if (value === 'string') built.unshift('String')
+                                    else if (value === 'array') built.unshift('Array')
+                                    else if (value === 'int') built.unshift('Number')
+                                    else if (value === 'any') built.unshift('Object')
+                                }
+                                break
+                            }
+
+                        }
                     }
                 }
             }
+            console.log(built.join(''))
         }
 
     }
