@@ -141,6 +141,10 @@ export default class Transpiler {
                                     else if (value === 'any') built.unshift('Object')
 
                                     this.specs.prototypes[this.specs.currents.prototype].type = value
+                                    
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
+                                        built.push(' = function ():')
+                                    }
                                 }
 
                                 break

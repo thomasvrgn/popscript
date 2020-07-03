@@ -129,6 +129,9 @@ var Transpiler = /** @class */ (function () {
                                     else if (value === 'any')
                                         built.unshift('Object');
                                     this.specs.prototypes[this.specs.currents.prototype].type = value;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
+                                        built.push(' = function ():');
+                                    }
                                 }
                                 break;
                             }
