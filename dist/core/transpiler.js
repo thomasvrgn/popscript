@@ -6,9 +6,11 @@
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         this.content = [];
+        this.code = [];
         this.specs = {
             currents: {
                 variable: '',
@@ -21,7 +23,7 @@ var Transpiler = /** @class */ (function () {
             prototypes: {}
         };
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
-        this.content = file_content.split(/\n/g);
+        this.content = file_content.split(/\n/g).filter(function (x) { return x.trim().length > 0; });
     }
     Transpiler.prototype.transpile = function () {
         for (var index in this.content) {
@@ -185,9 +187,10 @@ var Transpiler = /** @class */ (function () {
                     }
                 }
                 context = [];
-                console.log(built.join(''));
+                this.code.push(built.join(''));
             }
         }
+        console.log(new tabdown_1["default"](this.code).tab());
     };
     return Transpiler;
 }());

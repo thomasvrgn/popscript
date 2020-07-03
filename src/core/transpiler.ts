@@ -13,6 +13,7 @@ import Tabdown       from './tabdown'
 export default class Transpiler {
 
     private content : Array<string> = []
+    private code    : Array<string> = []
     private specs                   = {
         currents : {
             variable   : '',
@@ -35,7 +36,7 @@ export default class Transpiler {
 
         Tokenizer.addTokenSet(Tokens)
 
-        this.content = file_content.split(/\n/g)
+        this.content = file_content.split(/\n/g).filter(x => x.trim().length > 0)
 
     }
 
@@ -120,6 +121,7 @@ export default class Transpiler {
                                     this.specs.currents.variable = value
                                     context.push('VARIABLE::DECLARE')
                                 }
+                                
                                 break
                             }
 
@@ -196,13 +198,13 @@ export default class Transpiler {
                         }
                     }
                 }
-                
+
                 context = []
-    
-                console.log(built.join(''))
+                this.code.push(built.join(''))
             }
 
         }
+        console.log(new Tabdown(this.code).tab())
 
     }
 
