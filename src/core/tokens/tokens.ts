@@ -29,7 +29,6 @@ export default {
     CONVERSION  : /(int|str)+\s?:/        , // Match type conversion
     FUNCTION    : /fn/                    , // Match function keyword
     PROTOTYPE   : /prop/                  , // Match property keyword
-    ALIASE      : /aliase/                , // Match aliase keyword
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
@@ -42,8 +41,6 @@ export default {
     PRINT       : /print/                 , // Match print keyword
     RETURN      : /return/                , // Match return keyword
 
-    ADD         : /(\+=|=\+)/             , // Match value adding
-    REMOVE      : /(-=|=-)/               , // Match value removing
 
     // OTHER
 

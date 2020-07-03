@@ -24,7 +24,6 @@ exports["default"] = {
     CONVERSION: /(int|str)+\s?:/,
     FUNCTION: /fn/,
     PROTOTYPE: /prop/,
-    ALIASE: /aliase/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,
@@ -33,8 +32,6 @@ exports["default"] = {
     IN: /in/,
     PRINT: /print/,
     RETURN: /return/,
-    ADD: /(\+=|=\+)/,
-    REMOVE: /(-=|=-)/,
     // OTHER
     AFTER: /then|and/,
     ARGUMENT: /&/,

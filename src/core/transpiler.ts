@@ -13,13 +13,21 @@ import Tabdown       from './tabdown'
 export default class Transpiler {
 
     private content : Array<string> = []
-    private specs   : Object        = {
+    private specs                   = {
+        currents : {
+            variable  : '',
+            prototype : '',
+            function  : ''
+        },
         variables: {
 
         },
         functions: {
 
         },
+        prototypes: {
+
+        }
     }
 
     constructor (file_content) {
@@ -38,7 +46,7 @@ export default class Transpiler {
                       tokens  : Array<Token>  = Tokenizer.tokenize(line),
                       context : Array<string> = [],
                       built   : any           = []
-
+                
                 for (const token_index in tokens) {
                     if (tokens.hasOwnProperty(token_index)) {
                         const item  : Token  = tokens[token_index],
@@ -55,6 +63,8 @@ export default class Transpiler {
                             case 'WORD': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
                                     built.push(value)
+                                    this.specs.prototypes[value] = {}
+                                    this.specs.currents.prototype = value
                                     context.push('PROTOTYPE::TYPE')
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
                                     built.unshift(value)
@@ -62,11 +72,13 @@ export default class Transpiler {
                                         built.push(' = function ():')
                                     }
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
+                                    if (!this.specs.prototypes[this.specs.currents.prototype].arguments) this.specs.prototypes[this.specs.currents.prototype].arguments = []
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
                                     } else {
                                         built.push(value + '):')
                                     }
+                                    this.specs.prototypes[this.specs.currents.prototype].arguments.push(value)
                                 }
                                 break
                             }
@@ -88,6 +100,8 @@ export default class Transpiler {
                                     else if (value === 'array') built.unshift('Array')
                                     else if (value === 'int') built.unshift('Number')
                                     else if (value === 'any') built.unshift('Object')
+
+                                    this.specs.prototypes[this.specs.currents.prototype].type = value
                                 }
                                 break
                             }

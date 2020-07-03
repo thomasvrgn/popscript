@@ -10,8 +10,14 @@ var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         this.content = [];
         this.specs = {
+            currents: {
+                variable: '',
+                prototype: '',
+                "function": ''
+            },
             variables: {},
-            functions: {}
+            functions: {},
+            prototypes: {}
         };
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         this.content = file_content.split(/\n/g);
@@ -32,6 +38,8 @@ var Transpiler = /** @class */ (function () {
                             case 'WORD': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
                                     built.push(value);
+                                    this.specs.prototypes[value] = {};
+                                    this.specs.currents.prototype = value;
                                     context.push('PROTOTYPE::TYPE');
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
@@ -41,12 +49,15 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
+                                    if (!this.specs.prototypes[this.specs.currents.prototype].arguments)
+                                        this.specs.prototypes[this.specs.currents.prototype].arguments = [];
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
                                         built.push(value + ', ');
                                     }
                                     else {
                                         built.push(value + '):');
                                     }
+                                    this.specs.prototypes[this.specs.currents.prototype].arguments.push(value);
                                 }
                                 break;
                             }
@@ -71,6 +82,7 @@ var Transpiler = /** @class */ (function () {
                                         built.unshift('Number');
                                     else if (value === 'any')
                                         built.unshift('Object');
+                                    this.specs.prototypes[this.specs.currents.prototype].type = value;
                                 }
                                 break;
                             }
