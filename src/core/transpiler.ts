@@ -196,7 +196,7 @@ export default class Transpiler {
                                 } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
                                     built.push(value)
                                     ++this.specs.currents.count_args
-                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))[0].token !== 'AFTER') {
                                         built.push(', ')
                                     } else {
                                         built.push(')')
@@ -220,6 +220,13 @@ export default class Transpiler {
                                         throw new Error('No properties were specified!')
                                     }
                                 }
+                                break
+                            }
+
+                            case 'AFTER': {
+                                context.push('AFTER::USE')
+                                built.push(';')
+                                break
                             }
 
                             case 'TYPES': {
