@@ -29,7 +29,7 @@ var Transpiler = /** @class */ (function () {
         for (var index in this.content) {
             if (this.content.hasOwnProperty(index)) {
                 var line = this.content[index], tokens = parser_1.Tokenizer.tokenize(line), context = [], built = [];
-                for (var token_index in tokens) {
+                var _loop_1 = function (token_index) {
                     if (tokens.hasOwnProperty(token_index)) {
                         var item = tokens[token_index], value = item.value, token = item.token;
                         switch (token) {
@@ -41,8 +41,8 @@ var Transpiler = /** @class */ (function () {
                             case 'WORD': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
                                     built.push(value);
-                                    this.specs.prototypes[value] = {};
-                                    this.specs.currents.prototype = value;
+                                    this_1.specs.prototypes[value] = {};
+                                    this_1.specs.currents.prototype = value;
                                     context.push('PROTOTYPE::TYPE');
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
@@ -52,20 +52,20 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
-                                    if (!this.specs.prototypes[this.specs.currents.prototype].arguments)
-                                        this.specs.prototypes[this.specs.currents.prototype].arguments = {};
+                                    if (!this_1.specs.prototypes[this_1.specs.currents.prototype].arguments)
+                                        this_1.specs.prototypes[this_1.specs.currents.prototype].arguments = {};
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
                                         built.push(value + ', ');
                                     }
                                     else {
                                         built.push(value + '):');
                                     }
-                                    this.specs.prototypes[this.specs.currents.prototype].arguments[value] = '';
-                                    this.specs.variables[value] = '';
+                                    this_1.specs.prototypes[this_1.specs.currents.prototype].arguments[value] = '';
+                                    this_1.specs.variables[value] = '';
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value);
-                                    ++this.specs.currents.count_args;
+                                    ++this_1.specs.currents.count_args;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
                                         built.push(', ');
                                     }
@@ -76,12 +76,12 @@ var Transpiler = /** @class */ (function () {
                                 else if (context.slice(-1)[0] === 'ALIASE::DECLARE') {
                                     built.push('.');
                                     built.push(value);
-                                    this.specs.prototypes[value] = {};
-                                    this.specs.currents.prototype = value;
+                                    this_1.specs.prototypes[value] = {};
+                                    this_1.specs.currents.prototype = value;
                                     context.push('ALIASE::PROTOTYPE');
                                 }
                                 else if (context.slice(-1)[0] === 'ALIASE::PROTOTYPE') {
-                                    var type = this.specs.prototypes[value].type;
+                                    var type = this_1.specs.prototypes[value].type;
                                     if (type === 'string')
                                         built.unshift('String');
                                     else if (type === 'array')
@@ -91,28 +91,42 @@ var Transpiler = /** @class */ (function () {
                                     else if (type === 'any')
                                         built.unshift('Object');
                                     built.push(' = ' + value);
-                                    this.specs.prototypes[this.specs.currents.prototype] = this.specs.prototypes[value];
+                                    this_1.specs.prototypes[this_1.specs.currents.prototype] = this_1.specs.prototypes[value];
                                 }
                                 else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
-                                    if (!this.specs.functions[this.specs.currents["function"]].arguments)
-                                        this.specs.functions[this.specs.currents["function"]].arguments = {};
+                                    if (!this_1.specs.functions[this_1.specs.currents["function"]].arguments)
+                                        this_1.specs.functions[this_1.specs.currents["function"]].arguments = {};
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
                                         built.push(value + ', ');
                                     }
                                     else {
                                         built.push(value + '):');
                                     }
-                                    this.specs.functions[this.specs.currents["function"]].arguments[value] = '';
-                                    this.specs.variables[value] = '';
+                                    this_1.specs.functions[this_1.specs.currents["function"]].arguments[value] = '';
+                                    this_1.specs.variables[value] = '';
                                 }
-                                else if (this.specs.variables[value] !== undefined) {
+                                else if (this_1.specs.functions[value] !== undefined) {
+                                    built.push(value);
+                                    var match_1 = tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS', 'CALL'].includes(x.token); });
+                                    match_1.filter(function (x, index) { return x.token === 'AFTER' ? match_1 = match_1.slice(0, index) : match_1; });
+                                    if (this_1.specs.functions[value].arguments) {
+                                        if (Object.values(this_1.specs.functions[value].arguments).length === match_1.length) {
+                                            built.push('(');
+                                            context.push('FUNCTION::ARGUMENTS');
+                                        }
+                                    }
+                                    else {
+                                        built.push('()');
+                                    }
+                                }
+                                else if (this_1.specs.variables[value] !== undefined) {
                                     built.push(value);
                                     context.push('VARIABLE::USE');
                                 }
-                                else if (this.specs.prototypes[value] !== undefined) {
+                                else if (this_1.specs.prototypes[value] !== undefined) {
                                     built.push('.' + value);
                                     context.push('PROTOTYPE::CALL');
-                                    this.specs.currents.prototype = value;
+                                    this_1.specs.currents.prototype = value;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push('()');
                                     }
@@ -120,16 +134,16 @@ var Transpiler = /** @class */ (function () {
                                 else if (context.slice(-1)[0] === 'FUNCTION::DECLARE') {
                                     context.push('FUNCTION::NAME');
                                     built.push(value);
-                                    this.specs.functions[value] = {};
-                                    this.specs.currents["function"] = value;
+                                    this_1.specs.functions[value] = {};
+                                    this_1.specs.currents["function"] = value;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push('():');
                                     }
                                 }
                                 else {
                                     built.push("var " + value + " ");
-                                    this.specs.variables[value] = '';
-                                    this.specs.currents.variable = value;
+                                    this_1.specs.variables[value] = '';
+                                    this_1.specs.currents.variable = value;
                                     context.push('VARIABLE::DECLARE');
                                 }
                                 break;
@@ -162,12 +176,12 @@ var Transpiler = /** @class */ (function () {
                             case 'INT': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value);
-                                    this.specs.prototypes[this.specs.currents.prototype].arguments[Object.keys(this.specs.prototypes[this.specs.currents.prototype].arguments)[this.specs.currents.count_args]] = 'string';
-                                    ++this.specs.currents.count_args;
+                                    this_1.specs.prototypes[this_1.specs.currents.prototype].arguments[Object.keys(this_1.specs.prototypes[this_1.specs.currents.prototype].arguments)[this_1.specs.currents.count_args]] = 'string';
+                                    ++this_1.specs.currents.count_args;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
                                         built.push(', ');
                                     }
-                                    else if (this.specs.currents.count_args === Object.values(this.specs.prototypes[this.specs.currents.prototype].arguments).length) {
+                                    else if (this_1.specs.currents.count_args === Object.values(this_1.specs.prototypes[this_1.specs.currents.prototype].arguments).length) {
                                         built.push(')');
                                     }
                                     else {
@@ -175,8 +189,18 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
-                                    this.specs.variables[this.specs.currents.variable] = 'string';
+                                    this_1.specs.variables[this_1.specs.currents.variable] = 'string';
                                     built.push(value);
+                                }
+                                else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                    built.push(value);
+                                    ++this_1.specs.currents.count_args;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(', ');
+                                    }
+                                    else {
+                                        built.push(')');
+                                    }
                                 }
                                 else {
                                     if (token === 'INT')
@@ -185,8 +209,8 @@ var Transpiler = /** @class */ (function () {
                                         built.push(value);
                                     var prototype_name = tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['TABS', 'SPACE', 'CALL'].includes(x.token); });
                                     if (prototype_name && prototype_name[0] && prototype_name[0].token === 'WORD') {
-                                        if (this.specs.prototypes[prototype_name[0].value]) {
-                                            var type = this.specs.prototypes[prototype_name[0].value].type;
+                                        if (this_1.specs.prototypes[prototype_name[0].value]) {
+                                            var type = this_1.specs.prototypes[prototype_name[0].value].type;
                                             if (type !== 'any') {
                                                 if (type !== token.toLowerCase()) {
                                                     throw new Error('Property type is ' + type + ' and value is ' + token.toLowerCase() + '!');
@@ -212,7 +236,7 @@ var Transpiler = /** @class */ (function () {
                                         built.unshift('Number');
                                     else if (value === 'any')
                                         built.unshift('Object');
-                                    this.specs.prototypes[this.specs.currents.prototype].type = value;
+                                    this_1.specs.prototypes[this_1.specs.currents.prototype].type = value;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push(' = function ():');
                                     }
@@ -239,6 +263,10 @@ var Transpiler = /** @class */ (function () {
                             }
                         }
                     }
+                };
+                var this_1 = this;
+                for (var token_index in tokens) {
+                    _loop_1(token_index);
                 }
                 context = [];
                 this.code.push(built.join(''));

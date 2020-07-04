@@ -114,6 +114,18 @@ export default class Transpiler {
                                     }
                                     this.specs.functions[this.specs.currents.function].arguments[value] = ''
                                     this.specs.variables[value] = ''
+                                } else if (this.specs.functions[value] !== undefined) {
+                                    built.push(value)
+                                    let match = tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS', 'CALL'].includes(x.token))
+                                    match.filter((x, index) => x.token === 'AFTER' ? match = match.slice(0, index) : match)
+                                    if (this.specs.functions[value].arguments) {
+                                        if (Object.values(this.specs.functions[value].arguments).length === match.length) {
+                                            built.push('(')
+                                            context.push('FUNCTION::ARGUMENTS')
+                                        }
+                                    } else {
+                                        built.push('()')
+                                    }
                                 } else if (this.specs.variables[value] !== undefined) {
                                     built.push(value)
                                     context.push('VARIABLE::USE')
@@ -181,6 +193,14 @@ export default class Transpiler {
                                 } else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
                                     this.specs.variables[this.specs.currents.variable] = 'string'
                                     built.push(value)
+                                } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                    built.push(value)
+                                    ++this.specs.currents.count_args
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(', ')
+                                    } else {
+                                        built.push(')')
+                                    }
                                 } else {
                                     if (token === 'INT') built.push('(' + value + ')')
                                     else built.push(value)
