@@ -93,6 +93,18 @@ var Transpiler = /** @class */ (function () {
                                     built.push(' = ' + value);
                                     this.specs.prototypes[this.specs.currents.prototype] = this.specs.prototypes[value];
                                 }
+                                else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                    if (!this.specs.functions[this.specs.currents["function"]].arguments)
+                                        this.specs.functions[this.specs.currents["function"]].arguments = {};
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(value + ', ');
+                                    }
+                                    else {
+                                        built.push(value + '):');
+                                    }
+                                    this.specs.functions[this.specs.currents["function"]].arguments[value] = '';
+                                    this.specs.variables[value] = '';
+                                }
                                 else if (this.specs.variables[value] !== undefined) {
                                     built.push(value);
                                     context.push('VARIABLE::USE');
@@ -103,6 +115,15 @@ var Transpiler = /** @class */ (function () {
                                     this.specs.currents.prototype = value;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push('()');
+                                    }
+                                }
+                                else if (context.slice(-1)[0] === 'FUNCTION::DECLARE') {
+                                    context.push('FUNCTION::NAME');
+                                    built.push(value);
+                                    this.specs.functions[value] = {};
+                                    this.specs.currents["function"] = value;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
+                                        built.push('():');
                                     }
                                 }
                                 else {
@@ -125,6 +146,10 @@ var Transpiler = /** @class */ (function () {
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::CALL') {
                                     built.push('(');
                                     context.push('PROTOTYPE::CALL::ARGUMENTS');
+                                }
+                                else if (context.slice(-1)[0] === 'FUNCTION::NAME') {
+                                    built.push('(');
+                                    context.push('FUNCTION::ARGUMENTS');
                                 }
                                 break;
                             }
@@ -192,6 +217,11 @@ var Transpiler = /** @class */ (function () {
                                         built.push(' = function ():');
                                     }
                                 }
+                                break;
+                            }
+                            case 'FUNCTION': {
+                                context.push('FUNCTION::DECLARE');
+                                built.push('function ');
                                 break;
                             }
                             case 'SIGNS': {

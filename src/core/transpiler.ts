@@ -105,6 +105,15 @@ export default class Transpiler {
 
                                     built.push(' = ' + value)
                                     this.specs.prototypes[this.specs.currents.prototype] = this.specs.prototypes[value]
+                                } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                    if (!this.specs.functions[this.specs.currents.function].arguments) this.specs.functions[this.specs.currents.function].arguments = {}
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(value + ', ')
+                                    } else {
+                                        built.push(value + '):')
+                                    }
+                                    this.specs.functions[this.specs.currents.function].arguments[value] = ''
+                                    this.specs.variables[value] = ''
                                 } else if (this.specs.variables[value] !== undefined) {
                                     built.push(value)
                                     context.push('VARIABLE::USE')
@@ -114,6 +123,15 @@ export default class Transpiler {
                                     this.specs.currents.prototype = value
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push('()')
+                                    }
+                                } else if (context.slice(-1)[0] === 'FUNCTION::DECLARE') {
+                                    context.push('FUNCTION::NAME')
+                                    built.push(value)
+                                    this.specs.functions[value] = {}
+                                    this.specs.currents.function = value
+
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
+                                        built.push('():')
                                     }
                                 } else {
                                     built.push(`var ${value} `)
@@ -135,6 +153,9 @@ export default class Transpiler {
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::CALL') {
                                     built.push('(')
                                     context.push('PROTOTYPE::CALL::ARGUMENTS')
+                                } else if (context.slice(-1)[0] === 'FUNCTION::NAME') {
+                                    built.push('(')
+                                    context.push('FUNCTION::ARGUMENTS')
                                 }
                                 break
                             }
@@ -196,6 +217,12 @@ export default class Transpiler {
                                     }
                                 }
 
+                                break
+                            }
+
+                            case 'FUNCTION': {
+                                context.push('FUNCTION::DECLARE')
+                                built.push('function ')
                                 break
                             }
 
