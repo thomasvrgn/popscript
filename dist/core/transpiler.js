@@ -63,6 +63,9 @@ var Transpiler = /** @class */ (function () {
                                     this_1.specs.prototypes[this_1.specs.currents.prototype].arguments[value] = '';
                                     this_1.specs.variables[value] = '';
                                 }
+                                else if (context.slice(-1)[0] === 'PROTOTYPE::FUNCTION') {
+                                    built.push(' = ' + value);
+                                }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value);
                                     ++this_1.specs.currents.count_args;
@@ -114,14 +117,33 @@ var Transpiler = /** @class */ (function () {
                                             built.push('(');
                                             context.push('FUNCTION::ARGUMENTS');
                                         }
+                                        else if (this_1.specs.functions[value].infinite) {
+                                            built.push('(');
+                                            context.push('FUNCTION::ARGUMENTS');
+                                        }
                                     }
                                     else {
+                                        built.push('()');
+                                    }
+                                }
+                                else if (context.slice(-1)[0] === 'MODULE::CALL') {
+                                    built.push(value);
+                                    context.push('MODULE::ARGUMENTS');
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push('()');
                                     }
                                 }
                                 else if (this_1.specs.variables[value] !== undefined) {
                                     built.push(value);
                                     context.push('VARIABLE::USE');
+                                    if (context.includes('LOOP::LOOPED_ITEM')) {
+                                        if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[0].token !== 'AFTER') {
+                                            built.push(', ');
+                                        }
+                                        else {
+                                            built.push('):');
+                                        }
+                                    }
                                 }
                                 else if (this_1.specs.prototypes[value] !== undefined) {
                                     built.push('.' + value);
@@ -154,8 +176,13 @@ var Transpiler = /** @class */ (function () {
                                     context.push('PROTOTYPE::INFORMATIONS');
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
-                                    built.push(' = function (');
-                                    context.push('PROTOTYPE::ARGUMENTS');
+                                    if (this_1.specs.functions[tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'WORD'; })[0].value]) {
+                                        context.push('PROTOTYPE::FUNCTION');
+                                    }
+                                    else {
+                                        built.push(' = function (');
+                                        context.push('PROTOTYPE::ARGUMENTS');
+                                    }
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::CALL') {
                                     built.push('(');
@@ -165,11 +192,23 @@ var Transpiler = /** @class */ (function () {
                                     built.push('(');
                                     context.push('FUNCTION::ARGUMENTS');
                                 }
+                                else if (context.slice(-1)[0] === 'MODULE::ARGUMENTS') {
+                                    built.push('(');
+                                }
                                 break;
                             }
                             case 'ALIASE': {
                                 built.push('.prototype');
                                 context.push('ALIASE::DECLARE');
+                                break;
+                            }
+                            case 'PROCESS': {
+                                built.push(value);
+                                break;
+                            }
+                            case 'MODULE': {
+                                built.push('.');
+                                context.push('MODULE::CALL');
                                 break;
                             }
                             case 'STRING':
@@ -193,6 +232,16 @@ var Transpiler = /** @class */ (function () {
                                     built.push(value);
                                 }
                                 else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                    built.push(value);
+                                    ++this_1.specs.currents.count_args;
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[0].token !== 'AFTER') {
+                                        built.push(', ');
+                                    }
+                                    else {
+                                        built.push(')');
+                                    }
+                                }
+                                else if (context.includes('MODULE::ARGUMENTS')) {
                                     built.push(value);
                                     ++this_1.specs.currents.count_args;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[0].token !== 'AFTER') {
@@ -232,6 +281,21 @@ var Transpiler = /** @class */ (function () {
                                 built.push(';');
                                 break;
                             }
+                            case 'MULTIPLES': {
+                                built.push('...');
+                                this_1.specs.functions[this_1.specs.currents["function"]].infinite = true;
+                                break;
+                            }
+                            case 'SELF': {
+                                built.push('this');
+                                if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[0].token !== 'AFTER') {
+                                    built.push(', ');
+                                }
+                                else {
+                                    built.push(')');
+                                }
+                                break;
+                            }
                             case 'TYPES': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
                                     if (value === 'string')
@@ -247,6 +311,16 @@ var Transpiler = /** @class */ (function () {
                                         built.push(' = function ():');
                                     }
                                 }
+                                break;
+                            }
+                            case 'LOOP': {
+                                built.push('for(');
+                                context.push('LOOP::START');
+                                break;
+                            }
+                            case 'IN': {
+                                built.push('of ');
+                                context.push('LOOP::LOOPED_ITEM');
                                 break;
                             }
                             case 'FUNCTION': {
@@ -278,7 +352,7 @@ var Transpiler = /** @class */ (function () {
                 this.code.push(built.join(''));
             }
         }
-        console.log(new tabdown_1["default"](this.code).tab());
+        console.log(new tabdown_1["default"](this.code).tab().join('\n'));
     };
     return Transpiler;
 }());

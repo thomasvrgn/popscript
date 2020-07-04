@@ -1,16 +1,13 @@
-prop => add : any => test
-    print "coucou"
+fn print => mul values
+    loop value in values
+        process -> stdout -> write => value + " "
+    process -> stdout -> write => "\n"
 
-5 => add
-
-fn coucou => bruh test
-    print bruh test
-
-
-fn welcome
-    print "Bonjour"
+print => "coucou" "test" "bruh"
 
 
-welcome and "test"
+prop => log : any
+    print => self
 
-coucou => "test" "hello" and "coucou"
+
+"test" => log

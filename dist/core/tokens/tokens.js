@@ -14,6 +14,8 @@ exports["default"] = {
     R_PAREN: /\)/,
     COLON: /:/,
     CALL: /=>/,
+    MODULE: /->/,
+    PROCESS: /process/,
     // TYPES
     STRING: /(['"])(.*?)(['"])/,
     INT: /-?\d+/,
@@ -25,13 +27,13 @@ exports["default"] = {
     FUNCTION: /fn/,
     PROTOTYPE: /prop/,
     ALIASE: /aliase/,
+    MULTIPLES: /mul/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,
     WHILE: /while/,
     LOOP: /loop/,
     IN: /in/,
-    PRINT: /print/,
     RETURN: /return/,
     SELF: /self/,
     // OTHER
