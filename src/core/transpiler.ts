@@ -147,7 +147,6 @@ export default class Transpiler {
                                     }
                                 } else if (context.includes('MODULE::CALL')) {
                                     built.push(value)
-                                    context.push('MODULE::ARGUMENTS')
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token !== 'CALL').length === 0) {
                                         built.push(')')
                                     }
@@ -184,23 +183,19 @@ export default class Transpiler {
                                     context.push('VARIABLE::DECLARE')
                                 }
 
-                                if (context.slice(-1)[0] !== 'MODULE::ARGUMENTS' &&
-                                    context.slice(-1)[0] !== 'FUNCTION::DECLARE' &&
+                                if (context.slice(-1)[0] !== 'MODULE::CALL' &&
                                     !specs.functions[value] && !specs.prototypes[value]) {
-                                    if (this.scope[value]) {
-                                        const scopes = Object.entries(this.scope).filter(x => x[1] <= depth)
-                                        this.scope   = {}
-
-                                        for (const item of scopes) {
-                                            this.scope[item[0]] = item[1]
-                                        }
-
-                                        if (this.scope[value] === undefined && specs.variables[value] === undefined) {
-                                            throw new Error('Variable ' + value + ' not existing when calling it!')
-                                        }
-                                    } else {
+                                    if (this.scope[value] && this.scope[value] === depth) {
+                                        built = built.reverse().join(' ').replace(new RegExp(value), '""').split(' ').reverse()
+                                        built.unshift(new Array(depth).fill(new Array(this.tabsize).fill(' ').join('')).join(''))
+                                    } else if (!this.scope[value]) {
                                         this.scope[value] = depth
+                                    } else if (this.scope[value] > depth) {
+                                        this.scope[value] = depth
+                                        built.splice(parseInt(token_index) - 1, 0, 'var ')
                                     }
+                                } else if (context.slice(-1)[0] === 'MODULE::CALL') {
+                                    context.push('MODULE::ARGUMENTS')
                                 }
                                 
                                 break
