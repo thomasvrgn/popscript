@@ -29,6 +29,7 @@ let specs                = {
     }
 }
 
+
 export default class Transpiler {
 
     private content : Array<string> = []
@@ -42,7 +43,7 @@ export default class Transpiler {
     }
 
     transpile () {
-        
+
         for (const index in this.content) {
             if (this.content.hasOwnProperty(index)) {
                 let   line    : string        = this.content[index],
@@ -229,9 +230,7 @@ export default class Transpiler {
                                         built.push(')')
                                     }
                                 } else if (context.includes('IMPORT::DECLARE')) {
-                                    console.log(value.slice(1, value.length - 1))
-                                    const content = FS.readFileSync(Path.join(__dirname, '..', '..', 'example', value.slice(1, value.length - 1)), 'utf-8')
-                                    new Transpiler(content).transpile()
+                                    // Module
                                 } else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
                                     specs.variables[specs.currents.variable] = 'string'
                                     built.push(value)
@@ -281,7 +280,10 @@ export default class Transpiler {
 
                             case 'MULTIPLES': {
                                 built.push('...')
+                                if (specs.functions[specs.currents.function]) {
                                 specs.functions[specs.currents.function].infinite = true
+
+                                }
                                 break
                             }
                             
@@ -361,8 +363,9 @@ export default class Transpiler {
             }
 
         }
+
+        return new Tabdown(code).tab().join('\n')
         
-        console.log(new Tabdown(code).tab().join('\n'))
 
     }
 

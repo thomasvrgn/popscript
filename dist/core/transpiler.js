@@ -7,8 +7,6 @@ exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var tabdown_1 = require("./tabdown");
-var FS = require("fs");
-var Path = require("path");
 var code = [];
 var specs = {
     currents: {
@@ -230,9 +228,7 @@ var Transpiler = /** @class */ (function () {
                                     }
                                 }
                                 else if (context.includes('IMPORT::DECLARE')) {
-                                    console.log(value.slice(1, value.length - 1));
-                                    var content = FS.readFileSync(Path.join(__dirname, '..', '..', 'example', value.slice(1, value.length - 1)), 'utf-8');
-                                    new Transpiler(content).transpile();
+                                    // Module
                                 }
                                 else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
                                     specs.variables[specs.currents.variable] = 'string';
@@ -290,7 +286,9 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'MULTIPLES': {
                                 built.push('...');
-                                specs.functions[specs.currents["function"]].infinite = true;
+                                if (specs.functions[specs.currents["function"]]) {
+                                    specs.functions[specs.currents["function"]].infinite = true;
+                                }
                                 break;
                             }
                             case 'SELF': {
@@ -362,7 +360,7 @@ var Transpiler = /** @class */ (function () {
                 code.push(built.join(''));
             }
         }
-        console.log(new tabdown_1["default"](code).tab().join('\n'));
+        return new tabdown_1["default"](code).tab().join('\n');
     };
     return Transpiler;
 }());
