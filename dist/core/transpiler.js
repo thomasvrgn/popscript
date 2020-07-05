@@ -52,31 +52,19 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'WORD': {
-                                if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
+                                if (context.includes('PROTOTYPE::INFORMATIONS')) {
                                     built.push(value);
                                     specs.prototypes[value] = {};
                                     specs.currents.prototype = value;
                                     context.push('PROTOTYPE::TYPE');
                                 }
-                                else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
-                                    if (!specs.functions[specs.currents["function"]].arguments)
-                                        specs.functions[specs.currents["function"]].arguments = {};
-                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
-                                        built.push(value + ', ');
-                                    }
-                                    else {
-                                        built.push(value + ')');
-                                    }
-                                    specs.functions[specs.currents["function"]].arguments[value] = '';
-                                    specs.variables[value] = '';
-                                }
-                                else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                else if (context.includes('PROTOTYPE::TYPE')) {
                                     built.unshift(value);
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
                                         built.push(' = function ():');
                                     }
                                 }
-                                else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
+                                else if (context.includes('PROTOTYPE::ARGUMENTS')) {
                                     if (!specs.prototypes[specs.currents.prototype].arguments)
                                         specs.prototypes[specs.currents.prototype].arguments = {};
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
@@ -88,10 +76,10 @@ var Transpiler = /** @class */ (function () {
                                     specs.prototypes[specs.currents.prototype].arguments[value] = '';
                                     specs.variables[value] = '';
                                 }
-                                else if (context.slice(-1)[0] === 'PROTOTYPE::FUNCTION') {
+                                else if (context.includes('PROTOTYPE::FUNCTION')) {
                                     built.push(' = ' + value);
                                 }
-                                else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                else if (context.includes('PROTOTYPE::CALL::ARGUMENTS')) {
                                     built.push(value);
                                     ++specs.currents.count_args;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
@@ -101,14 +89,14 @@ var Transpiler = /** @class */ (function () {
                                         built.push(')');
                                     }
                                 }
-                                else if (context.slice(-1)[0] === 'ALIASE::DECLARE') {
+                                else if (context.includes('ALIASE::DECLARE')) {
                                     built.push('.');
                                     built.push(value);
                                     specs.prototypes[value] = {};
                                     specs.currents.prototype = value;
                                     context.push('ALIASE::PROTOTYPE');
                                 }
-                                else if (context.slice(-1)[0] === 'ALIASE::PROTOTYPE') {
+                                else if (context.includes('ALIASE::PROTOTYPE')) {
                                     var type = specs.prototypes[value].type;
                                     if (type === 'string')
                                         built.unshift('String');
@@ -121,7 +109,7 @@ var Transpiler = /** @class */ (function () {
                                     built.push(' = ' + value);
                                     specs.prototypes[specs.currents.prototype] = specs.prototypes[value];
                                 }
-                                else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                else if (context.includes('FUNCTION::ARGUMENTS')) {
                                     if (!specs.functions[specs.currents["function"]].arguments)
                                         specs.functions[specs.currents["function"]].arguments = {};
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
@@ -138,6 +126,18 @@ var Transpiler = /** @class */ (function () {
                                     specs.functions[specs.currents["function"]].arguments[value] = '';
                                     specs.variables[value] = '';
                                 }
+                                else if (context.includes('FUNCTION::CALL::ARGUMENTS')) {
+                                    if (!specs.functions[specs.currents["function"]].arguments)
+                                        specs.functions[specs.currents["function"]].arguments = {};
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(value + ', ');
+                                    }
+                                    else {
+                                        built.push(value + ')');
+                                    }
+                                    specs.functions[specs.currents["function"]].arguments[value] = '';
+                                    specs.variables[value] = '';
+                                }
                                 else if (specs.functions[value] !== undefined) {
                                     built.push(value);
                                     var match_1 = tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS', 'CALL'].includes(x.token); });
@@ -150,11 +150,11 @@ var Transpiler = /** @class */ (function () {
                                         built.push('()');
                                     }
                                 }
-                                else if (context.slice(-1)[0] === 'MODULE::CALL') {
+                                else if (context.includes('MODULE::CALL')) {
                                     built.push(value);
                                     context.push('MODULE::ARGUMENTS');
-                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token === 'CALL'; }).length === 0) {
-                                        built.push('()');
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token !== 'CALL'; }).length === 0) {
+                                        built.push(')');
                                     }
                                 }
                                 else if (specs.variables[value] !== undefined) {
@@ -177,7 +177,7 @@ var Transpiler = /** @class */ (function () {
                                         built.push('()');
                                     }
                                 }
-                                else if (context.slice(-1)[0] === 'FUNCTION::DECLARE') {
+                                else if (context.includes('FUNCTION::DECLARE')) {
                                     context.push('FUNCTION::NAME');
                                     built.push(value);
                                     specs.functions[value] = {};
@@ -211,7 +211,7 @@ var Transpiler = /** @class */ (function () {
                                             }
                                             finally { if (e_1) throw e_1.error; }
                                         }
-                                        if (!this_1.scope[value]) {
+                                        if (this_1.scope[value] === undefined && specs.variables[value] === undefined) {
                                             throw new Error('Variable ' + value + ' not existing when calling it!');
                                         }
                                     }
@@ -245,6 +245,9 @@ var Transpiler = /** @class */ (function () {
                                 }
                                 else if (context.slice(-1)[0] === 'MODULE::ARGUMENTS') {
                                     built.push('(');
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).filter(function (x) { return x.token !== 'CALL'; }).length === 0) {
+                                        built.push('()');
+                                    }
                                 }
                                 break;
                             }
@@ -264,7 +267,7 @@ var Transpiler = /** @class */ (function () {
                             }
                             case 'STRING':
                             case 'INT': {
-                                if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                if (context.includes('PROTOTYPE::CALL::ARGUMENTS')) {
                                     built.push(value);
                                     specs.prototypes[specs.currents.prototype].arguments[Object.keys(specs.prototypes[specs.currents.prototype].arguments)[specs.currents.count_args]] = 'string';
                                     ++specs.currents.count_args;
@@ -281,11 +284,11 @@ var Transpiler = /** @class */ (function () {
                                 else if (context.includes('IMPORT::DECLARE')) {
                                     // Module
                                 }
-                                else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
+                                else if (context.includes('VARIABLE::DECLARE')) {
                                     specs.variables[specs.currents.variable] = 'string';
                                     built.push(value);
                                 }
-                                else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                else if (context.includes('FUNCTION::ARGUMENTS')) {
                                     built.push(value);
                                     ++specs.currents.count_args;
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[0].token !== 'AFTER') {
@@ -305,7 +308,7 @@ var Transpiler = /** @class */ (function () {
                                         built.push(')');
                                     }
                                 }
-                                else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
+                                else if (context.includes('FUNCTION::CALL::ARGUMENTS')) {
                                     if (!specs.functions[specs.currents["function"]].arguments)
                                         specs.functions[specs.currents["function"]].arguments = {};
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
@@ -365,7 +368,7 @@ var Transpiler = /** @class */ (function () {
                                 break;
                             }
                             case 'TYPES': {
-                                if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                if (context.includes('PROTOTYPE::TYPE')) {
                                     if (value === 'string')
                                         built.unshift('String');
                                     else if (value === 'array')

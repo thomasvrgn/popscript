@@ -69,26 +69,17 @@ export default class Transpiler {
 
                             case 'WORD': {
 
-                                if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
+                                if (context.includes('PROTOTYPE::INFORMATIONS')) {
                                     built.push(value)
                                     specs.prototypes[value] = {}
                                     specs.currents.prototype = value
                                     context.push('PROTOTYPE::TYPE')
-                                } else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
-                                    if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
-                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
-                                        built.push(value + ', ')
-                                    } else {
-                                        built.push(value + ')')
-                                    }
-                                    specs.functions[specs.currents.function].arguments[value] = ''
-                                    specs.variables[value] = ''
-                                } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                } else if (context.includes('PROTOTYPE::TYPE')) {
                                     built.unshift(value)
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push(' = function ():')
                                     }
-                                } else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
+                                } else if (context.includes('PROTOTYPE::ARGUMENTS')) {
                                     if (!specs.prototypes[specs.currents.prototype].arguments) specs.prototypes[specs.currents.prototype].arguments = {}
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
@@ -97,9 +88,9 @@ export default class Transpiler {
                                     }
                                     specs.prototypes[specs.currents.prototype].arguments[value] = ''
                                     specs.variables[value] = ''
-                                } else if (context.slice(-1)[0] === 'PROTOTYPE::FUNCTION') {
+                                } else if (context.includes('PROTOTYPE::FUNCTION')) {
                                     built.push(' = ' + value)
-                                } else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                } else if (context.includes('PROTOTYPE::CALL::ARGUMENTS')) {
                                     built.push(value)
                                     ++specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
@@ -107,13 +98,13 @@ export default class Transpiler {
                                     } else {
                                         built.push(')')
                                     }
-                                } else if (context.slice(-1)[0] === 'ALIASE::DECLARE') {
+                                } else if (context.includes('ALIASE::DECLARE')) {
                                     built.push('.')
                                     built.push(value)
                                     specs.prototypes[value] = {}
                                     specs.currents.prototype = value
                                     context.push('ALIASE::PROTOTYPE')
-                                } else if (context.slice(-1)[0] === 'ALIASE::PROTOTYPE') {
+                                } else if (context.includes('ALIASE::PROTOTYPE')) {
                                     const type = specs.prototypes[value].type
                                     if (type === 'string') built.unshift('String')
                                     else if (type === 'array') built.unshift('Array')
@@ -122,7 +113,7 @@ export default class Transpiler {
 
                                     built.push(' = ' + value)
                                     specs.prototypes[specs.currents.prototype] = specs.prototypes[value]
-                                } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                } else if (context.includes('FUNCTION::ARGUMENTS')) {
                                     if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
@@ -132,6 +123,15 @@ export default class Transpiler {
                                         } else { 
                                             built.push(value + '):')
                                         }
+                                    }
+                                    specs.functions[specs.currents.function].arguments[value] = ''
+                                    specs.variables[value] = ''
+                                } else if (context.includes('FUNCTION::CALL::ARGUMENTS')) {
+                                    if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(value + ', ')
+                                    } else {
+                                        built.push(value + ')')
                                     }
                                     specs.functions[specs.currents.function].arguments[value] = ''
                                     specs.variables[value] = ''
@@ -145,13 +145,12 @@ export default class Transpiler {
                                     } else {
                                         built.push('()')
                                     }
-                                } else if (context.slice(-1)[0] === 'MODULE::CALL') {
+                                } else if (context.includes('MODULE::CALL')) {
                                     built.push(value)
                                     context.push('MODULE::ARGUMENTS')
-                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
-                                        built.push('()')
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token !== 'CALL').length === 0) {
+                                        built.push(')')
                                     }
-                                    
                                 } else if (specs.variables[value] !== undefined) {
                                     built.push(value)
                                     context.push('VARIABLE::USE')
@@ -169,7 +168,7 @@ export default class Transpiler {
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push('()')
                                     }
-                                } else if (context.slice(-1)[0] === 'FUNCTION::DECLARE') {
+                                } else if (context.includes('FUNCTION::DECLARE')) {
                                     context.push('FUNCTION::NAME')
                                     built.push(value)
                                     specs.functions[value] = {}
@@ -196,14 +195,14 @@ export default class Transpiler {
                                             this.scope[item[0]] = item[1]
                                         }
 
-                                        if (!this.scope[value]) {
+                                        if (this.scope[value] === undefined && specs.variables[value] === undefined) {
                                             throw new Error('Variable ' + value + ' not existing when calling it!')
                                         }
                                     } else {
                                         this.scope[value] = depth
                                     }
                                 }
-
+                                
                                 break
                             }
 
@@ -227,6 +226,9 @@ export default class Transpiler {
                                     context.push('FUNCTION::ARGUMENTS')
                                 } else if (context.slice(-1)[0] === 'MODULE::ARGUMENTS') {
                                     built.push('(')
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token !== 'CALL').length === 0) {
+                                        built.push('()')
+                                    }
                                 }
                                 break
                             }
@@ -249,7 +251,7 @@ export default class Transpiler {
                             }
 
                             case 'STRING': case 'INT': {
-                                if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
+                                if (context.includes('PROTOTYPE::CALL::ARGUMENTS')) {
                                     built.push(value)
                                     specs.prototypes[specs.currents.prototype].arguments[Object.keys(specs.prototypes[specs.currents.prototype].arguments)[specs.currents.count_args]] = 'string'
                                     ++specs.currents.count_args
@@ -262,10 +264,10 @@ export default class Transpiler {
                                     }
                                 } else if (context.includes('IMPORT::DECLARE')) {
                                     // Module
-                                } else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
+                                } else if (context.includes('VARIABLE::DECLARE')) {
                                     specs.variables[specs.currents.variable] = 'string'
                                     built.push(value)
-                                } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
+                                } else if (context.includes('FUNCTION::ARGUMENTS')) {
                                     built.push(value)
                                     ++specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))[0].token !== 'AFTER') {
@@ -281,7 +283,7 @@ export default class Transpiler {
                                     } else {
                                         built.push(')')
                                     }
-                                } else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
+                                } else if (context.includes('FUNCTION::CALL::ARGUMENTS')) {
                                     if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
@@ -339,7 +341,7 @@ export default class Transpiler {
                             }
 
                             case 'TYPES': {
-                                if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
+                                if (context.includes('PROTOTYPE::TYPE')) {
 
                                     if (value === 'string') built.unshift('String')
                                     else if (value === 'array') built.unshift('Array')
