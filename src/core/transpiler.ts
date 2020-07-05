@@ -186,8 +186,15 @@ export default class Transpiler {
                                 if (context.slice(-1)[0] !== 'MODULE::CALL' &&
                                     !specs.functions[value] && !specs.prototypes[value]) {
                                     if (this.scope[value] && this.scope[value] === depth) {
-                                        built = built.reverse().join(' ').replace(new RegExp(value), '""').split(' ').reverse()
-                                        built.unshift(new Array(depth).fill(new Array(this.tabsize).fill(' ').join('')).join(''))
+                                        if (context.includes('MODULE::ARGUMENTS')) {
+                                            built = built.reverse().join(' ').replace(new RegExp(value), '""').split(' ').reverse()
+                                            built.unshift(new Array(depth).fill(new Array(this.tabsize).fill(' ').join('')).join(''))
+                                        } else {
+                                            built = built.reverse().join('%%%').replace(new RegExp(value), 'var ').split('%%%').reverse()
+                                            specs.variables[value] = ''
+                                            this.scope[value] = undefined
+                                            built.push(value)
+                                        }
                                     } else if (!this.scope[value]) {
                                         this.scope[value] = depth
                                     } else if (this.scope[value] > depth) {

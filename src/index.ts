@@ -47,8 +47,8 @@ export default class Popscript {
                 readFile(path)
                 const code = new Transpiler(modules.reverse().map(x => x.join('\n')).join('\n')).transpile()
 
-                eval(code)
-                
+                console.log(code)
+            
             }
         })
 

@@ -70,7 +70,7 @@ var Popscript = /** @class */ (function () {
             if (bool) {
                 readFile(path);
                 var code = new transpiler_1["default"](modules.reverse().map(function (x) { return x.join('\n'); }).join('\n')).transpile();
-                eval(code);
+                console.log(code);
             }
         });
     };

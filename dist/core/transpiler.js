@@ -183,8 +183,16 @@ var Transpiler = /** @class */ (function () {
                                 if (context.slice(-1)[0] !== 'MODULE::CALL' &&
                                     !specs.functions[value] && !specs.prototypes[value]) {
                                     if (this_1.scope[value] && this_1.scope[value] === depth) {
-                                        built = built.reverse().join(' ').replace(new RegExp(value), '""').split(' ').reverse();
-                                        built.unshift(new Array(depth).fill(new Array(this_1.tabsize).fill(' ').join('')).join(''));
+                                        if (context.includes('MODULE::ARGUMENTS')) {
+                                            built = built.reverse().join(' ').replace(new RegExp(value), '""').split(' ').reverse();
+                                            built.unshift(new Array(depth).fill(new Array(this_1.tabsize).fill(' ').join('')).join(''));
+                                        }
+                                        else {
+                                            built = built.reverse().join('%%%').replace(new RegExp(value), 'var ').split('%%%').reverse();
+                                            specs.variables[value] = '';
+                                            this_1.scope[value] = undefined;
+                                            built.push(value);
+                                        }
                                     }
                                     else if (!this_1.scope[value]) {
                                         this_1.scope[value] = depth;
