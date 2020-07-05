@@ -24,7 +24,6 @@ var input = PATH.join(__dirname, '..', 'example', 'index.ps');
 var modules = [];
 var Popscript = /** @class */ (function () {
     function Popscript() {
-        this.modules = [];
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
     }
     Popscript.prototype.file = function (path) {
@@ -70,12 +69,8 @@ var Popscript = /** @class */ (function () {
         FS.exists(path, function (bool) {
             if (bool) {
                 readFile(path);
-                FS.readFile(path, 'utf-8', function (error, content) {
-                    if (error)
-                        throw error;
-                    var code = new transpiler_1["default"](modules.reverse().map(function (x) { return x.join('\n'); }).join('\n')).transpile();
-                    eval(code);
-                });
+                var code = new transpiler_1["default"](modules.reverse().map(function (x) { return x.join('\n'); }).join('\n')).transpile();
+                eval(code);
             }
         });
     };

@@ -9,11 +9,10 @@ import Tokens from './core/tokens/tokens'
 import * as FS from 'fs'
 import * as PATH from 'path'
 
-const input = PATH.join(__dirname, '..', 'example', 'index.ps')
-let modules : Array<string> = []
-export default class Popscript {
+const input   : string        = PATH.join(__dirname, '..', 'example', 'index.ps')
+let   modules : Array<string> = []
 
-    private modules: Array<string> = []
+export default class Popscript {
 
     constructor () {
         Tokenizer.addTokenSet(Tokens)
@@ -46,12 +45,9 @@ export default class Popscript {
         FS.exists (path, bool => {
             if (bool) {
                 readFile(path)
-                FS.readFile (path, 'utf-8', (error, content) => {
-                    if (error) throw error
-                    const code = new Transpiler(modules.reverse().map(x => x.join('\n')).join('\n')).transpile()
+                const code = new Transpiler(modules.reverse().map(x => x.join('\n')).join('\n')).transpile()
 
-                    eval(code)
-                })
+                eval(code)
             }
         })
 
