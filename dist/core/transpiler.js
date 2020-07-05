@@ -6,6 +6,7 @@
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var code = [];
 var specs = {
     currents: {
@@ -408,7 +409,7 @@ var Transpiler = /** @class */ (function () {
                 code.push(built.join(''));
             }
         }
-        return code.join('\n');
+        return new tabdown_1["default"](code).tab().join('\n');
     };
     return Transpiler;
 }());

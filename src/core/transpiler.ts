@@ -408,8 +408,7 @@ export default class Transpiler {
 
         }
 
-        return code.join('\n')
-        
+        return new Tabdown(code).tab().join('\n')  
 
     }
 
