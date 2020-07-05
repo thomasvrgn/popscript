@@ -3,10 +3,20 @@
          POPSCRIPT LANGUAGE
              Transpiler
 //////////////////////////////////*/
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
-var tabdown_1 = require("./tabdown");
 var code = [];
 var specs = {
     currents: {
@@ -22,14 +32,17 @@ var specs = {
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         this.content = [];
+        this.tabsize = 2;
+        this.scope = {};
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         this.content = file_content.split(/\n/g).filter(function (x) { return x.trim().length > 0; });
     }
     Transpiler.prototype.transpile = function () {
-        for (var index in this.content) {
-            if (this.content.hasOwnProperty(index)) {
-                var line = this.content[index], tokens = parser_1.Tokenizer.tokenize(line), context = [], built = [];
-                var _loop_1 = function (token_index) {
+        var _loop_1 = function (index) {
+            if (this_1.content.hasOwnProperty(index)) {
+                var line = this_1.content[index], tokens = parser_1.Tokenizer.tokenize(line), context = [], built = [], depth_1 = 0;
+                var _loop_2 = function (token_index) {
+                    var e_1, _a;
                     if (tokens.hasOwnProperty(token_index)) {
                         var item = tokens[token_index], value = item.value, token = item.token;
                         switch (token) {
@@ -44,6 +57,18 @@ var Transpiler = /** @class */ (function () {
                                     specs.prototypes[value] = {};
                                     specs.currents.prototype = value;
                                     context.push('PROTOTYPE::TYPE');
+                                }
+                                else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
+                                    if (!specs.functions[specs.currents["function"]].arguments)
+                                        specs.functions[specs.currents["function"]].arguments = {};
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(value + ', ');
+                                    }
+                                    else {
+                                        built.push(value + ')');
+                                    }
+                                    specs.functions[specs.currents["function"]].arguments[value] = '';
+                                    specs.variables[value] = '';
                                 }
                                 else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
                                     built.unshift(value);
@@ -103,7 +128,12 @@ var Transpiler = /** @class */ (function () {
                                         built.push(value + ', ');
                                     }
                                     else {
-                                        built.push(value + '):');
+                                        if (specs.functions[value] !== undefined) {
+                                            built.push(')');
+                                        }
+                                        else {
+                                            built.push(value + '):');
+                                        }
                                     }
                                     specs.functions[specs.currents["function"]].arguments[value] = '';
                                     specs.variables[value] = '';
@@ -113,14 +143,8 @@ var Transpiler = /** @class */ (function () {
                                     var match_1 = tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS', 'CALL'].includes(x.token); });
                                     match_1.filter(function (x, index) { return x.token === 'AFTER' ? match_1 = match_1.slice(0, index) : match_1; });
                                     if (specs.functions[value].arguments) {
-                                        if (Object.values(specs.functions[value].arguments).length === match_1.length) {
-                                            built.push('(');
-                                            context.push('FUNCTION::ARGUMENTS');
-                                        }
-                                        else if (specs.functions[value].infinite) {
-                                            built.push('(');
-                                            context.push('FUNCTION::ARGUMENTS');
-                                        }
+                                        built.push('(');
+                                        context.push('FUNCTION::CALL::ARGUMENTS');
                                     }
                                     else {
                                         built.push('()');
@@ -167,6 +191,33 @@ var Transpiler = /** @class */ (function () {
                                     specs.variables[value] = '';
                                     specs.currents.variable = value;
                                     context.push('VARIABLE::DECLARE');
+                                }
+                                if (context.slice(-1)[0] !== 'MODULE::ARGUMENTS' &&
+                                    context.slice(-1)[0] !== 'FUNCTION::DECLARE' &&
+                                    !specs.functions[value] && !specs.prototypes[value]) {
+                                    if (this_1.scope[value]) {
+                                        var scopes = Object.entries(this_1.scope).filter(function (x) { return x[1] <= depth_1; });
+                                        this_1.scope = {};
+                                        try {
+                                            for (var scopes_1 = (e_1 = void 0, __values(scopes)), scopes_1_1 = scopes_1.next(); !scopes_1_1.done; scopes_1_1 = scopes_1.next()) {
+                                                var item_1 = scopes_1_1.value;
+                                                this_1.scope[item_1[0]] = item_1[1];
+                                            }
+                                        }
+                                        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                                        finally {
+                                            try {
+                                                if (scopes_1_1 && !scopes_1_1.done && (_a = scopes_1["return"])) _a.call(scopes_1);
+                                            }
+                                            finally { if (e_1) throw e_1.error; }
+                                        }
+                                        if (!this_1.scope[value]) {
+                                            throw new Error('Variable ' + value + ' not existing when calling it!');
+                                        }
+                                    }
+                                    else {
+                                        this_1.scope[value] = depth_1;
+                                    }
                                 }
                                 break;
                             }
@@ -253,6 +304,18 @@ var Transpiler = /** @class */ (function () {
                                     else {
                                         built.push(')');
                                     }
+                                }
+                                else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
+                                    if (!specs.functions[specs.currents["function"]].arguments)
+                                        specs.functions[specs.currents["function"]].arguments = {};
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0) {
+                                        built.push(value + ', ');
+                                    }
+                                    else {
+                                        built.push(value + ')');
+                                    }
+                                    specs.functions[specs.currents["function"]].arguments[value] = '';
+                                    specs.variables[value] = '';
                                 }
                                 else {
                                     if (token === 'INT')
@@ -348,19 +411,27 @@ var Transpiler = /** @class */ (function () {
                                 if (parseInt(token_index) === 0) {
                                     built.push(value);
                                 }
+                                if (!this_1.tabsize) {
+                                    this_1.tabsize = value.length;
+                                }
+                                depth_1 = value.length / this_1.tabsize;
                                 break;
                             }
                         }
                     }
                 };
                 for (var token_index in tokens) {
-                    _loop_1(token_index);
+                    _loop_2(token_index);
                 }
                 context = [];
                 code.push(built.join(''));
             }
+        };
+        var this_1 = this;
+        for (var index in this.content) {
+            _loop_1(index);
         }
-        return new tabdown_1["default"](code).tab().join('\n');
+        return code.join('\n');
     };
     return Transpiler;
 }());

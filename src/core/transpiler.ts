@@ -33,6 +33,8 @@ let specs                = {
 export default class Transpiler {
 
     private content : Array<string> = []
+    private tabsize : number        = 2
+    private scope   : Object        = {}
 
     constructor (file_content) {
 
@@ -49,7 +51,8 @@ export default class Transpiler {
                 let   line    : string        = this.content[index],
                       tokens  : Array<Token>  = Tokenizer.tokenize(line),
                       context : Array<string> = [],
-                      built   : any           = []
+                      built   : any           = [],
+                      depth   : number        = 0
                 
                 for (const token_index in tokens) {
                     if (tokens.hasOwnProperty(token_index)) {
@@ -65,11 +68,21 @@ export default class Transpiler {
                             }
 
                             case 'WORD': {
+
                                 if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
                                     built.push(value)
                                     specs.prototypes[value] = {}
                                     specs.currents.prototype = value
                                     context.push('PROTOTYPE::TYPE')
+                                } else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
+                                    if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(value + ', ')
+                                    } else {
+                                        built.push(value + ')')
+                                    }
+                                    specs.functions[specs.currents.function].arguments[value] = ''
+                                    specs.variables[value] = ''
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
                                     built.unshift(value)
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
@@ -114,7 +127,11 @@ export default class Transpiler {
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
                                     } else {
-                                        built.push(value + '):')
+                                        if (specs.functions[value] !== undefined) {
+                                            built.push(')')
+                                        } else { 
+                                            built.push(value + '):')
+                                        }
                                     }
                                     specs.functions[specs.currents.function].arguments[value] = ''
                                     specs.variables[value] = ''
@@ -123,13 +140,8 @@ export default class Transpiler {
                                     let match = tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS', 'CALL'].includes(x.token))
                                     match.filter((x, index) => x.token === 'AFTER' ? match = match.slice(0, index) : match)
                                     if (specs.functions[value].arguments) {
-                                        if (Object.values(specs.functions[value].arguments).length === match.length) {
-                                            built.push('(')
-                                            context.push('FUNCTION::ARGUMENTS')
-                                        } else if (specs.functions[value].infinite) {
-                                            built.push('(')
-                                            context.push('FUNCTION::ARGUMENTS')
-                                        }
+                                        built.push('(')
+                                        context.push('FUNCTION::CALL::ARGUMENTS')
                                     } else {
                                         built.push('()')
                                     }
@@ -172,7 +184,26 @@ export default class Transpiler {
                                     specs.currents.variable = value
                                     context.push('VARIABLE::DECLARE')
                                 }
-                                
+
+                                if (context.slice(-1)[0] !== 'MODULE::ARGUMENTS' &&
+                                    context.slice(-1)[0] !== 'FUNCTION::DECLARE' &&
+                                    !specs.functions[value] && !specs.prototypes[value]) {
+                                    if (this.scope[value]) {
+                                        const scopes = Object.entries(this.scope).filter(x => x[1] <= depth)
+                                        this.scope   = {}
+
+                                        for (const item of scopes) {
+                                            this.scope[item[0]] = item[1]
+                                        }
+
+                                        if (!this.scope[value]) {
+                                            throw new Error('Variable ' + value + ' not existing when calling it!')
+                                        }
+                                    } else {
+                                        this.scope[value] = depth
+                                    }
+                                }
+
                                 break
                             }
 
@@ -250,6 +281,15 @@ export default class Transpiler {
                                     } else {
                                         built.push(')')
                                     }
+                                } else if (context.slice(-1)[0] === 'FUNCTION::CALL::ARGUMENTS') {
+                                    if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
+                                    if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
+                                        built.push(value + ', ')
+                                    } else {
+                                        built.push(value + ')')
+                                    }
+                                    specs.functions[specs.currents.function].arguments[value] = ''
+                                    specs.variables[value] = ''
                                 } else {
                                     if (token === 'INT') built.push('(' + value + ')')
                                     else built.push(value)
@@ -269,6 +309,7 @@ export default class Transpiler {
                                         throw new Error('No properties were specified!')
                                     }
                                 }
+                                
                                 break
                             }
 
@@ -351,6 +392,12 @@ export default class Transpiler {
                                 if (parseInt(token_index) === 0) {
                                     built.push(value)
                                 }
+                                if (!this.tabsize) {
+                                    this.tabsize = value.length
+                                }
+
+                                depth = value.length / this.tabsize
+
                                 break
                             }
                         }
@@ -364,7 +411,7 @@ export default class Transpiler {
 
         }
 
-        return new Tabdown(code).tab().join('\n')
+        return code.join('\n')
         
 
     }
