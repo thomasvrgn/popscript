@@ -33,7 +33,7 @@ exports["default"] = {
     ELSE: /else/,
     WHILE: /while/,
     LOOP: /loop/,
-    IN: /in/,
+    AS: /as/,
     RETURN: /return/,
     SELF: /self/,
     IMPORT: /import/,

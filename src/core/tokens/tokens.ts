@@ -40,7 +40,7 @@ export default {
 
     WHILE       : /while/                 , // Match while keyword
     LOOP        : /loop/                  , // Match loop keyword
-    IN          : /in/                    , // Match "in" in loop keyword
+    AS          : /as/                    , // Match "as" in loop keyword
 
     RETURN      : /return/                , // Match return keyword
     SELF        : /self/                  , // Match self keyword

@@ -1,5 +1,5 @@
 fn print => mul values
-  loop value in values
+  loop values as value
     process -> stdout -> write => value + " "
   process -> stdout -> write => "\n"
   value = "test"

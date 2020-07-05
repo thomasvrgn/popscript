@@ -145,9 +145,18 @@ var Transpiler = /** @class */ (function () {
                                         built.push(')');
                                     }
                                 }
-                                else if (specs.variables[value] !== undefined) {
-                                    built.push(value);
-                                    context.push('VARIABLE::USE');
+                                else if (context.slice(-1)[0] === 'LOOP::START') {
+                                    built.push('%%LOOP-VALUE (' + value + ')%%');
+                                }
+                                else if (context.slice(-1)[0] === 'LOOP::LOOPED_ITEM') {
+                                    var match = built.join('====').match(/%%LOOP-VALUE \(.*?\)%%/g);
+                                    if (match) {
+                                        var variable = built[built.indexOf(match[0])].match(/\(.*?\)/g)[0];
+                                        variable = variable.slice(1, variable.length - 1);
+                                        built[built.indexOf(match[0])] = 'var ' + value;
+                                        specs.variables[value] = '';
+                                        built.push(variable);
+                                    }
                                     if (context.includes('LOOP::LOOPED_ITEM')) {
                                         if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); })[0].token !== 'AFTER') {
                                             built.push(', ');
@@ -156,6 +165,10 @@ var Transpiler = /** @class */ (function () {
                                             built.push('):');
                                         }
                                     }
+                                }
+                                else if (specs.variables[value] !== undefined) {
+                                    built.push(value);
+                                    context.push('VARIABLE::USE');
                                 }
                                 else if (specs.prototypes[value] !== undefined) {
                                     built.push('.' + value);
@@ -379,8 +392,8 @@ var Transpiler = /** @class */ (function () {
                                 context.push('IMPORT::DECLARE');
                                 break;
                             }
-                            case 'IN': {
-                                built.push('of ');
+                            case 'AS': {
+                                built.push(' of ');
                                 context.push('LOOP::LOOPED_ITEM');
                                 break;
                             }
