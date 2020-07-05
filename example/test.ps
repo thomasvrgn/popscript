@@ -1,0 +1,4 @@
+fn print => mul values
+  loop value in values
+    process -> stdout -> write => value + " "
+  process -> stdout -> write => "\n"

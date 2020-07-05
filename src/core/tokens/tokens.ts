@@ -45,6 +45,8 @@ export default {
     RETURN      : /return/                , // Match return keyword
     SELF        : /self/                  , // Match self keyword
 
+    IMPORT      : /import/                , // Match import keyword
+
 
     // OTHER
 

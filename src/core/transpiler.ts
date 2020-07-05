@@ -7,30 +7,31 @@ import { Tokenizer } from './parser'
 import Tokens        from './tokens/tokens'
 import {Token}       from './scanner'
 import Tabdown       from './tabdown'
+import * as FS       from 'fs'
+import * as Path     from 'path'
 
+let code : Array<string> = []
+let specs                = {
+    currents : {
+        variable   : '',
+        prototype  : '',
+        function   : '',
+        count_args : 0 
+    },
+    variables: {
 
+    },
+    functions: {
+
+    },
+    prototypes: {
+
+    }
+}
 
 export default class Transpiler {
 
     private content : Array<string> = []
-    private code    : Array<string> = []
-    private specs                   = {
-        currents : {
-            variable   : '',
-            prototype  : '',
-            function   : '',
-            count_args : 0 
-        },
-        variables: {
-
-        },
-        functions: {
-
-        },
-        prototypes: {
-
-        }
-    }
 
     constructor (file_content) {
 
@@ -65,8 +66,8 @@ export default class Transpiler {
                             case 'WORD': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::INFORMATIONS') {
                                     built.push(value)
-                                    this.specs.prototypes[value] = {}
-                                    this.specs.currents.prototype = value
+                                    specs.prototypes[value] = {}
+                                    specs.currents.prototype = value
                                     context.push('PROTOTYPE::TYPE')
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
                                     built.unshift(value)
@@ -74,19 +75,19 @@ export default class Transpiler {
                                         built.push(' = function ():')
                                     }
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::ARGUMENTS') {
-                                    if (!this.specs.prototypes[this.specs.currents.prototype].arguments) this.specs.prototypes[this.specs.currents.prototype].arguments = {}
+                                    if (!specs.prototypes[specs.currents.prototype].arguments) specs.prototypes[specs.currents.prototype].arguments = {}
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
                                     } else {
                                         built.push(value + '):')
                                     }
-                                    this.specs.prototypes[this.specs.currents.prototype].arguments[value] = ''
-                                    this.specs.variables[value] = ''
+                                    specs.prototypes[specs.currents.prototype].arguments[value] = ''
+                                    specs.variables[value] = ''
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::FUNCTION') {
                                     built.push(' = ' + value)
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value)
-                                    ++this.specs.currents.count_args
+                                    ++specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(', ')
                                     } else {
@@ -95,36 +96,36 @@ export default class Transpiler {
                                 } else if (context.slice(-1)[0] === 'ALIASE::DECLARE') {
                                     built.push('.')
                                     built.push(value)
-                                    this.specs.prototypes[value] = {}
-                                    this.specs.currents.prototype = value
+                                    specs.prototypes[value] = {}
+                                    specs.currents.prototype = value
                                     context.push('ALIASE::PROTOTYPE')
                                 } else if (context.slice(-1)[0] === 'ALIASE::PROTOTYPE') {
-                                    const type = this.specs.prototypes[value].type
+                                    const type = specs.prototypes[value].type
                                     if (type === 'string') built.unshift('String')
                                     else if (type === 'array') built.unshift('Array')
                                     else if (type === 'int') built.unshift('Number')
                                     else if (type === 'any') built.unshift('Object')
 
                                     built.push(' = ' + value)
-                                    this.specs.prototypes[this.specs.currents.prototype] = this.specs.prototypes[value]
+                                    specs.prototypes[specs.currents.prototype] = specs.prototypes[value]
                                 } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
-                                    if (!this.specs.functions[this.specs.currents.function].arguments) this.specs.functions[this.specs.currents.function].arguments = {}
+                                    if (!specs.functions[specs.currents.function].arguments) specs.functions[specs.currents.function].arguments = {}
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(value + ', ')
                                     } else {
                                         built.push(value + '):')
                                     }
-                                    this.specs.functions[this.specs.currents.function].arguments[value] = ''
-                                    this.specs.variables[value] = ''
-                                } else if (this.specs.functions[value] !== undefined) {
+                                    specs.functions[specs.currents.function].arguments[value] = ''
+                                    specs.variables[value] = ''
+                                } else if (specs.functions[value] !== undefined) {
                                     built.push(value)
                                     let match = tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS', 'CALL'].includes(x.token))
                                     match.filter((x, index) => x.token === 'AFTER' ? match = match.slice(0, index) : match)
-                                    if (this.specs.functions[value].arguments) {
-                                        if (Object.values(this.specs.functions[value].arguments).length === match.length) {
+                                    if (specs.functions[value].arguments) {
+                                        if (Object.values(specs.functions[value].arguments).length === match.length) {
                                             built.push('(')
                                             context.push('FUNCTION::ARGUMENTS')
-                                        } else if (this.specs.functions[value].infinite) {
+                                        } else if (specs.functions[value].infinite) {
                                             built.push('(')
                                             context.push('FUNCTION::ARGUMENTS')
                                         }
@@ -138,7 +139,7 @@ export default class Transpiler {
                                         built.push('()')
                                     }
                                     
-                                } else if (this.specs.variables[value] !== undefined) {
+                                } else if (specs.variables[value] !== undefined) {
                                     built.push(value)
                                     context.push('VARIABLE::USE')
                                     if (context.includes('LOOP::LOOPED_ITEM')) {
@@ -148,26 +149,26 @@ export default class Transpiler {
                                             built.push('):')
                                         }
                                     }
-                                } else if (this.specs.prototypes[value] !== undefined) {
+                                } else if (specs.prototypes[value] !== undefined) {
                                     built.push('.' + value)
                                     context.push('PROTOTYPE::CALL')
-                                    this.specs.currents.prototype = value
+                                    specs.currents.prototype = value
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push('()')
                                     }
                                 } else if (context.slice(-1)[0] === 'FUNCTION::DECLARE') {
                                     context.push('FUNCTION::NAME')
                                     built.push(value)
-                                    this.specs.functions[value] = {}
-                                    this.specs.currents.function = value
+                                    specs.functions[value] = {}
+                                    specs.currents.function = value
 
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push('():')
                                     }
                                 } else {
                                     built.push(`var ${value} `)
-                                    this.specs.variables[value]  = ''
-                                    this.specs.currents.variable = value
+                                    specs.variables[value]  = ''
+                                    specs.currents.variable = value
                                     context.push('VARIABLE::DECLARE')
                                 }
                                 
@@ -179,7 +180,7 @@ export default class Transpiler {
                                     built.push('.')
                                     context.push('PROTOTYPE::INFORMATIONS')
                                 } else if (context.slice(-1)[0] === 'PROTOTYPE::TYPE') {
-                                    if (this.specs.functions[tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'WORD')[0].value]) {
+                                    if (specs.functions[tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'WORD')[0].value]) {
                                         context.push('PROTOTYPE::FUNCTION')
                                     } else {
                                         built.push(' = function (')
@@ -218,21 +219,25 @@ export default class Transpiler {
                             case 'STRING': case 'INT': {
                                 if (context.slice(-1)[0] === 'PROTOTYPE::CALL::ARGUMENTS') {
                                     built.push(value)
-                                    this.specs.prototypes[this.specs.currents.prototype].arguments[Object.keys(this.specs.prototypes[this.specs.currents.prototype].arguments)[this.specs.currents.count_args]] = 'string'
-                                    ++this.specs.currents.count_args
+                                    specs.prototypes[specs.currents.prototype].arguments[Object.keys(specs.prototypes[specs.currents.prototype].arguments)[specs.currents.count_args]] = 'string'
+                                    ++specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0) {
                                         built.push(', ')
-                                    } else if (this.specs.currents.count_args === Object.values(this.specs.prototypes[this.specs.currents.prototype].arguments).length) {
+                                    } else if (specs.currents.count_args === Object.values(specs.prototypes[specs.currents.prototype].arguments).length) {
                                         built.push(')')   
                                     } else {
                                         built.push(')')
                                     }
+                                } else if (context.includes('IMPORT::DECLARE')) {
+                                    console.log(value.slice(1, value.length - 1))
+                                    const content = FS.readFileSync(Path.join(__dirname, '..', '..', 'example', value.slice(1, value.length - 1)), 'utf-8')
+                                    new Transpiler(content).transpile()
                                 } else if (context.slice(-1)[0] === 'VARIABLE::DECLARE') {
-                                    this.specs.variables[this.specs.currents.variable] = 'string'
+                                    specs.variables[specs.currents.variable] = 'string'
                                     built.push(value)
                                 } else if (context.slice(-1)[0] === 'FUNCTION::ARGUMENTS') {
                                     built.push(value)
-                                    ++this.specs.currents.count_args
+                                    ++specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))[0].token !== 'AFTER') {
                                         built.push(', ')
                                     } else {
@@ -240,7 +245,7 @@ export default class Transpiler {
                                     }
                                 } else if (context.includes('MODULE::ARGUMENTS')) {
                                     built.push(value)
-                                    ++this.specs.currents.count_args
+                                    ++specs.currents.count_args
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length > 0 && tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))[0].token !== 'AFTER') {
                                         built.push(', ')
                                     } else {
@@ -251,8 +256,8 @@ export default class Transpiler {
                                     else built.push(value)
                                     const prototype_name= tokens.slice(parseInt(token_index) + 1).filter(x => !['TABS', 'SPACE', 'CALL'].includes(x.token))
                                     if (prototype_name && prototype_name[0] && prototype_name[0].token === 'WORD') {
-                                        if (this.specs.prototypes[prototype_name[0].value]) {
-                                            const type = this.specs.prototypes[prototype_name[0].value].type
+                                        if (specs.prototypes[prototype_name[0].value]) {
+                                            const type = specs.prototypes[prototype_name[0].value].type
                                             if (type !== 'any') {
                                                 if (type !== token.toLowerCase()) {
                                                     throw new Error('Property type is ' + type + ' and value is ' + token.toLowerCase() + '!')
@@ -276,7 +281,7 @@ export default class Transpiler {
 
                             case 'MULTIPLES': {
                                 built.push('...')
-                                this.specs.functions[this.specs.currents.function].infinite = true
+                                specs.functions[specs.currents.function].infinite = true
                                 break
                             }
                             
@@ -298,7 +303,7 @@ export default class Transpiler {
                                     else if (value === 'int') built.unshift('Number')
                                     else if (value === 'any') built.unshift('Object')
 
-                                    this.specs.prototypes[this.specs.currents.prototype].type = value
+                                    specs.prototypes[specs.currents.prototype].type = value
 
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).filter(x => x.token === 'CALL').length === 0) {
                                         built.push(' = function ():')
@@ -311,6 +316,11 @@ export default class Transpiler {
                             case 'LOOP': {
                                 built.push('for(')
                                 context.push('LOOP::START')
+                                break
+                            }
+
+                            case 'IMPORT': {
+                                context.push('IMPORT::DECLARE')
                                 break
                             }
 
@@ -346,13 +356,13 @@ export default class Transpiler {
                 }
 
                 context = []
-                this.code.push(built.join(''))
+                code.push(built.join(''))
 
             }
 
         }
         
-        console.log(new Tabdown(this.code).tab().join('\n'))
+        console.log(new Tabdown(code).tab().join('\n'))
 
     }
 

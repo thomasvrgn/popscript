@@ -36,6 +36,7 @@ exports["default"] = {
     IN: /in/,
     RETURN: /return/,
     SELF: /self/,
+    IMPORT: /import/,
     // OTHER
     AFTER: /then|and/,
     ARGUMENT: /&/,
