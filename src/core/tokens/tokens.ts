@@ -15,6 +15,8 @@ export default {
     R_PAREN     : /\)/                    , // Match any right parenthesis
     COLON       : /:/                     , // Match colon char 
     CALL        : /=>/                    , // Match arguments start like fn test => coucou
+    MODULE      : /->/                    , // Match module call keyword
+    PROCESS     : /process/               , // Match process keyword
 
     // TYPES
 
@@ -30,6 +32,7 @@ export default {
     FUNCTION    : /fn/                    , // Match function keyword
     PROTOTYPE   : /prop/                  , // Match property keyword
     ALIASE      : /aliase/                , // Match aliase keyword
+    MULTIPLES   : /mul/                   , // Match spread arguments
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
@@ -37,11 +40,12 @@ export default {
 
     WHILE       : /while/                 , // Match while keyword
     LOOP        : /loop/                  , // Match loop keyword
-    IN          : /in/                    , // Match "in" in loop keyword
+    AS          : /as/                    , // Match "as" in loop keyword
 
-    PRINT       : /print/                 , // Match print keyword
     RETURN      : /return/                , // Match return keyword
     SELF        : /self/                  , // Match self keyword
+
+    IMPORT      : /import/                , // Match import keyword
 
 
     // OTHER
