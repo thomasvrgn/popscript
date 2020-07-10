@@ -68,12 +68,18 @@ export default class Transpiler {
 
                                 // Word processing
 
+                                // Function name
+
                                 if (context.includes('FUNCTION::DECLARE')) {
                                     built.push(value + ' = function (')
                                     context.pop()
                                     context.push('FUNCTION::ARGUMENTS')
                                     this.specs.variables[value].type = 'function'
-                                } else if (context.includes('FUNCTION::ARGUMENTS')) {
+                                } 
+
+                                // Function arguments
+
+                                else if (context.includes('FUNCTION::ARGUMENTS')) {
                                     built.push(value)
                                     if (tokens.slice(parseInt(token_index) + 1).filter(x => !['TABS', 'SPACE'].includes(x.token)).length > 0) {
                                         built.push(', ')
@@ -81,14 +87,26 @@ export default class Transpiler {
                                         built.push('):')
                                         context.pop()
                                     }
-                                } else if (context.includes('LOOP::DECLARE')) {
+                                } 
+                                
+                                // Looped variable
+
+                                else if (context.includes('LOOP::DECLARE')) {
                                     built.push(value)
                                     context.pop()
-                                } else if (context.includes('LOOP::ARRAY')) {
+                                } 
+                                
+                                // Looped array
+                                
+                                else if (context.includes('LOOP::ARRAY')) {
                                     built.push(value)
                                     context.pop()
                                     built.push('):')
-                                } else if (this.specs.variables[value] && this.specs.variables[value].type === 'function') {
+                                } 
+                                
+                                // Function call
+
+                                else if (this.specs.variables[value] && this.specs.variables[value].type === 'function') {
 
                                     built.push(value)
                                     const fn_args = tokens.slice(parseInt(token_index) + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length)).filter(x => !['SPACE', 'TABS'].includes(x.token))
@@ -102,7 +120,11 @@ export default class Transpiler {
                                         built.push('()')
                                     }
 
-                                } else if (context.includes('FUNCTION::CALL')) {
+                                } 
+                                
+                                // Function call arguments
+
+                                else if (context.includes('FUNCTION::CALL')) {
                                     built.push(value)
                                     const fn_args = tokens.slice(parseInt(token_index) + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length)).filter(x => !['SPACE', 'TABS'].includes(x.token)
                                     )
@@ -113,7 +135,11 @@ export default class Transpiler {
                                         built.push(')')
                                         context.pop()
                                     }
-                                } else {
+                                } 
+                                
+                                // Variable sue
+
+                                else {
                                     built.push(value)
                                 }
 

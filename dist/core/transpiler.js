@@ -42,12 +42,14 @@ var Transpiler = /** @class */ (function () {
                                     };
                                 }
                                 // Word processing
+                                // Function name
                                 if (context.includes('FUNCTION::DECLARE')) {
                                     built.push(value + ' = function (');
                                     context.pop();
                                     context.push('FUNCTION::ARGUMENTS');
                                     this.specs.variables[value].type = 'function';
                                 }
+                                // Function arguments
                                 else if (context.includes('FUNCTION::ARGUMENTS')) {
                                     built.push(value);
                                     if (tokens.slice(parseInt(token_index) + 1).filter(function (x) { return !['TABS', 'SPACE'].includes(x.token); }).length > 0) {
@@ -58,15 +60,18 @@ var Transpiler = /** @class */ (function () {
                                         context.pop();
                                     }
                                 }
+                                // Looped variable
                                 else if (context.includes('LOOP::DECLARE')) {
                                     built.push(value);
                                     context.pop();
                                 }
+                                // Looped array
                                 else if (context.includes('LOOP::ARRAY')) {
                                     built.push(value);
                                     context.pop();
                                     built.push('):');
                                 }
+                                // Function call
                                 else if (this.specs.variables[value] && this.specs.variables[value].type === 'function') {
                                     built.push(value);
                                     var fn_args = tokens.slice(parseInt(token_index) + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length)).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
@@ -79,6 +84,7 @@ var Transpiler = /** @class */ (function () {
                                         built.push('()');
                                     }
                                 }
+                                // Function call arguments
                                 else if (context.includes('FUNCTION::CALL')) {
                                     built.push(value);
                                     var fn_args = tokens.slice(parseInt(token_index) + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length)).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
@@ -90,6 +96,7 @@ var Transpiler = /** @class */ (function () {
                                         context.pop();
                                     }
                                 }
+                                // Variable sue
                                 else {
                                     built.push(value);
                                 }
