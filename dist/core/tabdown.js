@@ -10,6 +10,8 @@ var Tabdown = /** @class */ (function () {
         this.code = [];
     }
     Tabdown.prototype.writeObject = function (array, property, value) {
+        if (array === void 0) { array = []; }
+        if (property === void 0) { property = ''; }
         var item = this.AST['root'];
         if (array.length > 0) {
             for (var itemt in array) {
@@ -48,6 +50,7 @@ var Tabdown = /** @class */ (function () {
         }
     };
     Tabdown.prototype.addBrackets = function (item) {
+        if (item === void 0) { item = {}; }
         for (var child in item) {
             if (item.hasOwnProperty(child)) {
                 if (typeof item[child] === 'object') {

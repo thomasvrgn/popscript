@@ -16,7 +16,7 @@ export default class Tabdown {
         this.code    = []
     }
 
-    private writeObject (array: Array<string>, property: string, value: any) {
+    private writeObject (array: Array<string> = [], property: string = '', value: any) {
         let item = this.AST['root']
         if (array.length > 0) {
             for (const itemt in array) {
@@ -30,7 +30,7 @@ export default class Tabdown {
         }
     }
 
-    private buildAST (index = 0) {
+    private buildAST (index : number = 0) {
 
         const line    = this.content[index],
               ft_line = this.content[index + 1]
@@ -57,7 +57,7 @@ export default class Tabdown {
 
     }
 
-    private addBrackets (item) {
+    private addBrackets (item: Object = {}) {
         
         for (const child in item) {
             if (item.hasOwnProperty(child)) {
