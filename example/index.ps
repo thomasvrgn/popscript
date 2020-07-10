@@ -1,16 +1,12 @@
 fn print => mul values
     for value in values
         native "process.stdout.write(value + ' ')"
-
+    native "process.stdout.write('\n')"
 test = "coucou"
 print => test "test" and test = "bruh"
 
-if test = "coucou"
-    bruh = "hello"
-    print => "bruh"
-
+bruh = "test"
 print => bruh
 
-bruh = "test"
 
 print =>

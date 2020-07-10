@@ -113,6 +113,8 @@ export default class Transpiler {
                                         built.push(')')
                                         context.pop()
                                     }
+                                } else {
+                                    built.push(value)
                                 }
 
                                 break
@@ -130,12 +132,29 @@ export default class Transpiler {
                                         built.push(')')
                                         context.pop()
                                     }
+                                } else {
+                                    built.push(value)
                                 }
+                                break
+                            }
+
+                            case 'SIGNS': {
+                                built.push(` ${value} `)
                                 break
                             }
 
                             case 'FUNCTION': {
                                 context.push('FUNCTION::DECLARE')
+                                break
+                            }
+
+                            case 'AFTER': {
+                                built.push(', ')
+                                break
+                            }
+
+                            case 'MULTIPLES': {
+                                built.push('...')
                                 break
                             }
 
@@ -179,7 +198,7 @@ export default class Transpiler {
 
         this.code.unshift('var ' + Object.keys(this.specs.variables).join(', '))
 
-        console.log(this.code.map(x => x.replace(/'/g, '"')))
+        console.log(new Tabdown(this.code.map(x => x.replace(/'/g, '"'))).tab().join('\n'))
 
     }
 

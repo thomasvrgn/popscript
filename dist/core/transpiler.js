@@ -6,6 +6,7 @@
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
         this.content = [];
@@ -89,6 +90,9 @@ var Transpiler = /** @class */ (function () {
                                         context.pop();
                                     }
                                 }
+                                else {
+                                    built.push(value);
+                                }
                                 break;
                             }
                             case 'STRING':
@@ -104,10 +108,25 @@ var Transpiler = /** @class */ (function () {
                                         context.pop();
                                     }
                                 }
+                                else {
+                                    built.push(value);
+                                }
+                                break;
+                            }
+                            case 'SIGNS': {
+                                built.push(" " + value + " ");
                                 break;
                             }
                             case 'FUNCTION': {
                                 context.push('FUNCTION::DECLARE');
+                                break;
+                            }
+                            case 'AFTER': {
+                                built.push(', ');
+                                break;
+                            }
+                            case 'MULTIPLES': {
+                                built.push('...');
                                 break;
                             }
                             case 'LOOP': {
@@ -140,7 +159,7 @@ var Transpiler = /** @class */ (function () {
             }
         }
         this.code.unshift('var ' + Object.keys(this.specs.variables).join(', '));
-        console.log(this.code.map(function (x) { return x.replace(/'/g, '"'); }));
+        console.log(new tabdown_1["default"](this.code.map(function (x) { return x.replace(/'/g, '"'); })).tab().join('\n'));
     };
     return Transpiler;
 }());
