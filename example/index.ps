@@ -1,6 +1,9 @@
-<<<<<<< HEAD
+fn print => mul values
+    for value in values
+        native "process.stdout.write(value + ' ')"
+
 test = "coucou"
-print => test
+print => test "test" and test = "bruh"
 
 if test = "coucou"
     bruh = "hello"
@@ -9,12 +12,5 @@ if test = "coucou"
 print => bruh
 
 bruh = "test"
-=======
-import "./test.ps"
 
-print => "coucou" "test" "bruh"
-
-
-values = "test"
-print => values
->>>>>>> 253b1000a6ebc0d00cbb37afa212e875f7637b47
+print =>
