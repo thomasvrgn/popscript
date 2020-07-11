@@ -3,18 +3,20 @@
                 Addon
 //////////////////////////////////*/
 
-import { builtinModules } from "module";
+import {Token}       from '../scanner'
 
 export default class Function {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
                  context : Array<string> = [], 
-                 specs) 
+                 specs,
+                 tokens  : Array<Token>  = [],
+                 index   : number        = 0) 
     {
 
         context.push('FUNCTION::DECLARE')
-        
+
         return
 
     }

@@ -3,12 +3,16 @@
                 Addon
 //////////////////////////////////*/
 
+import {Token}       from '../scanner'
+
 export default class Word {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
                  context : Array<string> = [], 
-                 specs) 
+                 specs,
+                 tokens  : Array<Token>  = [],
+                 index   : number        = 0) 
     {
 
         if (!specs.variables[value]) {
@@ -23,8 +27,13 @@ export default class Word {
 
             return value + ' = function ('
         } else if (context.includes('FUNCTION::ARGUMENTS')) {
+            const remaining = tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))
 
-            return value
+            if (remaining.length > 0) {
+                return value + ', '
+            } else {
+                return value + '):'
+            }
         }
 
         return

@@ -69,7 +69,7 @@ var Transpiler = /** @class */ (function () {
                                 item = tokens[token_index], value = item.value, token = item.token;
                                 if (FS.existsSync(Path.join(PATH, token.toLowerCase() + '.js'))) {
                                     addon = require(Path.join(PATH, token.toLowerCase() + '.js'))["default"];
-                                    built.push(new addon().exec(token, value, context, this.specs));
+                                    built.push(new addon().exec(token, value, context, this.specs, tokens, parseInt(token_index)));
                                 }
                             }
                         }
