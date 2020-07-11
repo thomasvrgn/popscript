@@ -21,7 +21,7 @@ export default class Transpiler {
         }
     }
 
-    constructor (file_content : string = '²') {
+    constructor (file_content : string = '') {
 
         Tokenizer.addTokenSet(Tokens)
 
@@ -54,9 +54,16 @@ export default class Transpiler {
                 }
 
                 this.code.push(built.join(''))
+                context = []
                 
             }
 
+        }
+
+        const variables = Object.keys(this.specs.variables)
+
+        if (variables.length > 0) {
+            this.code.unshift('var ' + variables.join(', '))
         }
 
         console.log(this.code)

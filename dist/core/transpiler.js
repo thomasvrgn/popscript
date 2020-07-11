@@ -46,7 +46,7 @@ var Path = require("path");
 var FS = require("fs");
 var Transpiler = /** @class */ (function () {
     function Transpiler(file_content) {
-        if (file_content === void 0) { file_content = '²'; }
+        if (file_content === void 0) { file_content = ''; }
         this.content = [];
         this.tabsize = 0;
         this.code = [];
@@ -58,7 +58,7 @@ var Transpiler = /** @class */ (function () {
     }
     Transpiler.prototype.transpile = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var PATH, index, line, tokens, context, built, token_index, item, value, token, addon;
+            var PATH, index, line, tokens, context, built, token_index, item, value, token, addon, variables;
             return __generator(this, function (_a) {
                 PATH = Path.resolve(Path.join(__dirname, 'addons'));
                 for (index in this.content) {
@@ -74,7 +74,12 @@ var Transpiler = /** @class */ (function () {
                             }
                         }
                         this.code.push(built.join(''));
+                        context = [];
                     }
+                }
+                variables = Object.keys(this.specs.variables);
+                if (variables.length > 0) {
+                    this.code.unshift('var ' + variables.join(', '));
                 }
                 console.log(this.code);
                 return [2 /*return*/];
