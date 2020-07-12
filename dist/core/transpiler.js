@@ -63,6 +63,7 @@ var Transpiler = /** @class */ (function () {
     Transpiler.prototype.transpile = function () {
         return __awaiter(this, void 0, void 0, function () {
             var PATH, index, line, tokens, context, built, token_index, item, value, token, addon, variables;
+            var _this = this;
             return __generator(this, function (_a) {
                 PATH = Path.resolve(Path.join(__dirname, 'addons'));
                 for (index in this.content) {
@@ -81,11 +82,11 @@ var Transpiler = /** @class */ (function () {
                         context = [];
                     }
                 }
-                variables = Object.keys(this.specs.variables);
+                variables = Object.keys(this.specs.variables).filter(function (x) { return _this.specs.variables[x].type !== 'aliase'; });
                 if (variables.length > 0) {
                     this.code.unshift('var ' + variables.join(', '));
                 }
-                eval(new tabdown_1["default"](this.code).tab().join('\n'));
+                console.log(new tabdown_1["default"](this.code).tab().join('\n'));
                 return [2 /*return*/];
             });
         });

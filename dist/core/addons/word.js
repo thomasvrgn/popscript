@@ -37,6 +37,19 @@ var Word = /** @class */ (function () {
         else if (context.includes('LOOP::ARRAY')) {
             return value + '):';
         }
+        else if (context.includes('ALIASE::DECLARE')) {
+            specs.variables[value].type = 'aliase';
+        }
+        else if (context.includes('ALIASE::FUNCTION')) {
+            context.pop();
+            specs.variables[Object.keys(specs.variables).slice(-1)[0]]['aliase'] = value;
+        }
+        else if (specs.variables[value] && specs.variables[value].type === 'aliase') {
+            context.push('FUNCTION::CALL');
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
+                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            return remaining.length > 0 ? specs.variables[value].aliase + '(' : specs.variables[value].aliase + '()';
+        }
         else if (specs.variables[value] && specs.variables[value].type === 'function') {
             context.push('FUNCTION::CALL');
             var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
@@ -57,7 +70,6 @@ var Word = /** @class */ (function () {
         else {
             return value;
         }
-        return;
     };
     return Word;
 }());

@@ -39,6 +39,16 @@ export default class Word {
             }
         } else if (context.includes('LOOP::ARRAY')) {
             return value + '):'
+        } else if (context.includes('ALIASE::DECLARE')) {
+            specs.variables[value].type = 'aliase'
+        } else if (context.includes('ALIASE::FUNCTION')) {
+            context.pop()
+            specs.variables[Object.keys(specs.variables).slice(-1)[0]]['aliase'] = value
+        } else if (specs.variables[value] && specs.variables[value].type === 'aliase') {
+            context.push('FUNCTION::CALL')
+            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
+                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            return remaining.length > 0 ? specs.variables[value].aliase + '(' : specs.variables[value].aliase + '()'
         } else if (specs.variables[value] && specs.variables[value].type === 'function') {
             context.push('FUNCTION::CALL')
             const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
@@ -56,8 +66,6 @@ export default class Word {
         } else {
             return value
         }
-
-        return
 
     }
 
