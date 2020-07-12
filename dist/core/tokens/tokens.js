@@ -27,6 +27,7 @@ exports["default"] = {
     MULTIPLES: /mul/,
     NATIVE: /native\s+".*?"/,
     PROP: /prop/,
+    SELF: /self/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,

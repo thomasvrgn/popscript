@@ -1,12 +1,14 @@
 fn print => mul values
     for value in values
-        native "process.stdout.write(value + ' ')"
+        native "process.stdout.write(value.value + ' ')"
     native "process.stdout.write('\n')"
 
 prop : add => value
-    if type self = "coucou"
-        print => "coucou"
-    elif type self = "array"
-        print => "I'm a array"
-    else 
-        print => "I'm nothing"
+    self += 5
+
+aliase += : add
+
+test = 5
+print => test
+test += 3
+print => test

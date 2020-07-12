@@ -29,7 +29,7 @@ export default class Word {
             context.push('FUNCTION::ARGUMENTS')
             specs.variables[value].type = 'function'
 
-            return value + ' = function ('
+            return value + '.value = function ('
         } else if (context.includes('FUNCTION::ARGUMENTS')) {
             const remaining = tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))
 
@@ -55,7 +55,7 @@ export default class Word {
             context.push('FUNCTION::CALL')
             const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
 
-            return remaining.length > 0 ? value + '(' : value + '()'
+            return remaining.length > 0 ? value + '.value' + '(' : value + '.value' + '()'
 
         } else if (context.includes('FUNCTION::CALL')) {
             const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
@@ -66,13 +66,13 @@ export default class Word {
                 context.pop()
                 return value + ')'
             }
-            
+
         } else if (context.includes('PROPERTY::DECLARE')) {
             context.pop()
             context.push('PROPERTY::ARGUMENTS')
             specs.variables[value].type = 'prototype'
 
-            return value + ' = function (self, '
+            return value + '.value = function (self, '
         } else if (context.includes('PROPERTY::ARGUMENTS')) {
             const remaining = tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))
 
@@ -83,7 +83,7 @@ export default class Word {
             }
         } else if (specs.variables[value] && specs.variables[value].type === 'prototype') {
             const built_copy = built[built.length - 1]
-            built[built.length - 1] = value + '('
+            built[built.length - 1] = value + '.value('
             built.push(built_copy)
             context.push('PROPERTY::CALL')
             const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
@@ -98,7 +98,11 @@ export default class Word {
                 return value + ')'
             }
         } else {
-            return value
+            const variable = tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))[0]
+            if (variable && specs.variables[variable.value] && specs.variables[variable.value].type.length > 0) {
+                return value
+            }
+            return !context.includes('LOOP::DECLARE') ? value + '.value' : value
         }
 
     }

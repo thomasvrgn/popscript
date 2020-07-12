@@ -25,7 +25,7 @@ var Signs = /** @class */ (function () {
                 if (specs.variables[specs.variables[value].aliase].type === 'prototype') {
                     context.push('PROPERTY::CALL');
                     var built_copy = built[built.length - 1];
-                    built[built.length - 1] = specs.variables[value].aliase + '(';
+                    built[built.length - 1] = specs.variables[value].aliase + '.value(';
                     built.push(built_copy);
                     var remaining = tokens.slice(index + 2, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
                         .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });

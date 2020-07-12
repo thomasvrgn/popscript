@@ -84,9 +84,9 @@ var Transpiler = /** @class */ (function () {
                 }
                 variables = Object.keys(this.specs.variables).filter(function (x) { return _this.specs.variables[x].type !== 'aliase'; });
                 if (variables.length > 0) {
-                    this.code.unshift('var ' + variables.join(', '));
+                    this.code.unshift(variables.map(function (x) { return x = 'var ' + x + ' = {value: undefined}'; }).join('\n'));
                 }
-                console.log(new tabdown_1["default"](this.code).tab().join('\n'));
+                eval(new tabdown_1["default"](this.code).tab().join('\n'));
                 return [2 /*return*/];
             });
         });

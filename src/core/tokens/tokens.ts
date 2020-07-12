@@ -32,6 +32,7 @@ export default {
     MULTIPLES   : /mul/                   , // Match spread arguments
     NATIVE      : /native\s+".*?"/        , // Match native code
     PROP        : /prop/                  , // Match property keyword
+    SELF        : /self/                  , // Match self keyword
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition

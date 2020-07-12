@@ -5,7 +5,7 @@
 
 import {Token}       from '../scanner'
 
-export default class Property {
+export default class If {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
@@ -15,9 +15,8 @@ export default class Property {
                  index   : number        = 0) 
     {
 
-        context.push('PROPERTY::DECLARE')
-
-        return
+        context.push('CONDITION::DECLARE')
+        return 'self.value'
 
     }
 
