@@ -4,11 +4,12 @@ fn print => mul values
     native "process.stdout.write('\n')"
 
 prop : add => value
-    self += 5
+    self += value
 
 aliase += : add
 
-test = 5
+
+test = "coucou"
 print => test
-test += 3
+test += "bruh"
 print => test

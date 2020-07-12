@@ -17,21 +17,21 @@ var Int = /** @class */ (function () {
             var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
                 .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
-                return value + ', ';
+                return '{value:' + value + '}, ';
             }
             else {
                 context.pop();
-                return value + ')';
+                return '{value:' + value + '})';
             }
         }
         else if (context.includes('PROPERTY::CALL')) {
             var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
-                return value + ', ';
+                return '{value:' + value + '}, ';
             }
             else {
                 context.pop();
-                return value + ')';
+                return '{value:' + value + '})';
             }
         }
         else {
