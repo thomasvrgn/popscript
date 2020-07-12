@@ -58,7 +58,7 @@ export default class Word {
             return remaining.length > 0 ? value + '.value' + '(' : value + '.value' + '()'
 
         } else if (context.includes('FUNCTION::CALL')) {
-            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
+            const remaining = tokens.slice(index + 2, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
 
             if (remaining.length > 0) {
                 return value + ', '

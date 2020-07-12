@@ -56,7 +56,7 @@ var Word = /** @class */ (function () {
             return remaining.length > 0 ? value + '.value' + '(' : value + '.value' + '()';
         }
         else if (context.includes('FUNCTION::CALL')) {
-            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 2, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
                 return value + ', ';
             }

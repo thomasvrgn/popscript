@@ -66,7 +66,7 @@ export default class Transpiler {
         const variables = Object.keys(this.specs.variables).filter(x => this.specs.variables[x].type !== 'aliase')
 
         if (variables.length > 0) {
-            this.code.unshift(variables.map(x => x = 'var ' + x + ' = {value: undefined}').join('\n'))
+            this.code.unshift('var ' + variables.map(x => x =  x + ' = {value: undefined}').join(',\n    ') + '')
         }
 
         eval(new Tabdown(this.code).tab().join('\n'))
