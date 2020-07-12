@@ -33,11 +33,11 @@ var Popscript = /** @class */ (function () {
         var readFile = function (file) {
             var e_1, _a, e_2, _b;
             var cntnt = FS.readFileSync(file, 'utf-8').split(/\r?\n/).join('\n').split('\n');
-            _this.content.push(cntnt);
             try {
                 for (var cntnt_1 = __values(cntnt), cntnt_1_1 = cntnt_1.next(); !cntnt_1_1.done; cntnt_1_1 = cntnt_1.next()) {
                     var line = cntnt_1_1.value;
                     var context = [];
+                    _this.content.push(line);
                     try {
                         for (var _c = (e_2 = void 0, __values(parser_1.Tokenizer.tokenize(line))), _d = _c.next(); !_d.done; _d = _c.next()) {
                             var item = _d.value;
@@ -72,7 +72,7 @@ var Popscript = /** @class */ (function () {
             }
         };
         readFile(file);
-        new transpiler_1["default"](this.content.map(function (x) { return x.join('\n'); }).join('\n')).transpile();
+        new transpiler_1["default"](this.content.join('\n')).transpile();
     };
     return Popscript;
 }());

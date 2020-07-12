@@ -27,14 +27,13 @@ var Signs = /** @class */ (function () {
                     var built_copy = built[built.length - 1];
                     built[built.length - 1] = specs.variables[value].aliase + '.value(';
                     built.push(built_copy);
-                    var remaining = tokens.slice(index + 2, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                        .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+                    var remaining = tokens.slice(index + 2, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+                    console.log(remaining);
                     return remaining.length > 0 ? ', ' : +')';
                 }
                 else {
                     context.push('FUNCTION::CALL');
-                    var remaining = tokens.slice(index, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                        .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+                    var remaining = tokens.slice(index, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
                     return remaining.length > 0 ? specs.variables[value].aliase + '(' : specs.variables[value].aliase + '()';
                 }
             }

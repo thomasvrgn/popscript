@@ -117,7 +117,6 @@ var Word = /** @class */ (function () {
             }
             else if (value && specs.variables[value] && specs.variables[value].type.length > 0) {
                 if (specs.variables[value].type === 'module') {
-                    console.log(specs);
                     return;
                 }
                 else {

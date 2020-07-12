@@ -96,7 +96,6 @@ export default class Word {
             return remaining.length > 0 ? ', ' :  + ')'
         } else if (context.includes('PROPERTY::CALL')) {
             const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
-
             if (remaining.length > 0) {
                 return value + ', '
             } else {
@@ -113,7 +112,6 @@ export default class Word {
                 }
             } else if (value && specs.variables[value] && specs.variables[value].type.length > 0) {
                 if (specs.variables[value].type === 'module') {
-                    console.log(specs)
                     return
                 } else {
                     return value

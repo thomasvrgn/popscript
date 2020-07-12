@@ -22,9 +22,9 @@ export default class Popscript {
 
         const readFile = (file) => {
             const cntnt: any = FS.readFileSync(file, 'utf-8').split(/\r?\n/).join('\n').split('\n')
-            this.content.push(cntnt)
             for (const line of cntnt) {
                 let context: Array<string> = []
+                this.content.push(line)
                 for (const item of Tokenizer.tokenize(line)) {
                     const token = item.token,
                           value = item.value
@@ -44,8 +44,7 @@ export default class Popscript {
         }
 
         readFile(file)
-
-        new Transpiler(this.content.map(x => x.join('\n')).join('\n')).transpile()
+        new Transpiler(this.content.join('\n')).transpile()
 
     }
 
