@@ -22,6 +22,7 @@ var Word = /** @class */ (function () {
         if (context.includes('FUNCTION::DECLARE')) {
             context.pop();
             context.push('FUNCTION::ARGUMENTS');
+            specs.variables[value].type = 'function';
             return value + ' = function (';
         }
         else if (context.includes('FUNCTION::ARGUMENTS')) {
@@ -35,6 +36,22 @@ var Word = /** @class */ (function () {
         }
         else if (context.includes('LOOP::ARRAY')) {
             return value + '):';
+        }
+        else if (specs.variables[value] && specs.variables[value].type === 'function') {
+            context.push('FUNCTION::CALL');
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
+                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            return remaining.length > 0 ? value + '(' : value + '()';
+        }
+        else if (context.includes('FUNCTION::CALL')) {
+            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
+                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            if (remaining.length > 0) {
+                return value + ', ';
+            }
+            else {
+                return value + ')';
+            }
         }
         else {
             return value;
