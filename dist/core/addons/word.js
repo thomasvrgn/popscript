@@ -47,19 +47,16 @@ var Word = /** @class */ (function () {
         }
         else if (specs.variables[value] && specs.variables[value].type === 'aliase') {
             context.push('FUNCTION::CALL');
-            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             return remaining.length > 0 ? specs.variables[value].aliase + '(' : specs.variables[value].aliase + '()';
         }
         else if (specs.variables[value] && specs.variables[value].type === 'function') {
             context.push('FUNCTION::CALL');
-            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             return remaining.length > 0 ? value + '(' : value + '()';
         }
         else if (context.includes('FUNCTION::CALL')) {
-            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
                 return value + ', ';
             }
@@ -88,13 +85,11 @@ var Word = /** @class */ (function () {
             built[built.length - 1] = value + '(';
             built.push(built_copy);
             context.push('PROPERTY::CALL');
-            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             return remaining.length > 0 ? ', ' : +')';
         }
         else if (context.includes('PROPERTY::CALL')) {
-            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
                 return value + ', ';
             }

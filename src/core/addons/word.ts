@@ -47,23 +47,26 @@ export default class Word {
             specs.variables[Object.keys(specs.variables).slice(-1)[0]]['aliase'] = value
         } else if (specs.variables[value] && specs.variables[value].type === 'aliase') {
             context.push('FUNCTION::CALL')
-            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
-                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
+
             return remaining.length > 0 ? specs.variables[value].aliase + '(' : specs.variables[value].aliase + '()'
+
         } else if (specs.variables[value] && specs.variables[value].type === 'function') {
             context.push('FUNCTION::CALL')
-            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
-                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
+
             return remaining.length > 0 ? value + '(' : value + '()'
+
         } else if (context.includes('FUNCTION::CALL')) {
-            const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
-                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
+
             if (remaining.length > 0) {
                 return value + ', '
             } else {
                 context.pop()
                 return value + ')'
             }
+            
         } else if (context.includes('PROPERTY::DECLARE')) {
             context.pop()
             context.push('PROPERTY::ARGUMENTS')
@@ -83,12 +86,11 @@ export default class Word {
             built[built.length - 1] = value + '('
             built.push(built_copy)
             context.push('PROPERTY::CALL')
-            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
-                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
             return remaining.length > 0 ? ', ' :  + ')'
         } else if (context.includes('PROPERTY::CALL')) {
-            const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
-                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
+
             if (remaining.length > 0) {
                 return value + ', '
             } else {

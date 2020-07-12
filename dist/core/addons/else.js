@@ -4,18 +4,17 @@
                 Addon
 //////////////////////////////////*/
 exports.__esModule = true;
-var Property = /** @class */ (function () {
-    function Property() {
+var Else = /** @class */ (function () {
+    function Else() {
     }
-    Property.prototype.exec = function (token, value, context, specs, tokens, index) {
+    Else.prototype.exec = function (token, value, context, specs, tokens, index) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
-        context.push('PROPERTY::DECLARE');
-        return;
+        return 'else:';
     };
-    return Property;
+    return Else;
 }());
-exports["default"] = Property;
+exports["default"] = Else;

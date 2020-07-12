@@ -6,7 +6,7 @@
 import {Token}       from '../scanner'
 import { builtinModules } from 'module'
 
-export default class Property {
+export default class Type {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
@@ -16,9 +16,7 @@ export default class Property {
                  index   : number        = 0) 
     {
 
-        context.push('PROPERTY::DECLARE')
-
-        return
+        return 'typeof '
 
     }
 

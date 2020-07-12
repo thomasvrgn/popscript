@@ -13,15 +13,14 @@ var String = /** @class */ (function () {
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
-        if (specs.variables[value.slice(1, value.length)] && specs.variables[value.slice(1, value.length)].type === 'function') {
-            context.push('FUNCTION::CALL');
-            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
-            return remaining.length > 0 ? value + '(' : value + '()';
+        if (context.includes('CONDITION::DECLARE')) {
+            if (tokens.slice(index + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length === 0) {
+                context = context.filter(function (x) { return x !== 'CONDITION::DECLARE'; });
+                return value + '):';
+            }
         }
-        else if (context.includes('FUNCTION::CALL')) {
-            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+        if (context.includes('FUNCTION::CALL')) {
+            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
                 return value + ', ';
             }
@@ -31,8 +30,7 @@ var String = /** @class */ (function () {
             }
         }
         else if (context.includes('PROPERTY::CALL')) {
-            var remaining = tokens.slice(index, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
-                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
                 return value + ', ';
             }

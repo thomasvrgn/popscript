@@ -18,11 +18,12 @@ export default {
 
     // TYPES
 
-    STRING      : /(['"])(.*?)(['"])/     , // Match any strings
+    STRING      : /(["])(.*?)(["])/     , // Match any strings
     INT         : /-?\d+/                 , // Match any digits
     OPTIONAL    : /opt/                   , // Match optional type
     BOOLEAN     : /true|false/            , // Match boolean
     TYPES       : /string|int|array|any/  , // Match types
+    TYPE        : /type/                  , // Match typeof keyword
 
     // KEYWORDS
 
@@ -30,7 +31,7 @@ export default {
     ALIASE      : /aliase/                , // Match aliase keyword
     MULTIPLES   : /mul/                   , // Match spread arguments
     NATIVE      : /native\s+".*?"/        , // Match native code
-    prop        : /prop/                  , // Match property keyword
+    PROP        : /prop/                  , // Match property keyword
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
@@ -50,7 +51,7 @@ export default {
     AFTER       : /then|and/              , // Match after keyword
     ARGUMENT    : /&/                     , // Match argument
     WORD        : /\w+/                   , // Match any words
-    SIGNS       : /[><=+\-*\/%|]+/         , // Match any sign
+    SIGNS       : /[><=+\-*\/%|]+/        , // Match any sign
     NOT         : /not|!/                 , // Match not keyword
     COMMENT     : /;.*/                   , // Match comments
 

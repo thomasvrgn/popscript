@@ -2,25 +2,11 @@ fn print => mul values
     for value in values
         native "process.stdout.write(value + ' ')"
     native "process.stdout.write('\n')"
-test = "coucou"
-print => test "test" 0 and test = "bruh"
 
-bruh = "test"
-print => bruh
-
-aliase log : print
-
-print =>
-
-aliase +==> : print
-
-log => "bruh"
-
-bruh += "test"
-
-+==> "bruh"
-
-prop : add => coucou help
-    print => self
-
-"test" => add => "coucou" "help"
+prop : add => value
+    if type self = "coucou"
+        print => "coucou"
+    elif type self = "array"
+        print => "I'm a array"
+    else 
+        print => "I'm nothing"

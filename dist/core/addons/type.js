@@ -4,18 +4,17 @@
                 Addon
 //////////////////////////////////*/
 exports.__esModule = true;
-var Property = /** @class */ (function () {
-    function Property() {
+var Type = /** @class */ (function () {
+    function Type() {
     }
-    Property.prototype.exec = function (token, value, context, specs, tokens, index) {
+    Type.prototype.exec = function (token, value, context, specs, tokens, index) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
-        context.push('PROPERTY::DECLARE');
-        return;
+        return 'typeof ';
     };
-    return Property;
+    return Type;
 }());
-exports["default"] = Property;
+exports["default"] = Type;
