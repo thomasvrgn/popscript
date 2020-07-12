@@ -5,7 +5,7 @@
 
 import {Token}       from '../scanner'
 
-export default class In {
+export default class Native {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
@@ -15,11 +15,7 @@ export default class In {
                  index   : number        = 0) 
     {
 
-        if (context.includes('LOOP::DECLARE')) {
-            context.pop()
-            context.push('LOOP::ARRAY')
-            return ' in '
-        }
+        return value.split(/"/g).slice(1, value.split(/"/g).length - 1).join('"')
 
     }
 
