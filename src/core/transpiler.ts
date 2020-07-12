@@ -69,7 +69,7 @@ export default class Transpiler {
             this.code.unshift('var ' + variables.join(', '))
         }
 
-        console.log(new Tabdown(this.code).tab().join('\n'))
+        eval(new Tabdown(this.code).tab().join('\n'))
 
     }
 

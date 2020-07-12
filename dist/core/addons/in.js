@@ -16,7 +16,7 @@ var In = /** @class */ (function () {
         if (context.includes('LOOP::DECLARE')) {
             context.pop();
             context.push('LOOP::ARRAY');
-            return ' in ';
+            return ' of ';
         }
     };
     return In;
