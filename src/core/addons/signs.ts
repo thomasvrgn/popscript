@@ -15,9 +15,7 @@ export default class Signs {
                  index   : number        = 0) 
     {
 
-        console.log(value)
-
-        return
+        return value
 
     }
 

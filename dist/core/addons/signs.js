@@ -13,8 +13,7 @@ var Signs = /** @class */ (function () {
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
-        console.log(value);
-        return;
+        return value;
     };
     return Signs;
 }());

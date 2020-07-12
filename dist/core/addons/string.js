@@ -4,40 +4,16 @@
                 Addon
 //////////////////////////////////*/
 exports.__esModule = true;
-var Word = /** @class */ (function () {
-    function Word() {
+var String = /** @class */ (function () {
+    function String() {
     }
-    Word.prototype.exec = function (token, value, context, specs, tokens, index) {
+    String.prototype.exec = function (token, value, context, specs, tokens, index) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
-        if (!specs.variables[value]) {
-            specs.variables[value] = {
-                type: ''
-            };
-        }
-        specs.current.variable = value;
-        if (context.includes('FUNCTION::DECLARE')) {
-            context.pop();
-            context.push('FUNCTION::ARGUMENTS');
-            specs.variables[value].type = 'function';
-            return value + ' = function (';
-        }
-        else if (context.includes('FUNCTION::ARGUMENTS')) {
-            var remaining = tokens.slice(index + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
-            if (remaining.length > 0) {
-                return value + ', ';
-            }
-            else {
-                return value + '):';
-            }
-        }
-        else if (context.includes('LOOP::ARRAY')) {
-            return value + '):';
-        }
-        else if (specs.variables[value] && specs.variables[value].type === 'function') {
+        if (specs.variables[value.slice(1, value.length)] && specs.variables[value.slice(1, value.length)].type === 'function') {
             context.push('FUNCTION::CALL');
             var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
                 .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
@@ -57,8 +33,7 @@ var Word = /** @class */ (function () {
         else {
             return value;
         }
-        return;
     };
-    return Word;
+    return String;
 }());
-exports["default"] = Word;
+exports["default"] = String;
