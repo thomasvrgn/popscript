@@ -82,7 +82,7 @@ var Transpiler = /** @class */ (function () {
                         context = [];
                     }
                 }
-                variables = Object.keys(this.specs.variables).filter(function (x) { return _this.specs.variables[x].type !== 'aliase'; });
+                variables = Object.keys(this.specs.variables).filter(function (x) { return !['aliase', 'module'].includes(_this.specs.variables[x].type); });
                 if (variables.length > 0) {
                     this.code.unshift('var ' + variables.map(function (x) { return x = x + ' = {value: undefined}'; }).join(',\n    ') + '');
                 }

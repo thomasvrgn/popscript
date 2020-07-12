@@ -63,7 +63,7 @@ export default class Transpiler {
 
         }
 
-        const variables = Object.keys(this.specs.variables).filter(x => this.specs.variables[x].type !== 'aliase')
+        const variables = Object.keys(this.specs.variables).filter(x => !['aliase', 'module'].includes(this.specs.variables[x].type))
 
         if (variables.length > 0) {
             this.code.unshift('var ' + variables.map(x => x =  x + ' = {value: undefined}').join(',\n    ') + '')

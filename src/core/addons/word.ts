@@ -17,8 +17,14 @@ export default class Word {
     {
 
         if (!specs.variables[value]) {
-            specs.variables[value] = {
-                type: ''
+            if (tokens.slice(0, index).filter(x => !['SPACE', 'TABS'].includes(x.token))[0] && tokens.slice(0, index).filter(x => !['SPACE', 'TABS'].includes(x.token))[0].token !== 'IMPORT') {
+                specs.variables[value] = {
+                    type: ''
+                }
+            } else if (tokens.slice(0, index).filter(x => !['SPACE', 'TABS'].includes(x.token))[0] && tokens.slice(0, index).filter(x => !['SPACE', 'TABS'].includes(x.token))[0].token === 'IMPORT') {
+                specs.variables[value] = {
+                    type: 'module'
+                }
             }
         }
 
@@ -100,7 +106,18 @@ export default class Word {
         } else {
             const variable = tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))[0]
             if (variable && specs.variables[variable.value] && specs.variables[variable.value].type.length > 0) {
-                return value
+                if (specs.variables[variable.value].type === 'module') {
+                    return
+                } else {
+                    return value
+                }
+            } else if (value && specs.variables[value] && specs.variables[value].type.length > 0) {
+                if (specs.variables[value].type === 'module') {
+                    console.log(specs)
+                    return
+                } else {
+                    return value
+                }
             }
             return !context.includes('LOOP::DECLARE') ? value + '.value' : value
         }
