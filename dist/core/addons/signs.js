@@ -4,17 +4,18 @@
                 Addon
 //////////////////////////////////*/
 exports.__esModule = true;
-var Tabs = /** @class */ (function () {
-    function Tabs() {
+var Signs = /** @class */ (function () {
+    function Signs() {
     }
-    Tabs.prototype.exec = function (token, value, context, specs, tokens, index) {
+    Signs.prototype.exec = function (token, value, context, specs, tokens, index) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
-        return value;
+        console.log(value);
+        return;
     };
-    return Tabs;
+    return Signs;
 }());
-exports["default"] = Tabs;
+exports["default"] = Signs;

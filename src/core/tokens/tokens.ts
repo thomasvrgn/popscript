@@ -26,7 +26,6 @@ export default {
 
     // KEYWORDS
 
-    CONVERSION  : /(int|str)+\s?:/        , // Match type conversion
     FUNCTION    : /fn/                    , // Match function keyword
     ALIASE      : /aliase/                , // Match aliase keyword
     MULTIPLES   : /mul/                   , // Match spread arguments
@@ -41,7 +40,6 @@ export default {
     IN          : /in/                    , // Match "in" in loop keyword
 
     RETURN      : /return/                , // Match return keyword
-    SELF        : /self/                  , // Match self keyword
 
     IMPORT      : /import/                , // Match import keyword
 
@@ -51,7 +49,7 @@ export default {
     AFTER       : /then|and/              , // Match after keyword
     ARGUMENT    : /&/                     , // Match argument
     WORD        : /\w+/                   , // Match any words
-    SIGNS       : /[><=+\-*\/%|]/         , // Match any sign
+    SIGNS       : /[><=+\-*\/%|]+/         , // Match any sign
     NOT         : /not|!/                 , // Match not keyword
     COMMENT     : /;.*/                   , // Match comments
 

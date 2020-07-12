@@ -18,6 +18,7 @@ var Word = /** @class */ (function () {
                 type: ''
             };
         }
+        specs.current.variable = value;
         if (context.includes('FUNCTION::DECLARE')) {
             context.pop();
             context.push('FUNCTION::ARGUMENTS');
@@ -31,6 +32,12 @@ var Word = /** @class */ (function () {
             else {
                 return value + '):';
             }
+        }
+        else if (context.includes('LOOP::ARRAY')) {
+            return value + '):';
+        }
+        else {
+            return value;
         }
         return;
     };

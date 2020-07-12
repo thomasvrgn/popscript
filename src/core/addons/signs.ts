@@ -5,7 +5,7 @@
 
 import {Token}       from '../scanner'
 
-export default class Tabs {
+export default class Signs {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
@@ -15,7 +15,9 @@ export default class Tabs {
                  index   : number        = 0) 
     {
 
-        return value
+        console.log(value)
+
+        return
 
     }
 

@@ -5,7 +5,7 @@
 
 import {Token}       from '../scanner'
 
-export default class Tabs {
+export default class Loop {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
@@ -15,7 +15,11 @@ export default class Tabs {
                  index   : number        = 0) 
     {
 
-        return value
+        if (context.includes('LOOP::DECLARE')) {
+            context.pop()
+            context.push('LOOP::ARRAY')
+            return ' in '
+        }
 
     }
 

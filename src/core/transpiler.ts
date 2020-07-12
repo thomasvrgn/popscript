@@ -16,7 +16,10 @@ export default class Transpiler {
     private tabsize : number        = 0
     private code    : Array<string> = []
     private specs                   = {
-        variables: {
+        current   : {
+            variable: '',
+        },
+        variables : {
 
         }
     }
@@ -66,7 +69,7 @@ export default class Transpiler {
             this.code.unshift('var ' + variables.join(', '))
         }
 
-        console.log(this.code)
+        console.log(new Tabdown(this.code).tab())
 
     }
 

@@ -21,6 +21,8 @@ export default class Word {
             }
         }
 
+        specs.current.variable = value
+
         if (context.includes('FUNCTION::DECLARE')) {
             context.pop()
             context.push('FUNCTION::ARGUMENTS')
@@ -34,6 +36,10 @@ export default class Word {
             } else {
                 return value + '):'
             }
+        } else if (context.includes('LOOP::ARRAY')) {
+            return value + '):'
+        } else {
+            return value
         }
 
         return

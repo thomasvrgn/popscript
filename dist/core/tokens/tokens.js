@@ -21,7 +21,6 @@ exports["default"] = {
     BOOLEAN: /true|false/,
     TYPES: /string|int|array|any/,
     // KEYWORDS
-    CONVERSION: /(int|str)+\s?:/,
     FUNCTION: /fn/,
     ALIASE: /aliase/,
     MULTIPLES: /mul/,
@@ -33,13 +32,12 @@ exports["default"] = {
     LOOP: /for/,
     IN: /in/,
     RETURN: /return/,
-    SELF: /self/,
     IMPORT: /import/,
     // OTHER
     AFTER: /then|and/,
     ARGUMENT: /&/,
     WORD: /\w+/,
-    SIGNS: /[><=+\-*\/%|]/,
+    SIGNS: /[><=+\-*\/%|]+/,
     NOT: /not|!/,
     COMMENT: /;.*/
 };

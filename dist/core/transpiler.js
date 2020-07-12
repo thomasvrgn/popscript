@@ -42,6 +42,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var Path = require("path");
 var FS = require("fs");
 var Transpiler = /** @class */ (function () {
@@ -51,6 +52,9 @@ var Transpiler = /** @class */ (function () {
         this.tabsize = 0;
         this.code = [];
         this.specs = {
+            current: {
+                variable: ''
+            },
             variables: {}
         };
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
@@ -81,7 +85,7 @@ var Transpiler = /** @class */ (function () {
                 if (variables.length > 0) {
                     this.code.unshift('var ' + variables.join(', '));
                 }
-                console.log(this.code);
+                console.log(new tabdown_1["default"](this.code).tab());
                 return [2 /*return*/];
             });
         });
