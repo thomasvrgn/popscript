@@ -63,9 +63,9 @@ var Word = /** @class */ (function () {
             return remaining.length > 0 ? value + '.value' + '(' : value + '.value' + '()';
         }
         else if (context.includes('FUNCTION::CALL')) {
-            var remaining = tokens.slice(index + 2, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) === -1 ? tokens.length : tokens.findIndex(function (x) { return x.token === 'AFTER'; }))).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {
-                return value + ', ';
+                return value;
             }
             else {
                 context.pop();
@@ -124,6 +124,12 @@ var Word = /** @class */ (function () {
                 }
             }
             return !context.includes('LOOP::DECLARE') ? value + '.value' : value;
+        }
+        if (context.includes('CONDITION::DECLARE')) {
+            if (tokens.slice(index + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length === 0) {
+                context = context.filter(function (x) { return x !== 'CONDITION::DECLARE'; });
+                return value + '):';
+            }
         }
     };
     return Word;

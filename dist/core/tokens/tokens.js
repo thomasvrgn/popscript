@@ -37,8 +37,8 @@ exports["default"] = {
     RETURN: /return/,
     IMPORT: /import/,
     // OTHER
-    AFTER: /then|and/,
-    ARGUMENT: /&/,
+    AFTER: /then|after/,
+    ARGUMENT: /and/,
     WORD: /\w+/,
     SIGNS: /[><=+\-*\/%|]+/,
     NOT: /not|!/,

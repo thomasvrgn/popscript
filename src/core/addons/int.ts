@@ -14,15 +14,30 @@ export default class Int {
                  tokens  : Array<Token>  = [],
                  index   : number        = 0) 
     {
-
+        if (context.includes('CONDITION::DECLARE')) {
+            if (tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length === 0) {
+                context = context.filter(x => x !== 'CONDITION::DECLARE')
+                return value + '):'
+            }
+        }
+        
         if (context.includes('FUNCTION::CALL')) {
             const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
                                     .filter(x => !['SPACE', 'TABS'].includes(x.token))
-            if (remaining.length > 0) {
-                return '{value:' + value + '}, '
+            if (tokens.slice(0, index).filter(x => !['SPACE', 'TABS'].includes(x.token)).slice(-1)[0].token !== 'SIGNS') {
+                if (remaining.length > 0) {
+                    return '{value:' + value + '}, '
+                } else {
+                    context.pop()
+                    return '{value:' + value + '})'
+                }
             } else {
-                context.pop()
-                return '{value:' + value + '})'
+                if (remaining.length > 0) {
+                    return value + ', '
+                } else {
+                    context.pop()
+                    return value + ')'
+                }
             }
         } else if (context.includes('PROPERTY::CALL')) {
             const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))

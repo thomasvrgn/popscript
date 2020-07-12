@@ -49,8 +49,8 @@ export default {
 
     // OTHER
 
-    AFTER       : /then|and/              , // Match after keyword
-    ARGUMENT    : /&/                     , // Match argument
+    AFTER       : /then|after/            , // Match after keyword
+    ARGUMENT    : /and/                   , // Match argument
     WORD        : /\w+/                   , // Match any words
     SIGNS       : /[><=+\-*\/%|]+/        , // Match any sign
     NOT         : /not|!/                 , // Match not keyword

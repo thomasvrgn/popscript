@@ -13,15 +13,32 @@ var Int = /** @class */ (function () {
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
+        if (context.includes('CONDITION::DECLARE')) {
+            if (tokens.slice(index + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).length === 0) {
+                context = context.filter(function (x) { return x !== 'CONDITION::DECLARE'; });
+                return value + '):';
+            }
+        }
         if (context.includes('FUNCTION::CALL')) {
             var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
                 .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
-            if (remaining.length > 0) {
-                return '{value:' + value + '}, ';
+            if (tokens.slice(0, index).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); }).slice(-1)[0].token !== 'SIGNS') {
+                if (remaining.length > 0) {
+                    return '{value:' + value + '}, ';
+                }
+                else {
+                    context.pop();
+                    return '{value:' + value + '})';
+                }
             }
             else {
-                context.pop();
-                return '{value:' + value + '})';
+                if (remaining.length > 0) {
+                    return value + ', ';
+                }
+                else {
+                    context.pop();
+                    return value + ')';
+                }
             }
         }
         else if (context.includes('PROPERTY::CALL')) {

@@ -64,10 +64,9 @@ export default class Word {
             return remaining.length > 0 ? value + '.value' + '(' : value + '.value' + '()'
 
         } else if (context.includes('FUNCTION::CALL')) {
-            const remaining = tokens.slice(index + 2, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
-
+            const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') === -1 ? tokens.length : tokens.findIndex(x => x.token === 'AFTER'))).filter(x => !['SPACE', 'TABS'].includes(x.token))
             if (remaining.length > 0) {
-                return value + ', '
+                return value
             } else {
                 context.pop()
                 return value + ')'
@@ -118,6 +117,13 @@ export default class Word {
                 }
             }
             return !context.includes('LOOP::DECLARE') ? value + '.value' : value
+        }
+
+        if (context.includes('CONDITION::DECLARE')) {
+            if (tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token)).length === 0) {
+                context = context.filter(x => x !== 'CONDITION::DECLARE')
+                return value + '):'
+            }
         }
 
     }
