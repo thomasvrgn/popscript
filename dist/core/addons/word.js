@@ -7,12 +7,13 @@ exports.__esModule = true;
 var Word = /** @class */ (function () {
     function Word() {
     }
-    Word.prototype.exec = function (token, value, context, specs, tokens, index) {
+    Word.prototype.exec = function (token, value, context, specs, tokens, index, built) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
+        if (built === void 0) { built = []; }
         if (!specs.variables[value]) {
             specs.variables[value] = {
                 type: ''
@@ -57,6 +58,41 @@ var Word = /** @class */ (function () {
             return remaining.length > 0 ? value + '(' : value + '()';
         }
         else if (context.includes('FUNCTION::CALL')) {
+            var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
+                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            if (remaining.length > 0) {
+                return value + ', ';
+            }
+            else {
+                context.pop();
+                return value + ')';
+            }
+        }
+        else if (context.includes('PROPERTY::DECLARE')) {
+            context.pop();
+            context.push('PROPERTY::ARGUMENTS');
+            specs.variables[value].type = 'prototype';
+            return value + ' = function (self, ';
+        }
+        else if (context.includes('PROPERTY::ARGUMENTS')) {
+            var remaining = tokens.slice(index + 1).filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            if (remaining.length > 0) {
+                return value + ', ';
+            }
+            else {
+                return value + '):';
+            }
+        }
+        else if (specs.variables[value] && specs.variables[value].type === 'prototype') {
+            var built_copy = built[built.length - 1];
+            built[built.length - 1] = value + '(';
+            built.push(built_copy);
+            context.push('PROPERTY::CALL');
+            var remaining = tokens.slice(index + 3, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
+                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            return remaining.length > 0 ? ', ' : +')';
+        }
+        else if (context.includes('PROPERTY::CALL')) {
             var remaining = tokens.slice(index + 1, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
                 .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
             if (remaining.length > 0) {

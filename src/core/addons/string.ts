@@ -29,6 +29,15 @@ export default class String {
                 context.pop()
                 return value + ')'
             }
+        } else if (context.includes('PROPERTY::CALL')) {
+            const remaining = tokens.slice(index, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
+                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            if (remaining.length > 0) {
+                return value + ', '
+            } else {
+                context.pop()
+                return value + ')'
+            }
         } else {
             return value
         }

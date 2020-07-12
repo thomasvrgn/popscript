@@ -30,6 +30,7 @@ export default {
     ALIASE      : /aliase/                , // Match aliase keyword
     MULTIPLES   : /mul/                   , // Match spread arguments
     NATIVE      : /native\s+".*?"/        , // Match native code
+    prop        : /prop/                  , // Match property keyword
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition

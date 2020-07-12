@@ -25,6 +25,7 @@ exports["default"] = {
     ALIASE: /aliase/,
     MULTIPLES: /mul/,
     NATIVE: /native\s+".*?"/,
+    prop: /prop/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,

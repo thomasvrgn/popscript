@@ -30,6 +30,17 @@ var String = /** @class */ (function () {
                 return value + ')';
             }
         }
+        else if (context.includes('PROPERTY::CALL')) {
+            var remaining = tokens.slice(index, (tokens.findIndex(function (x) { return x.token === 'AFTER'; }) || tokens.length))
+                .filter(function (x) { return !['SPACE', 'TABS'].includes(x.token); });
+            if (remaining.length > 0) {
+                return value + ', ';
+            }
+            else {
+                context.pop();
+                return value + ')';
+            }
+        }
         else {
             return value;
         }

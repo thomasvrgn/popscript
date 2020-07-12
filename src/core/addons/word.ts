@@ -12,7 +12,8 @@ export default class Word {
                  context : Array<string> = [], 
                  specs,
                  tokens  : Array<Token>  = [],
-                 index   : number        = 0) 
+                 index   : number        = 0,
+                 built   : Array<string> = []) 
     {
 
         if (!specs.variables[value]) {
@@ -55,6 +56,37 @@ export default class Word {
                                     .filter(x => !['SPACE', 'TABS'].includes(x.token))
             return remaining.length > 0 ? value + '(' : value + '()'
         } else if (context.includes('FUNCTION::CALL')) {
+            const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
+                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            if (remaining.length > 0) {
+                return value + ', '
+            } else {
+                context.pop()
+                return value + ')'
+            }
+        } else if (context.includes('PROPERTY::DECLARE')) {
+            context.pop()
+            context.push('PROPERTY::ARGUMENTS')
+            specs.variables[value].type = 'prototype'
+
+            return value + ' = function (self, '
+        } else if (context.includes('PROPERTY::ARGUMENTS')) {
+            const remaining = tokens.slice(index + 1).filter(x => !['SPACE', 'TABS'].includes(x.token))
+
+            if (remaining.length > 0) {
+                return value + ', '
+            } else {
+                return value + '):'
+            }
+        } else if (specs.variables[value] && specs.variables[value].type === 'prototype') {
+            const built_copy = built[built.length - 1]
+            built[built.length - 1] = value + '('
+            built.push(built_copy)
+            context.push('PROPERTY::CALL')
+            const remaining = tokens.slice(index + 3, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
+                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            return remaining.length > 0 ? ', ' :  + ')'
+        } else if (context.includes('PROPERTY::CALL')) {
             const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
                                     .filter(x => !['SPACE', 'TABS'].includes(x.token))
             if (remaining.length > 0) {

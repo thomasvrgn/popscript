@@ -24,7 +24,16 @@ export default class Int {
                 context.pop()
                 return value + ')'
             }
-        } else {
+        } else if (context.includes('PROPERTY::CALL')) {
+            const remaining = tokens.slice(index + 1, (tokens.findIndex(x => x.token === 'AFTER') || tokens.length))
+                                    .filter(x => !['SPACE', 'TABS'].includes(x.token))
+            if (remaining.length > 0) {
+                return value + ', '
+            } else {
+                context.pop()
+                return value + ')'
+            }
+        }  else {
             return value
         }
 

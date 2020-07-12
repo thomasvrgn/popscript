@@ -51,7 +51,7 @@ export default class Transpiler {
 
                         if (FS.existsSync(Path.join(PATH, token.toLowerCase() + '.js'))) {
                             const addon = require(Path.join(PATH, token.toLowerCase() + '.js')).default
-                            built.push(new addon().exec(token, value, context, this.specs, tokens, parseInt(token_index)))
+                            built.push(new addon().exec(token, value, context, this.specs, tokens, parseInt(token_index), built))
                         }
                     }
                 }
