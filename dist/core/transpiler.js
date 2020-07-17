@@ -42,7 +42,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
-var tabdown_1 = require("./tabdown");
 var Path = require("path");
 var FS = require("fs");
 var Transpiler = /** @class */ (function () {
@@ -62,8 +61,7 @@ var Transpiler = /** @class */ (function () {
     }
     Transpiler.prototype.transpile = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var PATH, index, line, tokens, context, built, token_index, item, value, token, addon, variables;
-            var _this = this;
+            var PATH, index, line, tokens, context, built, token_index, item, value, token, addon;
             return __generator(this, function (_a) {
                 PATH = Path.resolve(Path.join(__dirname, 'addons'));
                 for (index in this.content) {
@@ -82,15 +80,10 @@ var Transpiler = /** @class */ (function () {
                         context = [];
                     }
                 }
-                variables = Object.keys(this.specs.variables).filter(function (x) { return !['aliase', 'module'].includes(_this.specs.variables[x].type); });
-                if (variables.length > 0) {
-                    this.code.unshift('var ' + variables.map(function (x) { return x = x + ' = {value: undefined}'; }).join(',\n    ') + '');
-                }
-                console.log(new tabdown_1["default"](this.code).tab().join('\n'));
+                console.log(this.code);
                 return [2 /*return*/];
             });
         });
-
     };
     return Transpiler;
 }());
