@@ -90,6 +90,7 @@ var Transpiler = /** @class */ (function () {
                 return [2 /*return*/];
             });
         });
+
     };
     return Transpiler;
 }());

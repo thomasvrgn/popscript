@@ -29,8 +29,8 @@ export default class Transpiler {
         Tokenizer.addTokenSet(Tokens)
 
         this.content = file_content.split(/\n/g).filter(x => x.trim().length > 0)
-
     }
+
 
     public async transpile () {
 
@@ -67,6 +67,7 @@ export default class Transpiler {
 
         if (variables.length > 0) {
             this.code.unshift('var ' + variables.map(x => x =  x + ' = {value: undefined}').join(',\n    ') + '')
+
         }
 
         console.log(new Tabdown(this.code).tab().join('\n'))
