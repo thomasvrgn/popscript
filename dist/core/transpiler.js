@@ -52,7 +52,9 @@ var Transpiler = /** @class */ (function () {
         this.code = [];
         this.specs = {
             current: {
-                variable: ''
+                variable: '',
+                tabsize: 0,
+                tabs: 0
             },
             variables: {}
         };
@@ -77,6 +79,7 @@ var Transpiler = /** @class */ (function () {
                             }
                         }
                         this.code.push(built.join(''));
+                        this.specs.current.tabs = 0;
                         context = [];
                     }
                 }

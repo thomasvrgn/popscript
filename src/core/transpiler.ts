@@ -18,6 +18,8 @@ export default class Transpiler {
     private specs                   = {
         current   : {
             variable: '',
+            tabsize : 0,
+            tabs    : 0
         },
         variables : {
 
@@ -57,6 +59,7 @@ export default class Transpiler {
                 }
 
                 this.code.push(built.join(''))
+                this.specs.current.tabs = 0
                 context = []
                 
             }
