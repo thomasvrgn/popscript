@@ -22,31 +22,34 @@ var FS = require("fs");
 var PATH = require("path");
 var Popscript = /** @class */ (function () {
     function Popscript() {
-        this.module_count = 0;
         this.modules = [];
+        this.content = [];
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
     }
-    Popscript.prototype.file = function (path, callback) {
+    Popscript.prototype.file = function (file, callback) {
         var _this = this;
-        function readFile(file) {
+        if (file === void 0) { file = ''; }
+        if (callback === void 0) { callback = function () { }; }
+        var readFile = function (file) {
             var e_1, _a, e_2, _b;
-            var content = FS.readFileSync(file, 'utf-8').split(/\r?\n/).join('\n').split('\n');
+            var cntnt = FS.readFileSync(file, 'utf-8').split(/\r?\n/).join('\n').split('\n');
             try {
-                for (var content_1 = __values(content), content_1_1 = content_1.next(); !content_1_1.done; content_1_1 = content_1.next()) {
-                    var line = content_1_1.value;
+                for (var cntnt_1 = __values(cntnt), cntnt_1_1 = cntnt_1.next(); !cntnt_1_1.done; cntnt_1_1 = cntnt_1.next()) {
+                    var line = cntnt_1_1.value;
                     var context = [];
+                    _this.content.push(line);
                     try {
                         for (var _c = (e_2 = void 0, __values(parser_1.Tokenizer.tokenize(line))), _d = _c.next(); !_d.done; _d = _c.next()) {
                             var item = _d.value;
                             var token = item.token, value = item.value;
                             if (token === 'IMPORT') {
-                                ++this.module_count;
                                 context.push('MODULE::REQUIRE');
                             }
-                            else if (token === 'STRING') {
+                            else if (token === 'WORD') {
                                 if (context.includes('MODULE::REQUIRE')) {
-                                    this.modules.push(PATH.join(PATH.dirname(path), value.slice(1, value.length - 1) + '.ps'));
-                                    readFile(PATH.join(PATH.dirname(path), value.slice(1, value.length - 1) + '.ps'));
+                                    context.pop();
+                                    _this.modules.push(PATH.join(PATH.dirname(file), value + '.ps'));
+                                    readFile(PATH.join(PATH.dirname(file), value + '.ps'));
                                 }
                             }
                         }
@@ -63,31 +66,13 @@ var Popscript = /** @class */ (function () {
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (content_1_1 && !content_1_1.done && (_a = content_1["return"])) _a.call(content_1);
+                    if (cntnt_1_1 && !cntnt_1_1.done && (_a = cntnt_1["return"])) _a.call(cntnt_1);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-        }
-        FS.exists(path, function (bool) {
-            if (bool) {
-                readFile(path);
-                FS.readFile(path, 'utf-8', function (error, content) {
-                    if (error)
-                        throw error;
-                    new transpiler_1["default"](content).transpile(path, undefined, _this.module_count, function (code) {
-                        eval(code);
-                        console.log(code);
-                        callback();
-                    });
-                });
-            }
-        });
-    };
-    Popscript.prototype.text = function (content, callback) {
-        new transpiler_1["default"](content).transpile(undefined, undefined, 0, function (code) {
-            eval(code);
-            callback();
-        });
+        };
+        readFile(file);
+        new transpiler_1["default"](this.content.join('\n')).transpile();
     };
     return Popscript;
 }());

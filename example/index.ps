@@ -1,8 +1,22 @@
-prop log => any
-    print self
+fn print => mul values
+    for value in values
+        native "process.stdout.write(value.value + ' ')"
+    native "process.stdout.write('\n')"
 
-"Hello world" => log
+prop : add => value
+    self += value
 
-15 => log
+aliase += : add
 
-print ("test" "coucou") + "test"
+;test
+
+test = "coucou"
+print => test
+test += "bruh"
+print => test and 5
+
+import core
+
+bruh => test
+facto = factorial => 5
+print => facto
