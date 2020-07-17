@@ -69,7 +69,7 @@ export default class Transpiler {
             this.code.unshift('var ' + variables.map(x => x =  x + ' = {value: undefined}').join(',\n    ') + '')
         }
 
-        eval(new Tabdown(this.code).tab().join('\n'))
+        console.log(new Tabdown(this.code).tab().join('\n'))
 
     }
 

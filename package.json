@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsc",
-    "start": "nodemon ./dist/index.js --ignore \"./example/\""
+    "start": "nodemon ./dist/index.js --ignore \"./example/\"",
+    "bundle": "tsc-bundle tsconfig.json --outFile dist/bundle.js"
   },
   "repository": {
     "type": "git",

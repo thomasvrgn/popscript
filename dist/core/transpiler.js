@@ -86,7 +86,7 @@ var Transpiler = /** @class */ (function () {
                 if (variables.length > 0) {
                     this.code.unshift('var ' + variables.map(function (x) { return x = x + ' = {value: undefined}'; }).join(',\n    ') + '');
                 }
-                eval(new tabdown_1["default"](this.code).tab().join('\n'));
+                console.log(new tabdown_1["default"](this.code).tab().join('\n'));
                 return [2 /*return*/];
             });
         });
