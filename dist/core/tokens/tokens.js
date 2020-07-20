@@ -24,10 +24,10 @@ exports["default"] = {
     // KEYWORDS
     FUNCTION: /fn/,
     ALIASE: /aliase/,
-    MULTIPLES: /mul/,
     NATIVE: /native\s+".*?"/,
     PROP: /prop/,
     SELF: /self/,
+    MUTABLE: /mut/,
     IF: /if/,
     ELIF: /elif/,
     ELSE: /else/,

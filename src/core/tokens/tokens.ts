@@ -29,10 +29,10 @@ export default {
 
     FUNCTION    : /fn/                    , // Match function keyword
     ALIASE      : /aliase/                , // Match aliase keyword
-    MULTIPLES   : /mul/                   , // Match spread arguments
     NATIVE      : /native\s+".*?"/        , // Match native code
     PROP        : /prop/                  , // Match property keyword
     SELF        : /self/                  , // Match self keyword
+    MUTABLE     : /mut/                   , // Match mutable keyword
 
     IF          : /if/                    , // Match if condition
     ELIF        : /elif/                  , // Match else if condition
