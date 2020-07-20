@@ -19,7 +19,11 @@ export default class Transpiler {
         current   : {
             variable: '',
             tabsize : 0,
-            tabs    : 0
+            tabs    : 0,
+            argument: {
+                count: 0,
+                name: ''
+            }
         },
         variables : {
 

@@ -4,19 +4,19 @@
                 Addon
 //////////////////////////////////*/
 exports.__esModule = true;
-var Function = /** @class */ (function () {
-    function Function() {
+var Mutable = /** @class */ (function () {
+    function Mutable() {
     }
-    Function.prototype.exec = function (token, value, context, specs, tokens, index, built) {
+    Mutable.prototype.exec = function (token, value, context, specs, tokens, index, built) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
         if (tokens === void 0) { tokens = []; }
         if (index === void 0) { index = 0; }
         if (built === void 0) { built = []; }
-        context.push('FUNCTION::DECLARE');
-        return 'function ';
+        context.push('MUTABLE::DECLARE');
+        return;
     };
-    return Function;
+    return Mutable;
 }());
-exports["default"] = Function;
+exports["default"] = Mutable;

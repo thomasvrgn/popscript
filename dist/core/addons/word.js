@@ -39,7 +39,10 @@ var Word = /** @class */ (function () {
                 name: value,
                 mutable: false
             });
-            console.log(JSON.stringify(specs.variables[specs.current.variable], null, 2));
+            if (context.slice(-1)[0] === 'MUTABLE::DECLARE') {
+                specs.variables[specs.current.variable].arguments.filter(function (x) { return x.name === value; })[0].mutable = true;
+                context.pop();
+            }
             built.push(remaining.length > 0 ? value + ', ' : value + '):');
         }
         else if (context.includes('FUNCTION::DECLARE')) {

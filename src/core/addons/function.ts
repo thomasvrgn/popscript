@@ -5,7 +5,7 @@
 
 import {Token}       from '../scanner'
 
-export default class Tabulation {
+export default class Function {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 

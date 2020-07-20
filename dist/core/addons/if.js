@@ -4,10 +4,10 @@
                 Addon
 //////////////////////////////////*/
 exports.__esModule = true;
-var Tabulation = /** @class */ (function () {
-    function Tabulation() {
+var If = /** @class */ (function () {
+    function If() {
     }
-    Tabulation.prototype.exec = function (token, value, context, specs, tokens, index, built) {
+    If.prototype.exec = function (token, value, context, specs, tokens, index, built) {
         if (token === void 0) { token = ''; }
         if (value === void 0) { value = ''; }
         if (context === void 0) { context = []; }
@@ -17,6 +17,6 @@ var Tabulation = /** @class */ (function () {
         context.push('CONDITION::DECLARE');
         return 'if (';
     };
-    return Tabulation;
+    return If;
 }());
-exports["default"] = Tabulation;
+exports["default"] = If;

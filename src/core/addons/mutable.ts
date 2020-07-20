@@ -5,7 +5,7 @@
 
 import {Token}       from '../scanner'
 
-export default class If {
+export default class Mutable {
 
     public exec (token   : string        = '', 
                  value   : string        = '', 
@@ -15,10 +15,10 @@ export default class If {
                  index   : number        = 0,
                  built   : Array<string> = []) 
     {
-
-        context.push('CONDITION::DECLARE')
         
-        return 'if ('
+        context.push('MUTABLE::DECLARE')
+
+        return
 
     }
 
