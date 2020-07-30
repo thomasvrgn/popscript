@@ -39,17 +39,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 exports.__esModule = true;
 var parser_1 = require("./parser");
 var tokens_1 = require("./tokens/tokens");
 var Path = require("path");
 var FS = require("fs");
 var Transpiler = /** @class */ (function () {
-    function Transpiler(file_content) {
+    function Transpiler(file_content, modules) {
         if (file_content === void 0) { file_content = ''; }
         this.content = [];
         this.tabsize = 0;
         this.code = [];
+        this.modules = [];
         this.specs = {
             current: {
                 variable: '',
@@ -64,11 +76,13 @@ var Transpiler = /** @class */ (function () {
         };
         parser_1.Tokenizer.addTokenSet(tokens_1["default"]);
         this.content = file_content.split(/\n/g).filter(function (x) { return x.trim().length > 0; });
+        this.modules = modules;
     }
     Transpiler.prototype.transpile = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var PATH, index, line, tokens, context, built, token_index, item, value, token, addon;
-            return __generator(this, function (_a) {
+            var PATH, index, line, tokens, context, built, token_index, item, value, token, addon, _a, _b, jsFile, content;
+            var e_1, _c;
+            return __generator(this, function (_d) {
                 PATH = Path.resolve(Path.join(__dirname, 'addons'));
                 for (index in this.content) {
                     if (this.content.hasOwnProperty(index)) {
@@ -87,7 +101,21 @@ var Transpiler = /** @class */ (function () {
                         context = [];
                     }
                 }
-                console.log(this.code);
+                try {
+                    for (_a = __values(this.modules.filter(function (x) { return x.endsWith('.js'); })), _b = _a.next(); !_b.done; _b = _a.next()) {
+                        jsFile = _b.value;
+                        content = FS.readFileSync(jsFile, 'utf-8');
+                        this.code.unshift(content);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_b && !_b.done && (_c = _a["return"])) _c.call(_a);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                console.log(this.code.join('\n'));
                 return [2 /*return*/];
             });
         });

@@ -15,6 +15,7 @@ export default class Transpiler {
     private content : Array<string> = []
     private tabsize : number        = 0
     private code    : Array<string> = []
+    private modules : Array<string> = []
     private specs                   = {
         current   : {
             variable: '',
@@ -30,11 +31,13 @@ export default class Transpiler {
         }
     }
 
-    constructor (file_content : string = '') {
+    constructor (file_content : string = '', modules) {
 
         Tokenizer.addTokenSet(Tokens)
 
         this.content = file_content.split(/\n/g).filter(x => x.trim().length > 0)
+        this.modules = modules
+
     }
 
 
@@ -65,12 +68,17 @@ export default class Transpiler {
                 this.code.push(built.join(''))
                 this.specs.current.tabs = 0
                 context = []
-                
+
             }
 
         }
-    
-        console.log(this.code)
+        
+        for (const jsFile of this.modules.filter(x => x.endsWith('.js'))) {
+            const content = FS.readFileSync(jsFile, 'utf-8')
+            this.code.unshift(content)
+        }
+
+        console.log(this.code.join('\n'))
 
     }
 

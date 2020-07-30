@@ -45,11 +45,13 @@ var Popscript = /** @class */ (function () {
                             if (token === 'IMPORT') {
                                 context.push('MODULE::REQUIRE');
                             }
-                            else if (token === 'WORD') {
+                            else if (token === 'STRING') {
                                 if (context.includes('MODULE::REQUIRE')) {
                                     context.pop();
-                                    _this.modules.push(PATH.join(PATH.dirname(file), value + '.ps'));
-                                    readFile(PATH.join(PATH.dirname(file), value + '.ps'));
+                                    _this.modules.push(PATH.join(PATH.dirname(file), value.slice(1, value.length - 1)));
+                                    if (!value.slice(1, value.length - 1).endsWith('.js')) {
+                                        readFile(PATH.join(PATH.dirname(file), value.slice(1, value.length - 1)));
+                                    }
                                 }
                             }
                         }
@@ -72,7 +74,7 @@ var Popscript = /** @class */ (function () {
             }
         };
         readFile(file);
-        new transpiler_1["default"](this.content.join('\n')).transpile();
+        new transpiler_1["default"](this.content.join('\n'), this.modules).transpile();
     };
     return Popscript;
 }());

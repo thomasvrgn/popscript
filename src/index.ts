@@ -31,11 +31,13 @@ export default class Popscript {
         
                     if (token === 'IMPORT') {
                         context.push('MODULE::REQUIRE')
-                    } else if (token === 'WORD') {
+                    } else if (token === 'STRING') {
                         if (context.includes('MODULE::REQUIRE')) {
                             context.pop()
-                            this.modules.push(PATH.join(PATH.dirname(file), value!  + '.ps'))
-                            readFile(PATH.join(PATH.dirname(file), value + '.ps'))
+                            this.modules.push(PATH.join(PATH.dirname(file), value.slice(1, value.length - 1)))
+                            if (!value.slice(1, value.length - 1).endsWith('.js')) {
+                                readFile(PATH.join(PATH.dirname(file), value.slice(1, value.length - 1)))
+                            }
                         }
                     }
         
@@ -44,7 +46,7 @@ export default class Popscript {
         }
 
         readFile(file)
-        new Transpiler(this.content.join('\n')).transpile()
+        new Transpiler(this.content.join('\n'), this.modules).transpile()
 
     }
 
