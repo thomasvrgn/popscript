@@ -1,5 +1,4 @@
 # Node.js and NPM:
 node_modules
-package-lock.json
 .idea
 dist
