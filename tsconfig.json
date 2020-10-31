@@ -20,6 +20,6 @@
     "src/**/*"
   ],
   "files": [
-    "src/interfaces/index.ts"
+    "src/index.ts"
   ]
 }
