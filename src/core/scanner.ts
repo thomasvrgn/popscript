@@ -1,78 +1,70 @@
-/*//////////////////////////////////
-         POPSCRIPT LANGUAGE
-               Scanner
-//////////////////////////////////*/
+import { Token } from '../interfaces/token';
+import { Value } from '../interfaces/value';
 
-export interface Token {
-    token      : string,
-    value      : string,
-    customOut? : any
-}
-function formatOutput (currentToken: string, tokenValue: string, tokenizer: any) {
-    const output: Token = {
-        token     : currentToken , 
-        value     : tokenValue 
-    }
-    if (currentToken in tokenizer.customOut) output.customOut = tokenizer.customOut[currentToken]
-    return output
+export function formatOutput(currentToken: string, tokenValue: string, tokenizer: any): Token {
+  const output: Token = {
+    token: currentToken,
+    value: tokenValue,
+  };
+  if (currentToken in tokenizer.customOut) output.customOut = tokenizer.customOut[currentToken];
+  return output;
 }
 
-function updateValues (tempArray: any, values: any, key: string) {
-    if (tempArray !== null && (tempArray.index < values.startToken || 
-        tempArray.index === values.startToken                      && 
-        tempArray[0].length > values.endToken)) {
-
-        values.startToken = tempArray.index
-        values.tokenValue = tempArray[0]
-        values.endToken   = tempArray[0].length
-        values.currToken  = key
-    }
-    return values
+export function updateValues(tempArray: any, values: Value, key: string): Value {
+  const tmpValues: Value = values;
+  const arrayFirstElement: string = tempArray[0];
+  if (tempArray !== null
+      && (tempArray.index < values.startToken || (tempArray.index === values.startToken
+      && tempArray[0].length > values.endToken))) {
+    tmpValues.startToken = tempArray.index;
+    tmpValues.tokenValue = arrayFirstElement;
+    tmpValues.endToken = arrayFirstElement.length;
+    tmpValues.currToken = key;
+  }
+  return values;
 }
 
-function getNearestTok (tokens, string: string) {
+export function getNearestToken(tokens: object, string: string): Value {
+  let values: Value = {
+    endToken: 0,
+    startToken: Number.MAX_SAFE_INTEGER,
+    tokenValue: '',
+    currToken: '',
+  };
 
-    let values = {
-        endToken   : 0                       ,
-        startToken : Number.MAX_SAFE_INTEGER ,
-        tokenValue : ''                      ,
-        currToken  : ''                      ,
-    }
+  Object.entries(tokens).map((x) => {
+    const tempArray: Array<string> = string.match(tokens[x[0]]);
+    if (tempArray) values = updateValues(tempArray, values, x[0]);
+    return true;
+  });
 
-    for (const key in tokens) {
-        if (tokens.hasOwnProperty(key)) {
-            const tempArray = string.match(tokens[key])
-            values  = updateValues(tempArray, values, key)
-        }
-    }
-
-    return values
+  return values;
 }
 
-export function scanner (string: string, tokenizer) {
-    const tokens = tokenizer.tokens,
-          token  = []
+export default function scanner(string: string, tokenizer): Array<Token> {
+  const { tokens } = tokenizer;
+  const token = [];
+  let tmpString: string = string;
 
-    while (string) {
-
-        let { 
-            endToken   , 
-            startToken , 
-            tokenValue , 
-            currToken 
-        } = getNearestTok(tokens, string)
-
-        if (startToken !== 0) {
-            tokenValue = string.substring(0, startToken)
-            currToken  = tokenizer.errTok
-            endToken   = startToken
-        }
-
-        if (!tokenizer.ignore[currToken]) token.push(formatOutput(currToken, tokenValue, tokenizer))
-        if (currToken in tokenizer.functions) tokenizer.functions[currToken]()
-
-        string = string.substring(endToken)
+  while (tmpString) {
+    let {
+      endToken,
+      tokenValue,
+      // eslint-disable-next-line prefer-const
+      startToken,
+      currToken,
+    }: Value = getNearestToken(tokens, tmpString);
+    if (startToken !== 0) {
+      tokenValue = string.substring(0, startToken);
+      currToken = tokenizer.errTok;
+      endToken = startToken;
     }
 
-    return token
+    if (!tokenizer.ignore[currToken]) token.push(formatOutput(currToken, tokenValue, tokenizer));
+    if (currToken in tokenizer.functions) tokenizer.functions[currToken]();
+
+    tmpString = tmpString.substring(endToken);
+  }
+
+  return token;
 }

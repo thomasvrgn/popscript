@@ -1,10 +1,6 @@
 "use strict";
-/*//////////////////////////////////
-         POPSCRIPT LANGUAGE
-               Scanner
-//////////////////////////////////*/
 exports.__esModule = true;
-exports.scanner = void 0;
+exports.getNearestToken = exports.updateValues = exports.formatOutput = void 0;
 function formatOutput(currentToken, tokenValue, tokenizer) {
     var output = {
         token: currentToken,
@@ -14,36 +10,45 @@ function formatOutput(currentToken, tokenValue, tokenizer) {
         output.customOut = tokenizer.customOut[currentToken];
     return output;
 }
+exports.formatOutput = formatOutput;
 function updateValues(tempArray, values, key) {
-    if (tempArray !== null && (tempArray.index < values.startToken ||
-        tempArray.index === values.startToken &&
-            tempArray[0].length > values.endToken)) {
-        values.startToken = tempArray.index;
-        values.tokenValue = tempArray[0];
-        values.endToken = tempArray[0].length;
-        values.currToken = key;
+    var tmpValues = values;
+    var arrayFirstElement = tempArray[0];
+    if (tempArray !== null
+        && (tempArray.index < values.startToken || (tempArray.index === values.startToken
+            && tempArray[0].length > values.endToken))) {
+        tmpValues.startToken = tempArray.index;
+        tmpValues.tokenValue = arrayFirstElement;
+        tmpValues.endToken = arrayFirstElement.length;
+        tmpValues.currToken = key;
     }
     return values;
 }
-function getNearestTok(tokens, string) {
+exports.updateValues = updateValues;
+function getNearestToken(tokens, string) {
     var values = {
         endToken: 0,
         startToken: Number.MAX_SAFE_INTEGER,
         tokenValue: '',
         currToken: ''
     };
-    for (var key in tokens) {
-        if (tokens.hasOwnProperty(key)) {
-            var tempArray = string.match(tokens[key]);
-            values = updateValues(tempArray, values, key);
-        }
-    }
+    Object.entries(tokens).map(function (x) {
+        var tempArray = string.match(tokens[x[0]]);
+        if (tempArray)
+            values = updateValues(tempArray, values, x[0]);
+        return true;
+    });
     return values;
 }
+exports.getNearestToken = getNearestToken;
 function scanner(string, tokenizer) {
-    var tokens = tokenizer.tokens, token = [];
-    while (string) {
-        var _a = getNearestTok(tokens, string), endToken = _a.endToken, startToken = _a.startToken, tokenValue = _a.tokenValue, currToken = _a.currToken;
+    var tokens = tokenizer.tokens;
+    var token = [];
+    var tmpString = string;
+    while (tmpString) {
+        var _a = getNearestToken(tokens, tmpString), endToken = _a.endToken, tokenValue = _a.tokenValue, 
+        // eslint-disable-next-line prefer-const
+        startToken = _a.startToken, currToken = _a.currToken;
         if (startToken !== 0) {
             tokenValue = string.substring(0, startToken);
             currToken = tokenizer.errTok;
@@ -53,8 +58,8 @@ function scanner(string, tokenizer) {
             token.push(formatOutput(currToken, tokenValue, tokenizer));
         if (currToken in tokenizer.functions)
             tokenizer.functions[currToken]();
-        string = string.substring(endToken);
+        tmpString = tmpString.substring(endToken);
     }
     return token;
 }
-exports.scanner = scanner;
+exports["default"] = scanner;
