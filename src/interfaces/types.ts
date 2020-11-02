@@ -11,6 +11,7 @@ export enum Types {
   Number = 'Number',
   Return = 'Return',
   Array = 'Array',
+  Node = 'Node',
 }
 
 export const Nodes = [Types.FunctionDeclaration];

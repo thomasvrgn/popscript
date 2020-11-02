@@ -9,6 +9,7 @@
 exports.__esModule = true;
 var tokenizer_1 = require("./tokenizer");
 var tokens_1 = require("./tokens/tokens");
+var tabdown_1 = require("./tabdown");
 var types_1 = require("../interfaces/types");
 var Parser = /** @class */ (function () {
     function Parser(code) {
@@ -18,10 +19,11 @@ var Parser = /** @class */ (function () {
             children: []
         };
         this.tokens = [];
-        this.code = code
+        var split = code
             .split(/\r?\n/g)
-            .filter(function (x) { return x.length > 0; })
-            .join('');
+            .filter(function (x) { return x.length > 0; });
+        this.code = split.join('');
+        console.log(new tabdown_1["default"](split).tab());
         tokenizer_1["default"].addTokenSet(tokens_1["default"]);
         this.tokens = tokenizer_1["default"].tokenize(this.code);
     }

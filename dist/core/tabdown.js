@@ -1,101 +1,95 @@
 "use strict";
 exports.__esModule = true;
+var types_1 = require("../interfaces/types");
 var Tabdown = /** @class */ (function () {
-    function Tabdown(content) {
-        this.content = content.filter(function (x) { return x !== ''; });
-        this.AST = {
-            root: {}
+    function Tabdown(code) {
+        this.ast = {
+            type: types_1.Types.Program,
+            raw: '',
+            children: []
         };
-        this.parents = [];
-        this.code = [];
+        this.parameters = {
+            tabsize: 1
+        };
+        this.code = code;
     }
-    Tabdown.prototype.writeObject = function (array, property, value) {
-        if (array === void 0) { array = []; }
-        if (property === void 0) { property = ''; }
-        var item = this.AST['root'];
-        if (array.length > 0) {
-            for (var itemt in array) {
-                if (array.hasOwnProperty(itemt)) {
-                    if (parseInt(itemt) + 1 === array.length)
-                        item[array[itemt]][property] = value;
-                    item = item[array[itemt]];
-                }
-            }
-        }
-        else {
-            item[property] = value;
-        }
+    Tabdown.prototype.getTabSize = function (line) {
+        var preMatch = line.match(/^\s+/g);
+        return preMatch ? preMatch[0].length : null;
     };
-    Tabdown.prototype.buildAST = function (index) {
-        if (index === void 0) { index = 0; }
-        var line = this.content[index];
-        var ft_line = this.content[index + 1];
-        if (line.match(/^\s+/)) {
-            if (!this.tabsize) {
-                this.tabsize = line.match(/^\s+/)[0].length;
-            }
-        }
-        var depth = line
-            .match(/^\s+/)
-            ? line
-                .match(/^\s+/)[0]
-                .length / this.tabsize
-            : 0;
-        var ft_depth = ft_line
-            ? this.content[index + 1]
-                .match(/^\s+/)
-                ? this.content[index + 1]
-                    .match(/^\s+/)[0].length / this.tabsize
-                : 0
-            : undefined;
-        if (line.trimRight().endsWith(':')) {
-            this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, {});
-            this.parents.push(line.trim() + '||' + index + '||' + depth);
-        }
-        else {
-            this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, '');
-        }
-        if (ft_depth < depth) {
-            this.parents = this.parents.slice(0, ft_depth);
-        }
-        if (ft_line) {
-            this.buildAST(index + 1);
-        }
-    };
-    Tabdown.prototype.addBrackets = function (item) {
-        if (item === void 0) { item = {}; }
-        for (var child in item) {
-            if (item.hasOwnProperty(child)) {
-                if (typeof item[child] === 'object') {
-                    this.code
-                        .push(new Array(parseInt(child.split('||')[2]))
-                        .fill(new Array(this.tabsize)
-                        .fill(' ')
-                        .join(''))
-                        .join('') + child.split('||')[0].slice(0, child.split('||')[0].length - 1) + '{');
-                    this.addBrackets(item[child]);
-                    this.code
-                        .push(new Array(parseInt(child.split('||')[2]))
-                        .fill(new Array(this.tabsize)
-                        .fill(' ')
-                        .join('')).join('') + '}');
-                }
-                else {
-                    this.code
-                        .push(new Array(parseInt(child.split('||')[2]))
-                        .fill(new Array(this.tabsize)
-                        .fill(' ')
-                        .join(''))
-                        .join('') + child.split('||')[0]);
-                    this.addBrackets(item[child]);
-                }
-            }
-        }
+    Tabdown.prototype.goToParent = function (ast, it) {
+        if (it === 0)
+            return ast;
+        return this.goToParent(ast.parent, it - 1);
     };
     Tabdown.prototype.tab = function () {
-        this.buildAST(0);
-        this.addBrackets(this.AST.root);
-        return this.code;
+        var _this = this;
+        var Parser = function (code, index, ast) {
+            var line = code[index];
+            if (!line)
+                return ast;
+            var tabSize = _this.getTabSize(line);
+            if (tabSize && _this.parameters.tabsize === 0)
+                _this.parameters.tabsize = tabSize;
+            var amountTabs = tabSize / _this.parameters.tabsize;
+            if (!Number.isInteger(amountTabs))
+                return ast;
+            if (!ast.parent) {
+                ast.children.push({
+                    type: types_1.Types.Node,
+                    raw: line,
+                    params: {
+                        tabs: amountTabs
+                    },
+                    children: [],
+                    parent: ast
+                });
+                return Parser(code, index + 1, ast.children.slice(-1)[0]);
+            }
+            else if (amountTabs > ast.params.tabs) {
+                ast.children.push({
+                    type: types_1.Types.Node,
+                    raw: line,
+                    params: {
+                        tabs: amountTabs
+                    },
+                    children: [],
+                    parent: ast
+                });
+                return Parser(code, index + 1, ast.children.slice(-1)[0]);
+            }
+            else if (amountTabs < ast.params.tabs) {
+                return Parser(code, index, _this.goToParent(ast, Math.abs(ast.params.tabs - amountTabs) + 2));
+            }
+            else if (amountTabs === ast.params.tabs) {
+                ast.parent.children.push({
+                    type: types_1.Types.Node,
+                    raw: line,
+                    params: {
+                        tabs: amountTabs
+                    },
+                    children: [],
+                    parent: ast
+                });
+                return Parser(code, index + 1, ast.parent.children.slice(-1)[0]);
+            }
+            return Parser(code, index + 1, ast);
+        };
+        var getCircularReplacer = function () {
+            var seen = new WeakSet();
+            return function (key, value) {
+                if (typeof value === "object" && value !== null) {
+                    if (seen.has(value)) {
+                        return;
+                    }
+                    seen.add(value);
+                }
+                return value;
+            };
+        };
+        var parser = Parser(this.code, 0, this.ast);
+        console.log(JSON.stringify(parser, getCircularReplacer(), 2));
+        return Parser(this.code, 0, this.ast);
     };
     return Tabdown;
 }());

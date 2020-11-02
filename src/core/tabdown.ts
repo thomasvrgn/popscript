@@ -1,134 +1,96 @@
+import { Node } from '../interfaces/node';
+import { Types } from '../interfaces/types';
+
+export interface TabdownParameters {
+  tabsize: number | null,
+}
+
 export default class Tabdown {
-  private readonly content: Array<string>;
-  private parents: Array<string>;
-  private readonly AST: { root: {} };
-  private readonly code: Array<string>;
-  private tabsize: any;
+  private readonly ast: Node = {
+    type: Types.Program,
+    raw: '',
+    children: [],
+  };
+  private readonly parameters: TabdownParameters = {
+    tabsize: 1,
+  };
+  private readonly code: string[];
 
-  constructor(content) {
-    this.content = content.filter(x => x !== '');
-    this.AST = {
-      root: {}
+  constructor(code: string[]) {
+    this.code = code;
+  }
+
+  private getTabSize(line: string): number | null {
+    const preMatch: RegExpMatchArray = line.match(/^\s+/g);
+    return preMatch ? preMatch[0].length : null;
+  }
+
+  private goToParent(ast: Node, it: number): Node {
+    if (it === 0) return ast;
+    return this.goToParent(ast.parent, it - 1);
+  }
+  
+  public tab(): typeof Parser | null | Node {
+    const Parser = (code: string[], index: number, ast: Node): typeof Parser | null | Node => {
+      const line: string = code[index];
+      if (!line) return ast;
+      const tabSize: number | null = this.getTabSize(line);
+      if (tabSize && this.parameters.tabsize === 0) this.parameters.tabsize = tabSize;
+      const amountTabs: number = tabSize / this.parameters.tabsize;
+      if (!Number.isInteger(amountTabs)) return ast;
+      if (!ast.parent) {
+        ast.children.push({
+          type: Types.Node,
+          raw: line,
+          params: {
+            tabs: amountTabs,
+          },
+          children: [],
+          parent: ast,
+        });
+        return Parser(code, index + 1, ast.children.slice(-1)[0]);
+      } else if (amountTabs > ast.params.tabs) {
+        ast.children.push({
+          type: Types.Node,
+          raw: line,
+          params: {
+            tabs: amountTabs,
+          },
+          children: [],
+          parent: ast,
+        });
+        return Parser(code, index + 1, ast.children.slice(-1)[0]);
+      } else if (amountTabs < ast.params.tabs) {
+        return Parser(code, index, this.goToParent(ast, Math.abs(ast.params.tabs - amountTabs) + 2));
+      } else if (amountTabs === ast.params.tabs) {
+        ast.parent.children.push({
+          type: Types.Node,
+          raw: line,
+          params: {
+            tabs: amountTabs,
+          },
+          children: [],
+          parent: ast,
+        });
+        return Parser(code, index + 1, ast.parent.children.slice(-1)[0]);
+      }
+      return Parser(code, index + 1, ast);
+    }
+    const getCircularReplacer = () => {
+      const seen = new WeakSet();
+      return (key, value) => {
+        if (typeof value === "object" && value !== null) {
+          if (seen.has(value)) {
+            return;
+          }
+          seen.add(value);
+        }
+        return value;
+      };
     };
-    this.parents = [];
-    this.code = [];
-  }
-
-  private writeObject(array: Array<string> = [], property: string = '', value: any) {
-    let item = this.AST['root'];
-    if (array.length > 0) {
-      for (const itemt in array) {
-        if (array.hasOwnProperty(itemt)) {
-          if (parseInt(itemt) + 1 === array.length) item[array[itemt]][property] = value;
-          item = item[array[itemt]];
-        }
-      }
-    } else {
-      item[property] = value;
-    }
-  }
-
-  private buildAST(index: number = 0) {
-
-    const line = this.content[index];
-    const ft_line = this.content[index + 1];
-    if (line.match(/^\s+/)) {
-      if (!this.tabsize) {
-        this.tabsize = line.match(/^\s+/)[0].length;
-      }
-    }
-    const depth: number = line
-      .match(/^\s+/) 
-      ? line
-          .match(/^\s+/)[0]
-          .length / this.tabsize 
-      : 0;
-    const ft_depth: number | undefined = ft_line 
-        ? this.content[index + 1]
-            .match(/^\s+/) 
-          ? this.content[index + 1]
-              .match(/^\s+/)[0].length / this.tabsize 
-          : 0 
-        : undefined;
-
-    if (line.trimRight().endsWith(':')) {
-      this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, {});
-      this.parents.push(line.trim() + '||' + index + '||' + depth)
-    } else {
-      this.writeObject(this.parents, line.trim() + '||' + index + '||' + depth, '');
-    }
-    if (ft_depth < depth) {
-      this.parents = this.parents.slice(0, ft_depth);
-    }
-    if (ft_line) {
-      this.buildAST(index + 1);
-    }
-
-  }
-
-  private addBrackets(item: Object = {}) {
-
-    for (const child in item) {
-      if (item.hasOwnProperty(child)) {
-        if (typeof item[child] === 'object') {
-          this.code
-            .push(
-              new Array(
-                parseInt(
-                  child.split('||')[2]
-                )
-              )
-            .fill(
-              new Array(
-                this.tabsize
-              )
-              .fill(' ')
-              .join('')
-            )
-            .join('') + child.split('||')[0].slice(0, child.split('||')[0].length - 1) + '{');
-          this.addBrackets(item[child]);
-          this.code
-            .push(
-              new Array(
-                parseInt(
-                  child.split('||')[2]
-                )
-              )
-              .fill(
-                new Array(
-                  this.tabsize
-                )
-                .fill(' ')
-                .join('')
-              ).join('') + '}'
-            );
-        } else {
-          this.code
-            .push(
-              new Array(
-                parseInt(
-                  child.split('||')[2]
-                )
-              )
-              .fill(
-                new Array(
-                  this.tabsize
-                )
-                .fill(' ')
-                .join(''))
-                .join('') + child.split('||')[0]
-            );
-          this.addBrackets(item[child]);
-        }
-      }
-    }
-
-  }
-
-  public tab(): string[] {
-    this.buildAST(0);
-    this.addBrackets(this.AST.root);
-    return this.code;
+    const parser: typeof Parser = Parser(this.code, 0, this.ast);
+    console.log(JSON.stringify(parser, getCircularReplacer(), 2))
+    return Parser(this.code, 0, this.ast);
   }
 
 }

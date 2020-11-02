@@ -10,6 +10,7 @@ import Tokenizer from './tokenizer';
 import { Token } from '../interfaces/token';
 import Tokens from './tokens/tokens';
 import { Node } from '../interfaces/node';
+import Tabdown from './tabdown';
 import { Types, Nodes, Closures } from '../interfaces/types';
 
 export default class Parser {
@@ -24,10 +25,11 @@ export default class Parser {
   private tokens: Token[] = [];
 
   constructor(code: string) {
-    this.code = code
+    const split: string[] = code
       .split(/\r?\n/g)
-      .filter((x) => x.length > 0)
-      .join('');
+      .filter((x) => x.length > 0);
+    this.code = split.join('');
+    console.log(new Tabdown(split).tab());
     Tokenizer.addTokenSet(Tokens);
     this.tokens = Tokenizer.tokenize(this.code);
   }
